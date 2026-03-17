@@ -72,7 +72,7 @@ body { font-family: sans-serif; background:#f1f5f9;}
 </div>
 
 <!-- MODAL -->
-<div id="modal" class="custom-modal flex items-center justify-center">
+<div id="modal" class="custom-modal">
 <div class="bg-white p-4">
 <input id="nama" placeholder="Nama"><br>
 <input id="stok" type="number" placeholder="Stok"><br>
@@ -147,7 +147,16 @@ if(!isAdmin()){
 alert("Hanya admin");
 return;
 }
-document.getElementById('modal').style.display = show ? 'flex':'none';
+
+const modal = document.getElementById('modal');
+
+if(show){
+modal.style.display = "flex";
+modal.classList.add("items-center","justify-center");
+}else{
+modal.style.display = "none";
+modal.classList.remove("items-center","justify-center");
+}
 }
 
 // ================= INIT =================
