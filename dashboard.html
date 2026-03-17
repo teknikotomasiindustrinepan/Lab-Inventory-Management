@@ -270,14 +270,27 @@ function applyRoleUI(){
   // ================= renderbarang =================
 function renderBarang(){
   let html="";
+  let opt="";
+
   barangList.forEach(b=>{
-     html+=`<tr>
-  <td>${b.nama}</td>
-  <td>${b.stok ?? 0}</td>
-  </tr>`;
+    html+=`<tr>
+      <td>${b.nama}</td>
+      <td>${b.stok ?? 0}</td>
+    </tr>`;
+
+    if(b.stok > 0){
+      opt+=`<option value="${b.id}">
+        ${b.nama} (stok: ${b.stok})
+      </option>`;
+    }
   });
+
   document.getElementById('barangTable').innerHTML=html;
-  
+  document.getElementById('loanBarang').innerHTML=opt;
+
+  renderStokTable(); // 🔥 penting
+  renderStokTable();
+}
 // ================= INIT =================
 function initApp(){
 
@@ -361,16 +374,6 @@ function renderStokTable(){
 
   document.getElementById('stokTable').innerHTML = html;
 }
-// dropdown
-let opt="";
-barangList.forEach(b=>{
-if(b.stok > 0){
-opt+=`<option value="${b.id}">${b.nama} (stok: ${b.stok})</option>`;
-}
-});
-document.getElementById('loanBarang').innerHTML=opt;
-}
-
 // ================= PEMINJAMAN =================
 const loanForm = document.getElementById('loanForm');
 
