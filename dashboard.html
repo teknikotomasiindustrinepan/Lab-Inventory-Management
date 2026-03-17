@@ -163,6 +163,8 @@ auth.onAuthStateChanged(async user=>{
     document.getElementById("userInfo").innerText = "";
   }
 });
+  //returnedByName   // input manual (siapa yang beneran ngembaliin)
+  //returnedByUser   // user login (siapa yang klik sistem)
   
 // ================= ROLE =================
 function isAdmin(){
@@ -361,10 +363,20 @@ html+=`<tr>
 <td>${l.nama}</td>
 <td>${l.barang}</td>
 <td>${l.qty}</td>
-<td>${l.status}</td>
+
+<td>
+  ${l.status}
+  ${l.status === "kembali" 
+    ? `<br><small>
+        oleh: ${l.returnedByName || '-'} <br>
+        user: ${l.returnedByUser || '-'}
+      </small>`
+    : ''}
+</td>
+
 <td>
 ${(l.status=="dipinjam" && currentUser && (isAdmin() || l.userId === currentUser.uid)) 
-  ? `<button onclick="kembali('${l.id}','${l.barangId}',${l.qty})">Kembali</button>` 
+  ? `<button onclick="openReturnModal('${l.id}','${l.barangId}',${l.qty})">Kembali</button>` 
   : ''}
 </td>
 </tr>`;
@@ -391,7 +403,10 @@ stok: data.stok + qty
 
 // update status
 t.update(db.collection("loan").doc(id),{
-status:"kembali"
+  status: "kembali",
+  returnedByName: namaPengembali,        // input manual
+  returnedByUser: currentUser.email,     // user login
+  returnedAt: new Date()
 });
 
 }).then(()=>{
