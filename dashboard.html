@@ -17,14 +17,24 @@ body { font-family: sans-serif; background:#f1f5f9;}
 
 <body>
 <div class="flex">
+<!-- SIDEBAR -->
 <aside class="w-60 bg-slate-900 text-white p-4">
 <h2 class="text-lg font-bold mb-4">LabManager</h2>
-<div class="sidebar-link active" onclick="navigate('dashboard')">Dashboard</div>
-<div class="sidebar-link" onclick="navigate('barang')">Barang</div>
-<div class="sidebar-link" onclick="navigate('peminjaman')">Peminjaman</div>
-<div class="sidebar-link" onclick="navigate('riwayat')">Riwayat</div>
+
+<div id="userInfo" class="mb-4 text-sm text-gray-300"></div>
+
+<div id="menu-dashboard" class="sidebar-link active" onclick="navigate('dashboard')">Dashboard</div>
+<div id="menu-barang" class="sidebar-link" onclick="navigate('barang')">Barang</div>
+<div id="menu-peminjaman" class="sidebar-link" onclick="navigate('peminjaman')">Peminjaman</div>
+<div id="menu-riwayat" class="sidebar-link" onclick="navigate('riwayat')">Riwayat</div>
+
+<hr class="my-4">
+<button onclick="logout()" class="w-full bg-red-500 p-2 rounded">Logout</button>
 </aside>
 
+<hr class="my-4">
+<button onclick="logout()" class="w-full bg-red-500 p-2 rounded">Logout</button>
+  
 <main class="flex-1 p-6">
 <h1 id="page-title" class="text-xl mb-4">dashboard</h1>
 
@@ -124,22 +134,38 @@ function login(){
 
 auth.onAuthStateChanged(async user=>{
 if(user){
-currentUser = user;
+  currentUser = user;
 
-let doc = await db.collection("users").doc(user.uid).get();
-if(doc.exists){
-currentRole = doc.data().role;
-}
+  let doc = await db.collection("users").doc(user.uid).get();
 
-document.getElementById('loginPage').style.display="none";
+  if(doc.exists){
+    currentRole = doc.data().role;
+  }else{
+    currentRole = "user";
+  }
 
-initApp();
+  document.getElementById('loginPage').style.display="none";
+
+  // tampilkan info user
+  document.getElementById("userInfo").innerText =
+    currentUser.email + " (" + currentRole + ")";
+
+  applyRoleUI();
+  initApp();
 
 }else{
-document.getElementById('loginPage').style.display="flex";
+  currentUser = null;
+  currentRole = null;
+
+  document.getElementById('loginPage').style.display="flex";
+
+  // reset UI
+  document.getElementById("userInfo").innerText = "";
 }
 });
-
+document.getElementById("userInfo").innerText =
+  currentUser.email + " (" + currentRole + ")";
+  
 // ================= ROLE =================
 function isAdmin(){
 return currentRole === "admin";
@@ -170,12 +196,37 @@ modal.classList.remove("items-center","justify-center");
 }
 }
 
+  // ================= FUNCTION KONTROL ROLE =================
+function applyRoleUI(){
+
+  if(currentRole === "admin"){
+    // tampil semua
+    document.getElementById("menu-dashboard").style.display = "block";
+    document.getElementById("menu-barang").style.display = "block";
+    document.getElementById("menu-peminjaman").style.display = "block";
+    document.getElementById("menu-riwayat").style.display = "block";
+
+  }else{
+    // user biasa
+    document.getElementById("menu-dashboard").style.display = "none";
+    document.getElementById("menu-barang").style.display = "none";
+    document.getElementById("menu-peminjaman").style.display = "block";
+    document.getElementById("menu-riwayat").style.display = "block";
+
+    // default langsung ke peminjaman
+    navigate("peminjaman");
+  }
+}
+
+  
 // ================= INIT =================
 function initApp(){
 
-// hide tombol jika bukan admin
+// sembunyikan tombol tambah khusus admin
+const btnTambah = document.querySelector("#barang button");
+
 if(!isAdmin()){
-document.querySelector("button").style.display="none";
+  if(btnTambah) btnTambah.style.display="none";
 }
 
 // realtime barang
@@ -196,7 +247,6 @@ data.push({id:doc.id,...doc.data()});
 });
 renderRiwayat(data);
 });
-
 }
 
 // ================= BARANG =================
@@ -249,9 +299,9 @@ document.getElementById('loanBarang').innerHTML=opt;
 document.getElementById('loanForm').addEventListener('submit',async e=>{
 e.preventDefault();
 
-let id = loanBarang.value;
-let qty = parseInt(loanQty.value);
-let nama = loanName.value.trim();
+let id = document.getElementById('loanBarang').value;
+let qty = parseInt(document.getElementById('loanQty').value);
+let nama = document.getElementById('loanName').value.trim();
 
 if(!nama || isNaN(qty) || qty <= 0){
 alert("Input tidak valid");
@@ -290,6 +340,10 @@ userId: currentUser.uid
 
 }).then(()=>{
 alert("Berhasil pinjam");
+  
+  // reset form
+document.getElementById('loanForm').reset();
+  
 }).catch(err=>{
 alert(err);
 });
@@ -306,7 +360,9 @@ html+=`<tr>
 <td>${l.qty}</td>
 <td>${l.status}</td>
 <td>
-${l.status=="dipinjam" ? `<button onclick="kembali('${l.id}','${l.barangId}',${l.qty})">Kembali</button>`:''}
+${(l.status=="dipinjam" && currentUser && (isAdmin() || l.userId === currentUser.uid)) 
+  ? `<button onclick="kembali('${l.id}','${l.barangId}',${l.qty})">Kembali</button>` 
+  : ''}
 </td>
 </tr>`;
 });
@@ -341,6 +397,22 @@ alert("Dikembalikan");
 alert(err);
 });
 }
+  
+// ================= LOGOUT =================
+function logout(){
+  auth.signOut()
+    .then(()=>{
+      console.log("Logout berhasil");
+
+      // reset UI tambahan
+      document.getElementById("barangTable").innerHTML="";
+      document.getElementById("riwayatTable").innerHTML="";
+    })
+    .catch(err=>{
+      alert(err.message);
+    });
+}
+  
 </script>
 
 </body>
