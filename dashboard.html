@@ -104,8 +104,16 @@ let currentRole = null;
 
 // ================= AUTH =================
 function login(){
-let email = email.value.trim();
+let email = document.getElementById('email').value.trim();
 let password = document.getElementById('password').value;
+
+auth.signInWithEmailAndPassword(email,password)
+.then(()=>console.log("Login success"))
+.catch(err=>{
+console.error(err);
+alert(err.message);
+});
+}
 
 auth.signInWithEmailAndPassword(email,password)
 .catch(err=>alert(err.message));
