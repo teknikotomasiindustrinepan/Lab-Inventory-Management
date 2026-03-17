@@ -126,14 +126,14 @@ function login(){
     return;
   }
 
-  auth.signInWithEmailAndPassword(email, password)
-    .then(() => {
-      console.log("Login success");
-    })
-    .catch(err => {
-      console.error(err);
-      alert("Login gagal: " + err.message);
-    });
+ auth.signInWithEmailAndPassword(email, password)
+  .then(() => {
+    console.log("Login success");
+  })
+  .catch(err => {
+    console.error("LOGIN ERROR:", err);
+    alert(err.message);
+  });
 }
 
 auth.onAuthStateChanged(async user=>{
@@ -245,12 +245,14 @@ document.getElementById('stat-total').innerText=barangList.length;
 });
 
 // realtime loan
-db.collection("loan").onSnapshot(snap=>{
-let data=[];
-snap.forEach(doc=>{
-data.push({id:doc.id,...doc.data()});
-});
-renderRiwayat(data);
+db.collection("loan")
+  .orderBy("time","desc")
+  .onSnapshot(snap=>{
+    let data=[];
+    snap.forEach(doc=>{
+      data.push({id:doc.id,...doc.data()});
+    });
+    renderRiwayat(data);
 });
 }
 
@@ -357,9 +359,10 @@ alert(err);
 
 // ================= RIWAYAT =================
 function renderRiwayat(data){
-let html="";
-data.forEach(l=>{
-html+=`<tr>
+  let html="";
+  
+  data.forEach(l=>{
+    html+=`<tr>
 <td>${l.nama}</td>
 <td>${l.barang}</td>
 <td>${l.qty}</td>
@@ -385,12 +388,14 @@ ${(l.status=="dipinjam" && currentUser && (isAdmin() || l.userId === currentUser
   : ''}
 </td>
 </tr>`;
-document.getElementById('riwayatTable').innerHTML=html;
+  });
+
+  document.getElementById('riwayatTable').innerHTML=html;
 }
 
 // ================= PENGEMBALIAN =================
 async function kembali(id, barangId, qty){
-returnedAt: new Date()
+
 let ref = db.collection("barang").doc(barangId);
 
 await db.runTransaction(async (t)=>{
@@ -408,7 +413,7 @@ stok: data.stok + qty
 // update status
 t.update(db.collection("loan").doc(id),{
   status: "kembali",
-  returnedByName: currentUser.email,   // fallback
+  returnedByName: currentUser.email,
   returnedByUser: currentUser.email,
   returnedAt: new Date()
 });
