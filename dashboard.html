@@ -366,6 +366,11 @@ html+=`<tr>
 
 <td>
   ${l.status}
+  <br><small>
+    pinjam: ${formatDate(l.time)} <br>
+    kembali: ${formatDate(l.returnedAt)}
+  </small>
+
   ${l.status === "kembali" 
     ? `<br><small>
         oleh: ${l.returnedByName || '-'} <br>
@@ -376,17 +381,16 @@ html+=`<tr>
 
 <td>
 ${(l.status=="dipinjam" && currentUser && (isAdmin() || l.userId === currentUser.uid)) 
-  ? `<button onclick="openReturnModal('${l.id}','${l.barangId}',${l.qty})">Kembali</button>` 
+  ? `<button onclick="kembali('${l.id}','${l.barangId}',${l.qty})">Kembali</button>` 
   : ''}
 </td>
 </tr>`;
-});
 document.getElementById('riwayatTable').innerHTML=html;
 }
 
 // ================= PENGEMBALIAN =================
 async function kembali(id, barangId, qty){
-
+returnedAt: new Date()
 let ref = db.collection("barang").doc(barangId);
 
 await db.runTransaction(async (t)=>{
@@ -404,8 +408,8 @@ stok: data.stok + qty
 // update status
 t.update(db.collection("loan").doc(id),{
   status: "kembali",
-  returnedByName: namaPengembali,        // input manual
-  returnedByUser: currentUser.email,     // user login
+  returnedByName: currentUser.email,   // fallback
+  returnedByUser: currentUser.email,
   returnedAt: new Date()
 });
 
@@ -414,6 +418,15 @@ alert("Dikembalikan");
 }).catch(err=>{
 alert(err);
 });
+}
+  
+// ================= format waktu =================
+  function formatDate(date){
+  if(!date) return "-";
+
+  let d = date.toDate ? date.toDate() : new Date(date);
+
+  return d.toLocaleString("id-ID");
 }
   
 // ================= LOGOUT =================
