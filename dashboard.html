@@ -67,8 +67,18 @@ body { font-family: sans-serif; background:#f1f5f9;}
 
 <!-- RIWAYAT -->
 <section id="riwayat" class="page">
-<table class="w-full">
-<tbody id="riwayatTable"></tbody>
+<table class="w-full mt-4 border">
+  <thead class="bg-gray-200">
+    <tr>
+      <th>Nama Peminjam</th>
+      <th>Nama Barang</th>
+      <th>Jumlah</th>
+      <th>Nama Pengembali</th>
+      <th>Keterangan</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody id="riwayatTable"></tbody>
 </table>
 </section>
 
@@ -360,33 +370,52 @@ alert(err);
 // ================= RIWAYAT =================
 function renderRiwayat(data){
   let html="";
-  
+
   data.forEach(l=>{
-    html+=`<tr>
+
+    let namaPengembali = l.returnedByName || "-";
+
+    let keterangan = `
+      Pinjam: ${formatDate(l.time)} <br>
+      User: ${l.userId || '-'}
+    `;
+
+    if(l.status === "kembali"){
+      keterangan += `<br>Kembali: ${formatDate(l.returnedAt)} <br>User Return: ${l.returnedByUser || '-'}`;
+    }
+
+    html+=`<tr class="border-b">
+
 <td>${l.nama}</td>
 <td>${l.barang}</td>
 <td>${l.qty}</td>
 
 <td>
-  ${l.status}
-  <br><small>
-    pinjam: ${formatDate(l.time)} <br>
-    kembali: ${formatDate(l.returnedAt)}
-  </small>
+  ${l.status === "dipinjam"
+    ? `<input id="ret-${l.id}" placeholder="Nama pengembali" class="border p-1 text-sm">`
+    : namaPengembali
+  }
+</td>
 
-  ${l.status === "kembali" 
-    ? `<br><small>
-        oleh: ${l.returnedByName || '-'} <br>
-        user: ${l.returnedByUser || '-'}
-      </small>`
-    : ''}
+<td class="text-sm">
+  ${keterangan}
 </td>
 
 <td>
-${(l.status=="dipinjam" && currentUser && (isAdmin() || l.userId === currentUser.uid)) 
-  ? `<button onclick="kembali('${l.id}','${l.barangId}',${l.qty})">Kembali</button>` 
-  : ''}
+  ${l.status}
+
+  ${
+    (l.status=="dipinjam" && currentUser && (isAdmin() || l.userId === currentUser.uid))
+    ? `<br>
+       <button 
+         onclick="kembaliDenganNama('${l.id}','${l.barangId}',${l.qty})"
+         class="bg-green-500 text-white px-2 py-1 mt-1 rounded text-sm">
+         Kembali
+       </button>`
+    : ''
+  }
 </td>
+
 </tr>`;
   });
 
@@ -394,35 +423,43 @@ ${(l.status=="dipinjam" && currentUser && (isAdmin() || l.userId === currentUser
 }
 
 // ================= PENGEMBALIAN =================
-async function kembali(id, barangId, qty){
+async function kembaliDenganNama(id, barangId, qty){
 
-let ref = db.collection("barang").doc(barangId);
+  let input = document.getElementById("ret-" + id);
+  let namaPengembali = input ? input.value.trim() : "";
 
-await db.runTransaction(async (t)=>{
-let doc = await t.get(ref);
+  if(!namaPengembali){
+    alert("Nama pengembali wajib diisi");
+    return;
+  }
 
-if(!doc.exists) throw "Barang tidak ada";
+  let ref = db.collection("barang").doc(barangId);
 
-let data = doc.data();
+  await db.runTransaction(async (t)=>{
+    let doc = await t.get(ref);
 
-// tambah stok
-t.update(ref,{
-stok: data.stok + qty
-});
+    if(!doc.exists) throw "Barang tidak ada";
 
-// update status
-t.update(db.collection("loan").doc(id),{
-  status: "kembali",
-  returnedByName: currentUser.email,
-  returnedByUser: currentUser.email,
-  returnedAt: new Date()
-});
+    let data = doc.data();
 
-}).then(()=>{
-alert("Dikembalikan");
-}).catch(err=>{
-alert(err);
-});
+    // update stok
+    t.update(ref,{
+      stok: data.stok + qty
+    });
+
+    // update loan
+    t.update(db.collection("loan").doc(id),{
+      status: "kembali",
+      returnedByName: namaPengembali,
+      returnedByUser: currentUser.email,
+      returnedAt: new Date()
+    });
+
+  }).then(()=>{
+    alert("Berhasil dikembalikan");
+  }).catch(err=>{
+    alert(err);
+  });
 }
   
 // ================= format waktu =================
