@@ -352,7 +352,8 @@ barangId: id,
 qty,
 status:"dipinjam",
 time:new Date(),
-userId: currentUser.uid
+userId: currentUser.uid.
+userEmail: currentUser.email 
 });
 
 }).then(()=>{
@@ -375,14 +376,17 @@ function renderRiwayat(data){
 
     let namaPengembali = l.returnedByName || "-";
 
-    let keterangan = `
-      Pinjam: ${formatDate(l.time)} <br>
-      User: ${l.userId || '-'}
-    `;
+   let keterangan = `
+  Pinjam: ${formatDate(l.time)} <br>
+  User: ${l.userEmail || l.userId || '-'}
+`;
 
-    if(l.status === "kembali"){
-      keterangan += `<br>Kembali: ${formatDate(l.returnedAt)} <br>User Return: ${l.returnedByUser || '-'}`;
-    }
+if(l.status === "kembali"){
+  keterangan += `
+    <br>Kembali: ${formatDate(l.returnedAt)} 
+    <br>User Return: ${l.returnedByUser || '-'}
+  `;
+}
 
     html+=`<tr class="border-b">
 
