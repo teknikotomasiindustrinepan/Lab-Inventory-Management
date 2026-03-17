@@ -53,6 +53,10 @@ body { font-family: sans-serif; background:#f1f5f9;}
 <table class="w-full mt-4">
 <tbody id="barangTable"></tbody>
 </table>
+  <button onclick="resetSemua()" 
+class="bg-red-700 text-white px-4 py-2 rounded mt-4">
+RESET SEMUA DATA
+</button>
 </section>
 
 <!-- PEMINJAMAN -->
@@ -430,6 +434,27 @@ if(loanForm){
   });
 }
 
+  // ================= HAPUS RIWAYAT =================
+async function hapusRiwayat(id){
+
+  if(!isAdmin()){
+    alert("Hanya admin");
+    return;
+  }
+
+  let konfirmasi = confirm("Yakin ingin menghapus riwayat ini?");
+  if(!konfirmasi) return;
+
+  try{
+    await db.collection("loan").doc(id).delete();
+    alert("Riwayat berhasil dihapus");
+  }catch(err){
+    console.error(err);
+    alert("Gagal hapus: " + err.message);
+  }
+}
+
+  
 // ================= RIWAYAT =================
 function renderRiwayat(data){
   let html="";
@@ -469,6 +494,29 @@ if(l.status === "kembali"){
 
 <td>
   ${l.status}
+
+  ${
+    isAdmin()
+    ? `<br>
+       <button 
+         onclick="hapusRiwayat('${l.id}')"
+         class="bg-red-500 text-white px-2 py-1 mt-1 rounded text-sm">
+         Hapus
+       </button>`
+    : ''
+  }
+
+  ${
+    (l.status=="dipinjam" && currentUser && (isAdmin() || l.userId === currentUser.uid))
+    ? `<br>
+       <button 
+         onclick="kembaliDenganNama('${l.id}','${l.barangId}',${l.qty})"
+         class="bg-green-500 text-white px-2 py-1 mt-1 rounded text-sm">
+         Kembali
+       </button>`
+    : ''
+  }
+</td>
 
   ${
     (l.status=="dipinjam" && currentUser && (isAdmin() || l.userId === currentUser.uid))
@@ -552,6 +600,52 @@ function logout(){
     });
 }
   
+// ================= RESET =================
+  async function resetSemua(){
+
+  if(!isAdmin()){
+    alert("Hanya admin");
+    return;
+  }
+
+  let konfirmasi = prompt("Ketik 'RESET' untuk konfirmasi");
+
+  if(konfirmasi !== "RESET"){
+    alert("Dibatalkan");
+    return;
+  }
+
+  try{
+
+    // 🔥 1. Reset stok barang
+    let barangSnap = await db.collection("barang").get();
+
+    let batch = db.batch();
+
+    barangSnap.forEach(doc=>{
+      batch.update(doc.ref, { stok: 0 });
+    });
+
+    await batch.commit();
+
+    // 🔥 2. Hapus semua riwayat
+    let loanSnap = await db.collection("loan").get();
+
+    let batch2 = db.batch();
+
+    loanSnap.forEach(doc=>{
+      batch2.delete(doc.ref);
+    });
+
+    await batch2.commit();
+
+    alert("Semua data berhasil direset");
+
+  }catch(err){
+    console.error(err);
+    alert("Error reset: " + err.message);
+  }
+}
 </script>
 
 </body>
