@@ -28,8 +28,6 @@ body { font-family: sans-serif; background:#f1f5f9;}
 <div id="menu-peminjaman" class="sidebar-link" onclick="navigate('peminjaman')">Peminjaman</div>
 <div id="menu-riwayat" class="sidebar-link" onclick="navigate('riwayat')">Riwayat</div>
 
-<hr class="my-4">
-<button onclick="logout()" class="w-full bg-red-500 p-2 rounded">Logout</button>
 </aside>
 
 <hr class="my-4">
@@ -45,7 +43,7 @@ body { font-family: sans-serif; background:#f1f5f9;}
 
 <!-- BARANG -->
 <section id="barang" class="page">
-<button onclick="toggleModal(true)">+ Tambah</button>
+<button id="btnTambah" onclick="toggleModal(true)">+ Tambah</button>
 <table class="w-full mt-4">
 <tbody id="barangTable"></tbody>
 </table>
@@ -136,19 +134,14 @@ auth.onAuthStateChanged(async user=>{
 if(user){
   currentUser = user;
 
-  let doc = await db.collection("users").doc(user.uid).get();
-
-  if(doc.exists){
-    currentRole = doc.data().role;
-  }else{
-    currentRole = "user";
-  }
+  // ================= ROLE BERDASARKAN EMAIL =================
+if(user.email === "teknikotomasiindustri.nepan@gmail.com"){
+  currentRole = "admin";
+}else{
+  currentRole = "user";
+}
 
   document.getElementById('loginPage').style.display="none";
-
-  // tampilkan info user
-  document.getElementById("userInfo").innerText =
-    currentUser.email + " (" + currentRole + ")";
 
   applyRoleUI();
   initApp();
@@ -223,7 +216,7 @@ function applyRoleUI(){
 function initApp(){
 
 // sembunyikan tombol tambah khusus admin
-const btnTambah = document.querySelector("#barang button");
+const btnTambah = document.getElementById("btnTambah");
 
 if(!isAdmin()){
   if(btnTambah) btnTambah.style.display="none";
