@@ -57,12 +57,44 @@ body { font-family: sans-serif; background:#f1f5f9;}
 
 <!-- PEMINJAMAN -->
 <section id="peminjaman" class="page">
-<form id="loanForm">
-<input id="loanName" placeholder="Nama"><br>
-<select id="loanBarang"></select><br>
-<input id="loanQty" type="number"><br>
-<button type="submit">Pinjam</button>
-</form>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+  <!-- FORM PINJAM -->
+  <div class="bg-white p-4 rounded shadow">
+    <h2 class="font-bold mb-3">Form Peminjaman</h2>
+
+    <form id="loanForm" class="space-y-2">
+      <input id="loanName" placeholder="Nama" class="w-full border p-2 rounded">
+
+      <select id="loanBarang" class="w-full border p-2 rounded"></select>
+
+      <input id="loanQty" type="number" placeholder="Jumlah" class="w-full border p-2 rounded">
+
+      <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded">
+        Pinjam
+      </button>
+    </form>
+  </div>
+
+  <!-- TABEL STOK -->
+  <div class="bg-white p-4 rounded shadow">
+    <h2 class="font-bold mb-3">Stok Barang</h2>
+
+    <table class="w-full text-sm border">
+      <thead class="bg-gray-200">
+        <tr>
+          <th class="p-2">Nama Barang</th>
+          <th class="p-2">Stok</th>
+        </tr>
+      </thead>
+      <tbody id="stokTable"></tbody>
+    </table>
+
+  </div>
+
+</div>
+
 </section>
 
 <!-- RIWAYAT -->
@@ -235,6 +267,29 @@ function applyRoleUI(){
   }
 }
 
+  // ================= renderbarang =================
+function renderBarang(){
+  let html="";
+  barangList.forEach(b=>{
+    html+=`<tr>
+    <td>${b.nama}</td>
+    <td>${b.stok}</td>
+    </tr>`;
+  });
+  document.getElementById('barangTable').innerHTML=html;
+
+  // dropdown
+  let opt="";
+  barangList.forEach(b=>{
+    if(b.stok > 0){
+      opt+=`<option value="${b.id}">${b.nama} (stok: ${b.stok})</option>`;
+    }
+  });
+  document.getElementById('loanBarang').innerHTML=opt;
+
+  // ✅ TAMBAHAN
+  renderStokTable();
+}
   
 // ================= INIT =================
 function initApp(){
@@ -294,16 +349,20 @@ toggleModal(false);
 }
 
 // render barang
-function renderBarang(){
-let html="";
-barangList.forEach(b=>{
-html+=`<tr>
-<td>${b.nama}</td>
-<td>${b.stok}</td>
-</tr>`;
-});
-document.getElementById('barangTable').innerHTML=html;
+function renderStokTable(){
+  let html = "";
 
+  barangList.forEach(b=>{
+    html += `<tr class="border-b">
+      <td class="p-2">${b.nama}</td>
+      <td class="p-2 ${b.stok == 0 ? 'text-red-500 font-bold' : ''}">
+        ${b.stok}
+      </td>
+    </tr>`;
+  });
+
+  document.getElementById('stokTable').innerHTML = html;
+}
 // dropdown
 let opt="";
 barangList.forEach(b=>{
