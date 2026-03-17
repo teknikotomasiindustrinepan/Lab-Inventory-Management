@@ -58,6 +58,16 @@ body { font-family: sans-serif; background:#f1f5f9;}
 </table>
 </section>
 
+<div id="loginPage" class="fixed inset-0 flex items-center justify-center bg-black/50">
+  <div class="bg-white p-6 rounded-xl w-80">
+    <h2 class="text-lg font-bold mb-4">Login</h2>
+    <input id="email" placeholder="Email" class="w-full border p-2 mb-2">
+    <input id="password" type="password" placeholder="Password" class="w-full border p-2 mb-4">
+    <button onclick="login()" class="w-full bg-blue-600 text-white p-2 rounded">Login</button>
+  </div>
+</div>
+
+  
 </main>
 </div>
 
@@ -74,6 +84,7 @@ body { font-family: sans-serif; background:#f1f5f9;}
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
 
 <script>
 const firebaseConfig = {
@@ -83,50 +94,68 @@ projectId: "lab-inventory-management-c59c8"
 };
 
 firebase.initializeApp(firebaseConfig);
+
 const db = firebase.firestore();
+const auth = firebase.auth();
 
 let barangList = [];
+let currentUser = null;
+let currentRole = null;
 
-// NAVIGASI
+// ================= AUTH =================
+function login(){
+let email = email.value.trim();
+let password = document.getElementById('password').value;
+
+auth.signInWithEmailAndPassword(email,password)
+.catch(err=>alert(err.message));
+}
+
+auth.onAuthStateChanged(async user=>{
+if(user){
+currentUser = user;
+
+let doc = await db.collection("users").doc(user.uid).get();
+if(doc.exists){
+currentRole = doc.data().role;
+}
+
+document.getElementById('loginPage').style.display="none";
+
+initApp();
+
+}else{
+document.getElementById('loginPage').style.display="flex";
+}
+});
+
+// ================= ROLE =================
+function isAdmin(){
+return currentRole === "admin";
+}
+
+// ================= NAVIGASI =================
 window.navigate = function(page){
 document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
 document.getElementById(page).classList.add('active');
 document.getElementById('page-title').innerText = page;
 }
 
-// MODAL
+// ================= MODAL =================
 function toggleModal(show){
+if(!isAdmin()){
+alert("Hanya admin");
+return;
+}
 document.getElementById('modal').style.display = show ? 'flex':'none';
 }
 
-// ==================== BARANG ====================
-function saveBarang(){
-let nama = document.getElementById('nama').value;
-let stok = parseInt(document.getElementById('stok').value);
+// ================= INIT =================
+function initApp(){
 
-db.collection("barang").add({
-nama, stok
-});
-
-toggleModal(false);
-}
-
-function renderBarang(){
-let html="";
-barangList.forEach(b=>{
-html+=`<tr>
-<td>${b.nama}</td>
-<td>${b.stok}</td>
-</tr>`;
-});
-document.getElementById('barangTable').innerHTML=html;
-
-// isi dropdown
-let opt="";
-barangList.forEach(b=>{
-opt+=`<option value="${b.id}">${b.nama}</option>`;
-});
-document.getElementById('loanBarang').innerHTML=opt;
+// hide tombol jika bukan admin
+if(!isAdmin()){
+document.querySelector("button").style.display="none";
 }
 
 // realtime barang
@@ -139,37 +168,115 @@ renderBarang();
 document.getElementById('stat-total').innerText=barangList.length;
 });
 
-// ==================== PEMINJAMAN ====================
-document.getElementById('loanForm').addEventListener('submit',e=>{
-e.preventDefault();
+// realtime loan
+db.collection("loan").onSnapshot(snap=>{
+let data=[];
+snap.forEach(doc=>{
+data.push({id:doc.id,...doc.data()});
+});
+renderRiwayat(data);
+});
 
-let id = document.getElementById('loanBarang').value;
-let qty = parseInt(document.getElementById('loanQty').value);
-let nama = document.getElementById('loanName').value;
+}
 
-let barang = barangList.find(b=>b.id==id);
+// ================= BARANG =================
+function saveBarang(){
 
-if(barang.stok < qty){
-alert("stok tidak cukup");
+if(!isAdmin()){
+alert("Akses ditolak");
 return;
 }
 
-// kurangi stok
-db.collection("barang").doc(id).update({
-stok: barang.stok - qty
+let nama = document.getElementById('nama').value.trim();
+let stok = parseInt(document.getElementById('stok').value);
+
+if(!nama || isNaN(stok) || stok < 0){
+alert("Input tidak valid");
+return;
+}
+
+db.collection("barang").add({
+nama,
+stok,
+createdAt: new Date()
+});
+
+toggleModal(false);
+}
+
+// render barang
+function renderBarang(){
+let html="";
+barangList.forEach(b=>{
+html+=`<tr>
+<td>${b.nama}</td>
+<td>${b.stok}</td>
+</tr>`;
+});
+document.getElementById('barangTable').innerHTML=html;
+
+// dropdown
+let opt="";
+barangList.forEach(b=>{
+if(b.stok > 0){
+opt+=`<option value="${b.id}">${b.nama} (stok: ${b.stok})</option>`;
+}
+});
+document.getElementById('loanBarang').innerHTML=opt;
+}
+
+// ================= PEMINJAMAN =================
+document.getElementById('loanForm').addEventListener('submit',async e=>{
+e.preventDefault();
+
+let id = loanBarang.value;
+let qty = parseInt(loanQty.value);
+let nama = loanName.value.trim();
+
+if(!nama || isNaN(qty) || qty <= 0){
+alert("Input tidak valid");
+return;
+}
+
+let ref = db.collection("barang").doc(id);
+
+await db.runTransaction(async (t)=>{
+let doc = await t.get(ref);
+
+if(!doc.exists) throw "Barang tidak ada";
+
+let data = doc.data();
+
+if(data.stok < qty){
+throw "Stok tidak cukup";
+}
+
+// update stok aman
+t.update(ref,{
+stok: data.stok - qty
 });
 
 // simpan loan
-db.collection("loan").add({
+let loanRef = db.collection("loan").doc();
+t.set(loanRef,{
 nama,
-barang: barang.nama,
+barang: data.nama,
+barangId: id,
 qty,
 status:"dipinjam",
-time:new Date()
-});
+time:new Date(),
+userId: currentUser.uid
 });
 
-// ==================== RIWAYAT ====================
+}).then(()=>{
+alert("Berhasil pinjam");
+}).catch(err=>{
+alert(err);
+});
+
+});
+
+// ================= RIWAYAT =================
 function renderRiwayat(data){
 let html="";
 data.forEach(l=>{
@@ -179,33 +286,39 @@ html+=`<tr>
 <td>${l.qty}</td>
 <td>${l.status}</td>
 <td>
-${l.status=="dipinjam" ? `<button onclick="kembali('${l.id}',${l.qty},'${l.barang}')">Kembali</button>`:''}
+${l.status=="dipinjam" ? `<button onclick="kembali('${l.id}','${l.barangId}',${l.qty})">Kembali</button>`:''}
 </td>
 </tr>`;
 });
 document.getElementById('riwayatTable').innerHTML=html;
 }
 
-db.collection("loan").onSnapshot(snap=>{
-let data=[];
-snap.forEach(doc=>{
-data.push({id:doc.id,...doc.data()});
-});
-renderRiwayat(data);
-});
+// ================= PENGEMBALIAN =================
+async function kembali(id, barangId, qty){
 
-// pengembalian
-function kembali(id, qty, namaBarang){
-let barang = barangList.find(b=>b.nama==namaBarang);
+let ref = db.collection("barang").doc(barangId);
+
+await db.runTransaction(async (t)=>{
+let doc = await t.get(ref);
+
+if(!doc.exists) throw "Barang tidak ada";
+
+let data = doc.data();
 
 // tambah stok
-db.collection("barang").doc(barang.id).update({
-stok: barang.stok + qty
+t.update(ref,{
+stok: data.stok + qty
 });
 
 // update status
-db.collection("loan").doc(id).update({
+t.update(db.collection("loan").doc(id),{
 status:"kembali"
+});
+
+}).then(()=>{
+alert("Dikembalikan");
+}).catch(err=>{
+alert(err);
 });
 }
 </script>
