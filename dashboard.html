@@ -18,15 +18,23 @@ body { font-family: sans-serif; background:#f1f5f9;}
 <body>
 <div class="flex">
 <!-- SIDEBAR -->
-<aside class="w-60 bg-slate-900 text-white p-4">
-<h2 class="text-lg font-bold mb-4">LabManager</h2>
+<aside class="w-60 bg-slate-900 text-white p-4 flex flex-col justify-between h-screen">
 
-<div id="userInfo" class="mb-4 text-sm text-gray-300"></div>
+  <div>
+    <h2 class="text-lg font-bold mb-4">LabManager</h2>
 
-<div id="menu-dashboard" class="sidebar-link active" onclick="navigate('dashboard')">Dashboard</div>
-<div id="menu-barang" class="sidebar-link" onclick="navigate('barang')">Barang</div>
-<div id="menu-peminjaman" class="sidebar-link" onclick="navigate('peminjaman')">Peminjaman</div>
-<div id="menu-riwayat" class="sidebar-link" onclick="navigate('riwayat')">Riwayat</div>
+    <div id="userInfo" class="mb-4 text-sm text-gray-300"></div>
+
+    <div id="menu-dashboard" class="sidebar-link active" onclick="navigate('dashboard')">Dashboard</div>
+    <div id="menu-barang" class="sidebar-link" onclick="navigate('barang')">Barang</div>
+    <div id="menu-peminjaman" class="sidebar-link" onclick="navigate('peminjaman')">Peminjaman</div>
+    <div id="menu-riwayat" class="sidebar-link" onclick="navigate('riwayat')">Riwayat</div>
+  </div>
+
+  <!-- LOGOUT DI BAWAH -->
+  <button onclick="logout()" class="w-full bg-red-500 p-2 rounded mt-4">
+    Logout
+  </button>
 
 </aside>
 
@@ -131,33 +139,32 @@ function login(){
 }
 
 auth.onAuthStateChanged(async user=>{
-if(user){
-  currentUser = user;
+  if(user){
+    currentUser = user;
 
-  // ================= ROLE BERDASARKAN EMAIL =================
-if(user.email === "teknikotomasiindustri.nepan@gmail.com"){
-  currentRole = "admin";
-}else{
-  currentRole = "user";
-}
+    if(user.email === "teknikotomasiindustri.nepan@gmail.com"){
+      currentRole = "admin";
+    }else{
+      currentRole = "user";
+    }
 
-  document.getElementById('loginPage').style.display="none";
+    document.getElementById('loginPage').style.display="none";
 
-  applyRoleUI();
-  initApp();
+    // PINDAHKAN KE SINI
+    document.getElementById("userInfo").innerText =
+      currentUser.email + " (" + currentRole + ")";
 
-}else{
-  currentUser = null;
-  currentRole = null;
+    applyRoleUI();
+    initApp();
 
-  document.getElementById('loginPage').style.display="flex";
+  }else{
+    currentUser = null;
+    currentRole = null;
 
-  // reset UI
-  document.getElementById("userInfo").innerText = "";
-}
+    document.getElementById('loginPage').style.display="flex";
+    document.getElementById("userInfo").innerText = "";
+  }
 });
-document.getElementById("userInfo").innerText =
-  currentUser.email + " (" + currentRole + ")";
   
 // ================= ROLE =================
 function isAdmin(){
@@ -166,9 +173,14 @@ return currentRole === "admin";
 
 // ================= NAVIGASI =================
 window.navigate = function(page){
-document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-document.getElementById(page).classList.add('active');
-document.getElementById('page-title').innerText = page;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(page).classList.add('active');
+
+  document.getElementById('page-title').innerText = page;
+
+  // TAMBAHAN
+  document.querySelectorAll('.sidebar-link').forEach(l=>l.classList.remove('active'));
+  document.getElementById("menu-" + page).classList.add('active');
 }
 
 // ================= MODAL =================
