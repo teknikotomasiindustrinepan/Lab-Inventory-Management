@@ -277,19 +277,6 @@ function renderBarang(){
     </tr>`;
   });
   document.getElementById('barangTable').innerHTML=html;
-
-  // dropdown
-  let opt="";
-  barangList.forEach(b=>{
-    if(b.stok > 0){
-      opt+=`<option value="${b.id}">${b.nama} (stok: ${b.stok})</option>`;
-    }
-  });
-  document.getElementById('loanBarang').innerHTML=opt;
-
-  // ✅ TAMBAHAN
-  renderStokTable();
-}
   
 // ================= INIT =================
 function initApp(){
