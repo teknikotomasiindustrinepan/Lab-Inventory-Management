@@ -216,12 +216,12 @@
 <!-- Toast Message -->
 <div id="toast" class="fixed bottom-8 right-8 px-6 py-3 rounded-lg text-white font-medium transform translate-y-20 transition shadow-xl z-[100]"></div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { getFirestore, doc, setDoc, addDoc, updateDoc, deleteDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+<!-- Firebase Compat (STABIL) -->
+<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
 
-// 🔥 CONFIG FIREBASE (PUNYA KAMU)
+<script>
 const firebaseConfig = {
   apiKey: "AIzaSyD7v9RjzDP80LcrblAwe6DGNs_ujQ0NIkk",
   authDomain: "lab-inventory-management-c59c8.firebaseapp.com",
@@ -232,169 +232,14 @@ const firebaseConfig = {
 };
 
 // INIT
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-// STATE
-let state = {
-  barang: [],
-  peminjaman: [],
-  user: null
-};
-
-// LOGIN ANONYM
-signInAnonymously(auth);
-
-onAuthStateChanged(auth, (user) => {
-  state.user = user;
-  if (user) {
-    document.getElementById('auth-status').innerText = "Database Terhubung";
-    startListeners();
-  }
+// TEST KONEKSI
+db.collection("test").add({
+  status: "connected",
+  time: new Date()
 });
-
-// LISTENER REALTIME
-function startListeners() {
-  onSnapshot(collection(db, "barang"), (snapshot) => {
-    state.barang = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    renderAll();
-  });
-
-  onSnapshot(collection(db, "loans"), (snapshot) => {
-    state.peminjaman = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    renderAll();
-  });
-}
-
-// ==================== CRUD BARANG ====================
-window.saveBarang = async () => {
-  const id = document.getElementById('edit-id').value;
-
-  const data = {
-    nama: document.getElementById('inp-nama').value,
-    kategori: document.getElementById('inp-kategori').value,
-    stok: parseInt(document.getElementById('inp-stok').value) || 0,
-    kondisi: document.getElementById('inp-kondisi').value
-  };
-
-  if (!data.nama) return alert("Nama wajib diisi");
-
-  if (id) {
-    await updateDoc(doc(db, "barang", id), data);
-  } else {
-    await addDoc(collection(db, "barang"), data);
-  }
-
-  toggleModal('modal-barang', false);
-};
-
-window.hapusBarang = async (id) => {
-  await deleteDoc(doc(db, "barang", id));
-};
-
-window.editBarang = (id) => {
-  const b = state.barang.find(x => x.id === id);
-  document.getElementById('edit-id').value = b.id;
-  document.getElementById('inp-nama').value = b.nama;
-  document.getElementById('inp-kategori').value = b.kategori;
-  document.getElementById('inp-stok').value = b.stok;
-  document.getElementById('inp-kondisi').value = b.kondisi;
-  toggleModal('modal-barang', true);
-};
-
-// ==================== PEMINJAMAN ====================
-document.getElementById('loanForm').onsubmit = async (e) => {
-  e.preventDefault();
-
-  const barangId = document.getElementById('loanBarangSelect').value;
-  const qty = parseInt(document.getElementById('loanQty').value);
-
-  const barang = state.barang.find(b => b.id === barangId);
-
-  if (barang.stok < qty) return alert("Stok tidak cukup");
-
-  await updateDoc(doc(db, "barang", barangId), {
-    stok: barang.stok - qty
-  });
-
-  await addDoc(collection(db, "loans"), {
-    peminjam: document.getElementById('loanName').value,
-    barangId,
-    barangNama: barang.nama,
-    jumlah: qty,
-    tglKembali: document.getElementById('loanDate').value,
-    status: "Dipinjam"
-  });
-
-  e.target.reset();
-};
-
-window.kembalikanBarang = async (loanId) => {
-  const loan = state.peminjaman.find(p => p.id === loanId);
-  const barang = state.barang.find(b => b.id === loan.barangId);
-
-  await updateDoc(doc(db, "barang", barang.id), {
-    stok: barang.stok + loan.jumlah
-  });
-
-  await updateDoc(doc(db, "loans", loanId), {
-    status: "Dikembalikan"
-  });
-};
-
-// ==================== RENDER ====================
-window.renderAll = () => {
-  renderBarang();
-  renderRiwayat();
-  populateSelect();
-};
-
-function renderBarang() {
-  const tbody = document.getElementById('barangTable');
-  tbody.innerHTML = state.barang.map(b => `
-    <tr>
-      <td>${b.nama}</td>
-      <td>${b.kategori}</td>
-      <td>${b.stok}</td>
-      <td>${b.kondisi}</td>
-      <td>
-        <button onclick="editBarang('${b.id}')">Edit</button>
-        <button onclick="hapusBarang('${b.id}')">Hapus</button>
-      </td>
-    </tr>
-  `).join('');
-}
-
-function populateSelect() {
-  const select = document.getElementById('loanBarangSelect');
-  select.innerHTML = state.barang.map(b =>
-    `<option value="${b.id}">${b.nama} (${b.stok})</option>`
-  ).join('');
-}
-
-function renderRiwayat() {
-  const tbody = document.getElementById('riwayatTable');
-  tbody.innerHTML = state.peminjaman.map(p => `
-    <tr>
-      <td>${p.peminjam}</td>
-      <td>${p.barangNama}</td>
-      <td>${p.jumlah}</td>
-      <td>${p.tglKembali}</td>
-      <td>${p.status}</td>
-      <td>
-        ${p.status === 'Dipinjam'
-          ? `<button onclick="kembalikanBarang('${p.id}')">Selesai</button>`
-          : '-'}
-      </td>
-    </tr>
-  `).join('');
-}
-
-// MODAL
-window.toggleModal = (id, show) => {
-  document.getElementById(id).style.display = show ? 'flex' : 'none';
-};
 </script>
 
 </body>
