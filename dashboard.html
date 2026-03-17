@@ -104,19 +104,22 @@ let currentRole = null;
 
 // ================= AUTH =================
 function login(){
-let email = document.getElementById('email').value.trim();
-let password = document.getElementById('password').value;
+  let email = document.getElementById('email').value.trim();
+  let password = document.getElementById('password').value;
 
-auth.signInWithEmailAndPassword(email,password)
-.then(()=>console.log("Login success"))
-.catch(err=>{
-console.error(err);
-alert(err.message);
-});
-}
+  if(!email || !password){
+    alert("Email dan password wajib diisi");
+    return;
+  }
 
-auth.signInWithEmailAndPassword(email,password)
-.catch(err=>alert(err.message));
+  auth.signInWithEmailAndPassword(email, password)
+    .then(() => {
+      console.log("Login success");
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Login gagal: " + err.message);
+    });
 }
 
 auth.onAuthStateChanged(async user=>{
