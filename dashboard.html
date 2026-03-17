@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Inventaris Lab Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .sidebar-link {
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            color: #cbd5e1;
+            cursor: pointer;
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar-link:hover, .sidebar-link.active {
+            background-color: #334155;
+            color: white;
+        }
+
+        .page { display: none; }
+        .page.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .glass-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .custom-modal {
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-slate-900 text-white flex-shrink-0 flex flex-col">
+        <div class="p-6">
+            <h2 class="text-xl font-bold flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                </svg>
+                LabManager
+            </h2>
+        </div>
+        <nav class="flex-1 px-4 mt-4">
+            <div class="sidebar-link active" onclick="navigate('dashboard')">Dashboard</div>
+            <div class="sidebar-link" onclick="navigate('barang')">Data Barang</div>
+            <div class="sidebar-link" onclick="navigate('peminjaman')">Peminjaman</div>
+            <div class="sidebar-link" onclick="navigate('riwayat')">Riwayat</div>
+        </nav>
+        <div class="p-4 border-t border-slate-800 text-xs text-slate-500">
+            v2.0 Stable Build
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden">
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8">
+            <h1 id="page-title" class="text-lg font-semibold text-slate-800 capitalize">Dashboard</h1>
+            <div id="auth-status" class="text-xs font-mono text-slate-400">Connecting...</div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-8">
+            <!-- Dashboard Page -->
+            <section id="dashboard" class="page active">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="glass-card p-6 rounded-xl">
+                        <p class="text-sm text-slate-500 mb-1">Total Barang</p>
+                        <h3 class="text-3xl font-bold text-slate-800" id="stat-total">-</h3>
+                    </div>
+                    <div class="glass-card p-6 rounded-xl border-l-4 border-emerald-500">
+                        <p class="text-sm text-slate-500 mb-1">Unit Tersedia</p>
+                        <h3 class="text-3xl font-bold text-slate-800" id="stat-tersedia">-</h3>
+                    </div>
+                    <div class="glass-card p-6 rounded-xl border-l-4 border-blue-500">
+                        <p class="text-sm text-slate-500 mb-1">Sedang Dipinjam</p>
+                        <h3 class="text-3xl font-bold text-slate-800" id="stat-dipinjam">-</h3>
+                    </div>
+                    <div class="glass-card p-6 rounded-xl border-l-4 border-rose-500">
+                        <p class="text-sm text-slate-500 mb-1">Kondisi Rusak</p>
+                        <h3 class="text-3xl font-bold text-slate-800" id="stat-rusak">-</h3>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Data Barang Page -->
+            <section id="barang" class="page">
+                <div class="flex justify-between items-center mb-6">
+                    <button onclick="toggleModal('modal-barang', true)" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium shadow-sm transition">
+                        + Tambah Barang Baru
+                    </button>
+                    <div class="relative w-64">
+                        <input type="text" id="searchBarang" placeholder="Cari alat/bahan..." onkeyup="renderBarang()" 
+                               class="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                        <svg class="w-5 h-5 absolute left-3 top-2.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                </div>
+                <div class="glass-card rounded-xl overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 text-slate-600 uppercase text-xs font-semibold">
+                            <tr>
+                                <th class="px-6 py-4">Nama Barang</th>
+                                <th class="px-6 py-4">Kategori</th>
+                                <th class="px-6 py-4 text-center">Stok</th>
+                                <th class="px-6 py-4">Kondisi</th>
+                                <th class="px-6 py-4">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="barangTable" class="divide-y divide-slate-100 text-sm">
+                            <!-- Data injected here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Peminjaman Page -->
+            <section id="peminjaman" class="page">
+                <div class="max-w-2xl mx-auto glass-card rounded-2xl p-8">
+                    <h2 class="text-xl font-bold text-slate-800 mb-6">Formulir Peminjaman Alat</h2>
+                    <form id="loanForm" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Nama Peminjam</label>
+                            <input type="text" id="loanName" required class="w-full p-2.5 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Alat/Barang</label>
+                                <select id="loanBarangSelect" required class="w-full p-2.5 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"></select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Jumlah Unit</label>
+                                <input type="number" id="loanQty" min="1" required class="w-full p-2.5 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Tanggal Pengembalian</label>
+                            <input type="date" id="loanDate" required class="w-full p-2.5 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg">Konfirmasi Peminjaman</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Riwayat Page -->
+            <section id="riwayat" class="page">
+                <div class="glass-card rounded-xl overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 text-slate-600 text-xs font-semibold uppercase">
+                            <tr>
+                                <th class="px-6 py-4">Peminjam</th>
+                                <th class="px-6 py-4">Barang</th>
+                                <th class="px-6 py-4">Qty</th>
+                                <th class="px-6 py-4">Batas Kembali</th>
+                                <th class="px-6 py-4">Status</th>
+                                <th class="px-6 py-4">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="riwayatTable" class="divide-y divide-slate-100 text-sm">
+                            <!-- Data injected here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+
+<!-- Modal Tambah/Edit Barang -->
+<div id="modal-barang" class="custom-modal">
+    <div class="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl">
+        <h3 id="modal-title" class="text-xl font-bold mb-4">Tambah Barang</h3>
+        <input type="hidden" id="edit-id">
+        <div class="space-y-4">
+            <input type="text" id="inp-nama" placeholder="Nama Barang (ex: Osiloskop)" class="w-full p-2 border rounded-lg">
+            <input type="text" id="inp-kategori" placeholder="Kategori (ex: Elektronika)" class="w-full p-2 border rounded-lg">
+            <div class="flex gap-4">
+                <input type="number" id="inp-stok" placeholder="Stok Awal" class="w-full p-2 border rounded-lg">
+                <select id="inp-kondisi" class="w-full p-2 border rounded-lg">
+                    <option value="Baik">Kondisi Baik</option>
+                    <option value="Rusak">Rusak/Perbaikan</option>
+                </select>
+            </div>
+        </div>
+        <div class="flex gap-2 mt-6">
+            <button onclick="toggleModal('modal-barang', false)" class="flex-1 px-4 py-2 bg-slate-100 rounded-lg hover:bg-slate-200">Batal</button>
+            <button onclick="saveBarang()" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Simpan</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Message -->
+<div id="toast" class="fixed bottom-8 right-8 px-6 py-3 rounded-lg text-white font-medium transform translate-y-20 transition shadow-xl z-[100]"></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, addDoc, updateDoc, deleteDoc, collection, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // --- CONFIG & STATE ---
+    const firebaseConfig = JSON.parse(__firebase_config);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'lab-inventaris-demo';
+
+    let state = {
+        barang: [],
+        peminjaman: [],
+        user: null
+    };
+
+    // --- INITIALIZATION ---
+    const initApp = async () => {
+        try {
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await signInWithCustomToken(auth, __initial_auth_token);
+            } else {
+                await signInAnonymously(auth);
+            }
+        } catch (error) {
+            console.error("Auth Error:", error);
+            showToast("Gagal menyambungkan ke database", "bg-red-500");
+        }
+    };
+
+    onAuthStateChanged(auth, (user) => {
+        state.user = user;
+        if (user) {
+            document.getElementById('auth-status').innerText = `ID: ${user.uid}`;
+            startListeners();
+        }
+    });
+
+    const startListeners = () => {
+        if (!state.user) return;
+
+        // Listener for Items
+        const qBarang = collection(db, 'artifacts', appId, 'public', 'data', 'barang');
+        onSnapshot(qBarang, (snapshot) => {
+            state.barang = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderAll();
+        }, (err) => showToast("Error loading items", "bg-red-500"));
+
+        // Listener for Loans
+        const qLoans = collection(db, 'artifacts', appId, 'public', 'data', 'loans');
+        onSnapshot(qLoans, (snapshot) => {
+            state.peminjaman = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderAll();
+        }, (err) => showToast("Error loading history", "bg-red-500"));
+    };
+
+    // --- NAVIGATION ---
+    window.navigate = (pageId) => {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.sidebar-link').forEach(l => {
+            l.classList.remove('active');
+            if(l.innerText.toLowerCase().includes(pageId.replace('dashboard', ''))) l.classList.add('active');
+        });
+
+        document.getElementById(pageId).classList.add('active');
+        document.getElementById('page-title').innerText = pageId;
+    };
+
+    // --- LOGIC: BARANG ---
+    window.saveBarang = async () => {
+        if (!state.user) return;
+
+        const id = document.getElementById('edit-id').value;
+        const data = {
+            nama: document.getElementById('inp-nama').value,
+            kategori: document.getElementById('inp-kategori').value,
+            stok: parseInt(document.getElementById('inp-stok').value) || 0,
+            kondisi: document.getElementById('inp-kondisi').value
+        };
+
+        if (!data.nama) return showToast("Nama barang wajib diisi", "bg-amber-500");
+
+        try {
+            if (id) {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'barang', id), data);
+                showToast("Data barang diperbarui", "bg-blue-600");
+            } else {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'barang'), data);
+                showToast("Barang berhasil ditambahkan", "bg-emerald-600");
+            }
+            toggleModal('modal-barang', false);
+        } catch (err) {
+            showToast("Gagal menyimpan data", "bg-red-500");
+        }
+    };
+
+    window.hapusBarang = async (id) => {
+        if (confirm('Hapus item ini dari inventaris?')) {
+            try {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'barang', id));
+                showToast("Barang dihapus", "bg-slate-700");
+            } catch (e) { showToast("Gagal menghapus", "bg-red-500"); }
+        }
+    };
+
+    window.editBarang = (id) => {
+        const b = state.barang.find(x => x.id === id);
+        if (!b) return;
+
+        document.getElementById('modal-title').innerText = "Edit Barang";
+        document.getElementById('edit-id').value = b.id;
+        document.getElementById('inp-nama').value = b.nama;
+        document.getElementById('inp-kategori').value = b.kategori;
+        document.getElementById('inp-stok').value = b.stok;
+        document.getElementById('inp-kondisi').value = b.kondisi;
+        toggleModal('modal-barang', true);
+    };
+
+    // --- LOGIC: LOANS ---
+    document.getElementById('loanForm').onsubmit = async (e) => {
+        e.preventDefault();
+        if (!state.user) return;
+
+        const bId = document.getElementById('loanBarangSelect').value;
+        const qty = parseInt(document.getElementById('loanQty').value);
+        const barang = state.barang.find(b => b.id === bId);
+
+        if (barang.stok < qty) return showToast("Stok tidak mencukupi!", "bg-red-500");
+
+        const loanData = {
+            peminjam: document.getElementById('loanName').value,
+            barangId: bId,
+            barangNama: barang.nama,
+            jumlah: qty,
+            tglKembali: document.getElementById('loanDate').value,
+            status: 'Dipinjam',
+            tglPinjam: new Date().toISOString().split('T')[0]
+        };
+
+        try {
+            // Update Stock
+            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'barang', bId), {
+                stok: barang.stok - qty
+            });
+            // Record Loan
+            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'loans'), loanData);
+            
+            showToast("Peminjaman berhasil dicatat", "bg-blue-600");
+            e.target.reset();
+            navigate('riwayat');
+        } catch (e) { showToast("Gagal memproses", "bg-red-500"); }
+    };
+
+    window.kembalikanBarang = async (loanId) => {
+        const loan = state.peminjaman.find(p => p.id === loanId);
+        const barang = state.barang.find(b => b.id === loan.barangId);
+
+        try {
+            if (barang) {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'barang', barang.id), {
+                    stok: barang.stok + loan.jumlah
+                });
+            }
+            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'loans', loanId), {
+                status: 'Dikembalikan'
+            });
+            showToast("Barang telah dikembalikan", "bg-emerald-600");
+        } catch (e) { showToast("Gagal memproses pengembalian", "bg-red-500"); }
+    };
+
+    // --- UI RENDERING ---
+    window.renderAll = () => {
+        renderDashboard();
+        renderBarang();
+        renderRiwayat();
+        populateSelect();
+    };
+
+    function renderDashboard() {
+        document.getElementById('stat-total').innerText = state.barang.length;
+        document.getElementById('stat-tersedia').innerText = state.barang.reduce((a, b) => a + b.stok, 0);
+        document.getElementById('stat-dipinjam').innerText = state.peminjaman.filter(p => p.status === 'Dipinjam').length;
+        document.getElementById('stat-rusak').innerText = state.barang.filter(b => b.kondisi === 'Rusak').length;
+    }
+
+    window.renderBarang = () => {
+        const query = document.getElementById('searchBarang').value.toLowerCase();
+        const tbody = document.getElementById('barangTable');
+        tbody.innerHTML = state.barang
+            .filter(b => b.nama.toLowerCase().includes(query) || b.kategori.toLowerCase().includes(query))
+            .map(b => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="px-6 py-4 font-medium text-slate-900">${b.nama}</td>
+                    <td class="px-6 py-4 text-slate-500">${b.kategori}</td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="px-3 py-1 rounded-full ${b.stok > 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'} font-bold">
+                            ${b.stok}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="${b.kondisi === 'Baik' ? 'text-emerald-600' : 'text-rose-600'} flex items-center gap-1">
+                            <span class="w-2 h-2 rounded-full ${b.kondisi === 'Baik' ? 'bg-emerald-500' : 'bg-rose-500'}"></span>
+                            ${b.kondisi}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 space-x-2">
+                        <button onclick="editBarang('${b.id}')" class="text-blue-600 hover:text-blue-800 font-medium">Edit</button>
+                        <button onclick="hapusBarang('${b.id}')" class="text-rose-600 hover:text-rose-800 font-medium">Hapus</button>
+                    </td>
+                </tr>
+            `).join('');
+    };
+
+    function populateSelect() {
+        const select = document.getElementById('loanBarangSelect');
+        const currentVal = select.value;
+        select.innerHTML = '<option value="">Pilih Barang...</option>' + 
+            state.barang
+            .filter(b => b.stok > 0 && b.kondisi === 'Baik')
+            .map(b => `<option value="${b.id}" ${b.id === currentVal ? 'selected' : ''}>${b.nama} (Stok: ${b.stok})</option>`)
+            .join('');
+    }
+
+    function renderRiwayat() {
+        const tbody = document.getElementById('riwayatTable');
+        tbody.innerHTML = state.peminjaman
+            .sort((a, b) => b.status === 'Dipinjam' ? 1 : -1)
+            .map(p => `
+                <tr>
+                    <td class="px-6 py-4">${p.peminjam}</td>
+                    <td class="px-6 py-4">${p.barangNama}</td>
+                    <td class="px-6 py-4 font-mono">${p.jumlah}</td>
+                    <td class="px-6 py-4 text-slate-500">${p.tglKembali}</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 rounded-md text-xs font-bold uppercase ${p.status === 'Dipinjam' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'}">
+                            ${p.status}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        ${p.status === 'Dipinjam' ? 
+                          `<button onclick="kembalikanBarang('${p.id}')" class="text-emerald-600 hover:underline">Selesai</button>` : 
+                          '-'}
+                    </td>
+                </tr>
+            `).join('');
+    }
+
+    // --- HELPERS ---
+    window.toggleModal = (id, show) => {
+        const modal = document.getElementById(id);
+        modal.style.display = show ? 'flex' : 'none';
+        if (!show) {
+            document.getElementById('edit-id').value = '';
+            document.getElementById('modal-title').innerText = "Tambah Barang";
+            document.querySelectorAll('#modal-barang input').forEach(i => i.value = '');
+        }
+    };
+
+    function showToast(msg, colorClass) {
+        const t = document.getElementById('toast');
+        t.innerText = msg;
+        t.className = `fixed bottom-8 right-8 px-6 py-3 rounded-lg text-white font-medium transition shadow-xl z-[100] ${colorClass}`;
+        t.style.transform = 'translateY(0)';
+        setTimeout(() => { t.style.transform = 'translateY(200%)'; }, 3000);
+    }
+
+    // Run Init
+    initApp();
+</script>
+
+</body>
+</html>
