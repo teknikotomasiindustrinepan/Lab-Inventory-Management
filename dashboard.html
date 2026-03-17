@@ -271,10 +271,10 @@ function applyRoleUI(){
 function renderBarang(){
   let html="";
   barangList.forEach(b=>{
-    html+=`<tr>
-    <td>${b.nama}</td>
-    <td>${b.stok}</td>
-    </tr>`;
+     html+=`<tr>
+  <td>${b.nama}</td>
+  <td>${b.stok ?? 0}</td>
+  </tr>`;
   });
   document.getElementById('barangTable').innerHTML=html;
   
@@ -313,26 +313,37 @@ db.collection("loan")
 // ================= BARANG =================
 function saveBarang(){
 
-if(!isAdmin()){
-alert("Akses ditolak");
-return;
-}
+  if(!isAdmin()){
+    alert("Akses ditolak");
+    return;
+  }
 
-let nama = document.getElementById('nama').value.trim();
-let stok = parseInt(document.getElementById('stok').value);
+  let nama = document.getElementById('nama').value.trim();
+  let stok = parseInt(document.getElementById('stok').value);
 
-if(!nama || isNaN(stok) || stok < 0){
-alert("Input tidak valid");
-return;
-}
+  if(!nama || isNaN(stok) || stok < 0){
+    alert("Input tidak valid");
+    return;
+  }
 
-db.collection("barang").add({
-nama,
-stok,
-createdAt: new Date()
-});
+  db.collection("barang").add({
+    nama,
+    stok,
+    createdAt: new Date()
+  })
+  .then(()=>{
+    alert("Barang berhasil ditambahkan");
 
-toggleModal(false);
+    // reset input
+    document.getElementById('nama').value = "";
+    document.getElementById('stok').value = "";
+
+    toggleModal(false);
+  })
+  .catch(err=>{
+    console.error(err);
+    alert("Gagal simpan: " + err.message);
+  });
 }
 
 // render barang
@@ -342,8 +353,8 @@ function renderStokTable(){
   barangList.forEach(b=>{
     html += `<tr class="border-b">
       <td class="p-2">${b.nama}</td>
-      <td class="p-2 ${b.stok == 0 ? 'text-red-500 font-bold' : ''}">
-        ${b.stok}
+      <td class="p-2 ${(!b.stok || b.stok == 0) ? 'text-red-500 font-bold' : ''}">
+        ${b.stok ?? 0}
       </td>
     </tr>`;
   });
