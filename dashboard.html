@@ -161,6 +161,7 @@ const auth = firebase.auth();
 let barangList = [];
 let currentUser = null;
 let currentRole = null;
+let editId = null;
 
 // ================= AUTH =================
 function login(){
@@ -271,15 +272,52 @@ function applyRoleUI(){
   }
 }
 
+  // ================= open edit=================
+function openEdit(id, nama, stok){
+
+  if(!isAdmin()){
+    alert("Hanya admin");
+    return;
+  }
+
+  editId = id;
+
+  document.getElementById('nama').value = nama;
+  document.getElementById('stok').value = stok;
+
+  toggleModal(true);
+}
+  
+  
   // ================= renderbarang =================
 function renderBarang(){
   let html="";
   let opt="";
 
   barangList.forEach(b=>{
-    html+=`<tr>
+
+    html+=`<tr class="border-b">
       <td>${b.nama}</td>
       <td>${b.stok ?? 0}</td>
+
+      ${
+        isAdmin()
+        ? `<td class="space-x-2">
+            <button 
+              onclick="openEdit('${b.id}','${b.nama}',${b.stok})"
+              class="bg-blue-500 text-white px-2 py-1 rounded text-sm">
+              Edit
+            </button>
+
+            <button 
+              onclick="resetStok('${b.id}','${b.nama}')"
+              class="bg-yellow-500 text-white px-2 py-1 rounded text-sm">
+              Reset
+            </button>
+          </td>`
+        : ''
+      }
+
     </tr>`;
 
     if(b.stok > 0){
@@ -287,12 +325,12 @@ function renderBarang(){
         ${b.nama} (stok: ${b.stok})
       </option>`;
     }
+
   });
 
   document.getElementById('barangTable').innerHTML=html;
   document.getElementById('loanBarang').innerHTML=opt;
 
-  renderStokTable(); // 🔥 penting
   renderStokTable();
 }
 // ================= INIT =================
@@ -328,7 +366,7 @@ db.collection("loan")
 }
 
 // ================= BARANG =================
-function saveBarang(){
+async function saveBarang(){
 
   if(!isAdmin()){
     alert("Akses ditolak");
@@ -343,24 +381,40 @@ function saveBarang(){
     return;
   }
 
-  db.collection("barang").add({
-    nama,
-    stok,
-    createdAt: new Date()
-  })
-  .then(()=>{
-    alert("Barang berhasil ditambahkan");
+  try{
 
-    // reset input
-    document.getElementById('nama').value = "";
-    document.getElementById('stok').value = "";
+    if(editId){
+      // 🔥 UPDATE
+      await db.collection("barang").doc(editId).update({
+        nama,
+        stok
+      });
+
+      alert("Barang berhasil diupdate");
+
+      editId = null;
+
+    }else{
+      // 🔥 ADD
+      await db.collection("barang").add({
+        nama,
+        stok,
+        createdAt: new Date()
+      });
+
+      alert("Barang berhasil ditambahkan");
+    }
+
+    // reset form
+    document.getElementById('nama').value="";
+    document.getElementById('stok').value="";
 
     toggleModal(false);
-  })
-  .catch(err=>{
+
+  }catch(err){
     console.error(err);
-    alert("Gagal simpan: " + err.message);
-  });
+    alert("Error: " + err.message);
+  }
 }
 
 // render barang
