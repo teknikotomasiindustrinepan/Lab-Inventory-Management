@@ -26,10 +26,10 @@ body { font-family: sans-serif; background:#f1f5f9;}
     <div id="userInfo" class="mb-4 text-sm text-gray-300"></div>
 
     <div id="menu-dashboard" class="sidebar-link active" onclick="navigate('dashboard')">Dashboard</div>
-    <div id="menu-barang" class="sidebar-link" onclick="navigate('barang')">Barang</div>
-    <div id="menu-peminjaman" class="sidebar-link" onclick="navigate('peminjaman')">Peminjaman</div>
-    <div id="menu-riwayat" class="sidebar-link" onclick="navigate('riwayat')">Riwayat dan Pengembalian Barang</div>
-    <div id="menu-barangRusak" class="sidebar-link" onclick="navigate('barangRusak')">Barang Rusak</div>
+    <div id="menu-barang" class="sidebar-link" onclick="navigate('barang')">Data Master Barang</div>
+    <div id="menu-peminjaman" class="sidebar-link" onclick="navigate('peminjaman')">Input Peminjaman</div>
+    <div id="menu-riwayat" class="sidebar-link" onclick="navigate('riwayat')">Riwayat & Pengembalian</div>
+    <div id="menu-barangRusak" class="sidebar-link" onclick="navigate('barangRusak')">Lapor Barang Rusak</div>
   </div>
 
   <!-- LOGOUT DI BAWAH -->
@@ -41,7 +41,7 @@ body { font-family: sans-serif; background:#f1f5f9;}
 
   
 <main class="flex-1 p-6">
-<h1 id="page-title" class="text-xl mb-4">dashboard</h1>
+<h1 id="page-title" class="text-xl mb-4">Dashboard LabManager TOI Nepan</h1>
 
 <!-- DASHBOARD -->
 <section id="dashboard" class="page active">
@@ -77,14 +77,14 @@ body { font-family: sans-serif; background:#f1f5f9;}
   </div>
 
   <div class="bg-white p-4 rounded shadow mb-6">
-  <h3 class="font-bold mb-3">Total Jumlah Barang yang Dipinjam</h3>
+  <h3 class="font-bold mb-3">Volume Pinjam per Item</h3>
   <canvas id="barangDipinjamChart" height="120"></canvas>
 </div>
   
 
   <!-- TABEL BARANG HABIS / HAMPIR HABIS -->
   <div class="bg-white p-4 rounded shadow mb-6">
-    <h3 class="font-bold mb-3">Barang Habis / Hampir Habis</h3>
+    <h3 class="font-bold mb-3">Stok Kritis</h3>
     <table class="w-full border text-sm">
       <thead class="bg-gray-200">
         <tr>
