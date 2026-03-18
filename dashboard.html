@@ -1053,7 +1053,10 @@ let loanChartInstance = null; // global
   });
   document.getElementById('barangHabisTable').innerHTML = htmlB;
 
+ 
+}
 
+  
     let barangDipinjamChart = null; // chart global
 
 function renderBarangDipinjamChart(loans){
@@ -1096,8 +1099,7 @@ db.collection("loan").onSnapshot(snap => {
   snap.forEach(doc => loans.push({id: doc.id, ...doc.data()}));
   renderBarangDipinjamChart(loans);
 });
-    
-}
+   
 
 // ===== BARANG RUSAK TERBARU =====
   renderDashboardDamage();  // <-- panggil fungsi render barang rusak di sini
