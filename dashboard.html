@@ -593,7 +593,7 @@ async function hapusBarang(id, nama){
 function renderStokTable(){
   let html = "";
   barangList.forEach(b=>{
-        html += `<tr class="border-b">
+    html += `<tr class="border-b">
       <td class="p-3 font-mono text-xs text-gray-600">${b.kode}</td>
       <td class="p-3">${b.nama}</td>
       <td class="p-3">
@@ -608,14 +608,8 @@ function renderStokTable(){
         </span>
       </td>
     </tr>`;
-    ${b.nama}</td>
-      <td class="p-3">
-        <span class="px-2 py-1 rounded text-xs font-bold ${(!b.stok || b.stok == 0) ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}">
-            ${b.stok ?? 0} Unit
-        </span>
-      </td>
-    </tr>`;
   });
+
   document.getElementById('stokTable').innerHTML = html;
 }
 
