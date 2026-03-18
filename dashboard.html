@@ -510,7 +510,9 @@ function renderBarang(){
   let html="";
   let opt="";
 
-  barangList.forEach(b=>{
+  [...barangList]
+.sort((a,b)=> a.nama.localeCompare(b.nama))
+.forEach(b=>{
     html+=`
     <tr>
       <td class="p-2 border">${b.kode}</td>
@@ -592,9 +594,11 @@ async function hapusBarang(id, nama){
 
 function renderStokTable(){
   let html = "";
-  barangList.forEach(b=>{
+  [...barangList]
+.sort((a,b)=> a.nama.localeCompare(b.nama))
+.forEach(b=>{
     html += `<tr class="border-b">
-      <td class="p-3 font-mono text-xs text-gray-600">${b.kode}</td>
+      <td class="p-3">${b.kode}</td>
       <td class="p-3">${b.nama}</td>
       <td class="p-3">
         <span class="px-2 py-1 rounded text-xs font-bold ${
