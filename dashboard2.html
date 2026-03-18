@@ -211,12 +211,11 @@ RESET SEMUA DATA
     class="bg-green-600 text-white px-3 py-2 rounded">
     Print
   </button>
-
-
-  
+ 
 <table class="w-full mt-4 border">
   <thead class="bg-gray-200">
     <tr>
+      <th>Kode Barang</th>  <!-- tambahan -->
       <th>Nama Peminjam</th>
       <th>Nama Barang</th>
       <th>Jumlah</th>
@@ -260,9 +259,11 @@ RESET SEMUA DATA
     <table class="w-full text-sm border">
       <thead class="bg-gray-200">
         <tr>
+          <th>Kode Barang</th>  <!-- tambahan -->
           <th>Nama Barang</th>
           <th>Jumlah Rusak</th>
           <th>Tanggal</th>
+          <th>Aksi</th>
         </tr>
       </thead>
       <tbody id="damageTable"></tbody>
@@ -723,65 +724,56 @@ function renderRiwayat(data){
   let html="";
 
   data.forEach(l=>{
-
     let namaPengembali = l.returnedByName || "-";
 
-   let keterangan = `
-  Pinjam: ${formatDate(l.time)} <br>
-  User: ${l.userEmail || l.userId || '-'}
-`;
+    let kodeBarang = "-";
+    const b = barangList.find(b=>b.id === l.barangId);
+    if(b) kodeBarang = b.kode || "-";
 
-if(l.status === "kembali"){
-  keterangan += `
-    <br>Kembali: ${formatDate(l.returnedAt)} 
-    <br>User Return: ${l.returnedByUser || '-'}
-  `;
-}
+    let keterangan = `
+      Pinjam: ${formatDate(l.time)} <br>
+      User: ${l.userEmail || l.userId || '-'}
+    `;
+
+    if(l.status === "kembali"){
+      keterangan += `
+        <br>Kembali: ${formatDate(l.returnedAt)} 
+        <br>User Return: ${l.returnedByUser || '-'}
+      `;
+    }
 
     html+=`<tr class="border-b">
-
-<td>${l.nama}</td>
-<td>${l.barang}</td>
-<td>${l.qty}</td>
-
-<td>
-  ${l.status === "dipinjam"
-    ? `<input id="ret-${l.id}" placeholder="Nama pengembali" class="border p-1 text-sm">`
-    : namaPengembali
-  }
-</td>
-
-<td class="text-sm">
-  ${keterangan}
-</td>
-
-<td>
-  ${l.status}
-
-  ${
-    isAdmin()
-    ? `<br>
-       <button 
-         onclick="hapusRiwayat('${l.id}')"
-         class="bg-red-500 text-white px-2 py-1 mt-1 rounded text-sm">
-         Hapus
-       </button>`
-    : ''
-  }
-
-  ${
-    (l.status=="dipinjam" && currentUser && (isAdmin() || l.userId === currentUser.uid))
-    ? `<br>
-       <button 
-         onclick="kembaliDenganNama('${l.id}','${l.barangId}',${l.qty})"
-         class="bg-green-500 text-white px-2 py-1 mt-1 rounded text-sm">
-         Kembali
-       </button>`
-    : ''
-  }
-</td>
-
-</tr>`;
+      <td>${kodeBarang}</td>   <!-- kolom kode -->
+      <td>${l.nama}</td>
+      <td>${l.barang}</td>
+      <td>${l.qty}</td>
+      <td>
+        ${l.status === "dipinjam"
+          ? `<input id="ret-${l.id}" placeholder="Nama pengembali" class="border p-1 text-sm">`
+          : namaPengembali
+        }
+      </td>
+      <td class="text-sm">${keterangan}</td>
+      <td>
+        ${l.status}
+        ${
+          isAdmin()
+          ? `<br><button onclick="hapusRiwayat('${l.id}')"
+             class="bg-red-500 text-white px-2 py-1 mt-1 rounded text-sm">
+             Hapus
+           </button>` 
+          : ''
+        }
+        ${
+          (l.status=="dipinjam" && currentUser && (isAdmin() || l.userId === currentUser.uid))
+          ? `<br><button onclick="kembaliDenganNama('${l.id}','${l.barangId}',${l.qty})"
+             class="bg-green-500 text-white px-2 py-1 mt-1 rounded text-sm">
+             Kembali
+           </button>`
+          : ''
+        }
+      </td>
+    </tr>`;
   });
 
   document.getElementById('riwayatTable').innerHTML=html;
@@ -1182,7 +1174,13 @@ function renderDamageTable() {
       const d = doc.data();
       const date = d.time.toDate ? d.time.toDate() : new Date(d.time);
 
+      // cari kode barang
+      let kodeBarang = "-";
+      const b = barangList.find(b => b.id === d.barangId);
+      if(b) kodeBarang = b.kode || "-";
+
       html += `<tr class="border-b">
+        <td>${kodeBarang}</td>  <!-- kolom kode -->
         <td>${d.nama}</td>
         <td>${d.qty}</td>
         <td>${date.toLocaleString("id-ID")}</td>
