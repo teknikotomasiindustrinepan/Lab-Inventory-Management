@@ -24,6 +24,21 @@ table {
   margin-left: auto;
   margin-right: auto;
 }
+
+/* ===== KECUALI KOLOM TERTENTU ===== */
+/* Barang: nama & tempat simpan tetap rata kiri */
+#barangTable td:nth-child(2),
+#barangTable td:nth-child(3),
+#stokTable td:nth-child(1) {
+  text-align: left;
+}
+
+/* Riwayat: nama peminjam, nama barang, keterangan tetap rata kiri */
+#riwayatTable td:nth-child(2),
+#riwayatTable td:nth-child(3),
+#riwayatTable td:nth-child(6) {
+  text-align: left;
+}
 </style>
 </head>
 
