@@ -168,49 +168,37 @@ th.nama-barang {
 <body>
 <div class="flex">
 <!-- SIDEBAR -->
-<aside id="sidebar" class="w-64 bg-slate-900 text-white p-4 flex flex-col justify-between h-screen sticky top-0">
+<aside id="sidebar" class="w-64 p-4 flex flex-col justify-between h-screen sticky top-0">
 
-  <div class="text-center mb-6 border-b border-gray-200 pb-4">
+  <!-- ATAS -->
+  <div>
 
-  <img src="LOGO TE.png" class="w-16 h-16 mx-auto mb-2 object-contain">
+    <div class="text-center mb-6 border-b border-gray-200 pb-4">
+      <img src="LOGO TE.png" class="w-16 h-16 mx-auto mb-2 object-contain">
 
-  <h2 class="text-xl font-bold text-blue-900 leading-tight">
-    Lab-Invent TOI
-  </h2>
+      <h2 class="text-xl font-bold text-blue-900 leading-tight">
+        Lab-Invent TOI
+      </h2>
 
-  <span class="text-xs text-gray-500">
-    SMK Negeri 1 Japara
-  </span>
+      <span class="text-xs text-gray-500">
+        SMK Negeri 1 Japara
+      </span>
+    </div>
 
-</div>
-
-   <div id="userInfo" class="mb-4 px-3 py-2 bg-gray-100 rounded text-xs text-gray-600 truncate"></div>
+    <div id="userInfo" class="mb-4 px-3 py-2 bg-gray-100 rounded text-xs text-gray-600 truncate"></div>
 
     <nav class="space-y-1">
-      <div id="menu-dashboard" class="sidebar-link active" onclick="navigate('dashboard')">
-    Dashboard
-  </div>
-
-  <div id="menu-barang" class="sidebar-link" onclick="navigate('barang')">
-    Data Master Barang
-  </div>
-
-  <div id="menu-peminjaman" class="sidebar-link" onclick="navigate('peminjaman')">
-    Input Peminjaman
-  </div>
-
-  <div id="menu-riwayat" class="sidebar-link" onclick="navigate('riwayat')">
-    Riwayat & Pengembalian
-  </div>
-
-  <div id="menu-barangRusak" class="sidebar-link" onclick="navigate('barangRusak')">
-    Lapor Barang Rusak
-  </div>
+      <div id="menu-dashboard" class="sidebar-link active" onclick="navigate('dashboard')">Dashboard</div>
+      <div id="menu-barang" class="sidebar-link" onclick="navigate('barang')">Data Master Barang</div>
+      <div id="menu-peminjaman" class="sidebar-link" onclick="navigate('peminjaman')">Input Peminjaman</div>
+      <div id="menu-riwayat" class="sidebar-link" onclick="navigate('riwayat')">Riwayat & Pengembalian</div>
+      <div id="menu-barangRusak" class="sidebar-link" onclick="navigate('barangRusak')">Lapor Barang Rusak</div>
     </nav>
+
   </div>
 
-  <!-- LOGOUT DI BAWAH -->
-  <button onclick="logout()" class="w-full bg-red-600 hover:bg-red-700 p-2 rounded mt-4 transition font-semibold">
+  <!-- BAWAH -->
+  <button onclick="logout()" class="w-full bg-red-600 hover:bg-red-700 p-2 rounded mt-4 text-white font-semibold">
     Logout
   </button>
 
@@ -567,11 +555,6 @@ th.nama-barang {
   }
 
   document.getElementById("periodePrint").innerText = teks;
-}
-
-function printRiwayat() {
-  isiPeriodePrint(); // isi teks dulu
-  window.print();
 }
 
 function printLaporan() {
@@ -1213,7 +1196,20 @@ function printRiwayat(){
 
   const today = new Date();
   const tanggal = today.toLocaleDateString("id-ID");
+const dari = document.getElementById("startDate").value;
+const sampai = document.getElementById("endDate").value;
 
+let periodeText = "";
+
+if (dari && sampai) {
+  periodeText = `${dari} sampai dengan ${sampai}`;
+} else if (dari) {
+  periodeText = `mulai ${dari} sampai sekarang`;
+} else if (sampai) {
+  periodeText = `hingga ${sampai}`;
+} else {
+  periodeText = "semua data";
+}
   let win = window.open('', '', 'width=1000,height=700');
 
   win.document.write(`
@@ -1296,9 +1292,8 @@ function printRiwayat(){
     <body>
 
       <h2>LAPORAN RIWAYAT PEMINJAMAN & PENGEMBALIAN</h2>
-      <p id="printOnlyText" class="text-sm text-gray-600 mb-3">
-  Laporan ini memuat data peminjaman dan pengembalian barang dalam periode 
-  <span id="periodePrint"></span>.
+      <p style="font-size:12px; margin-bottom:10px;">
+  Laporan ini memuat data peminjaman dan pengembalian barang dalam periode ${periodeText}.
 </p>
 
       ${clonedTable.outerHTML}
