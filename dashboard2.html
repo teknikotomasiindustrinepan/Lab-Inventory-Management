@@ -68,11 +68,11 @@ table thead th {
 
     <div id="userInfo" class="mb-4 text-sm text-gray-300"></div>
 
-    <div id="menu-dashboard" class="sidebar-link active" onclick="navigate('Dashboard LabManager TOI Nepan')">Dashboard</div>
-    <div id="menu-barang" class="sidebar-link" onclick="navigate('Data Master Barang')">Data Master Barang</div>
-    <div id="menu-peminjaman" class="sidebar-link" onclick="navigate('Input Peminjaman')">Input Peminjaman</div>
-    <div id="menu-riwayat" class="sidebar-link" onclick="navigate('Riwayat & Pengembalian')">Riwayat & Pengembalian</div>
-    <div id="menu-barangRusak" class="sidebar-link" onclick="navigate('Lapor Barang Rusak')">Lapor Barang Rusak</div>
+    <div id="menu-dashboard" class="sidebar-link active" onclick="navigate('dashboard')">Dashboard</div>
+    <div id="menu-barang" class="sidebar-link" onclick="navigate('barang')">Data Master Barang</div>
+    <div id="menu-peminjaman" class="sidebar-link" onclick="navigate('peminjaman')">Input Peminjaman</div>
+    <div id="menu-riwayat" class="sidebar-link" onclick="navigate('riwayat')">Riwayat & Pengembalian</div>
+    <div id="menu-barangRusak" class="sidebar-link" onclick="navigate('barangRusak')">Lapor Barang Rusak</div>
   </div>
 
   <!-- LOGOUT DI BAWAH -->
@@ -335,6 +335,28 @@ RESET SEMUA DATA
 <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
 
 <script>
+
+const pageTitles = {
+  dashboard: "Dashboard LabManager TOI Nepan",
+  barang: "Data Master Barang",
+  peminjaman: "Input Peminjaman",
+  riwayat: "Riwayat & Pengembalian",
+  barangRusak: "Lapor Barang Rusak"
+};
+
+function navigate(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(page).classList.add('active');
+
+  // gunakan mapping untuk page-title
+  document.getElementById('page-title').innerText = pageTitles[page] || page;
+
+  document.querySelectorAll('.sidebar-link').forEach(l=>l.classList.remove('active'));
+  document.getElementById("menu-" + page).classList.add('active');
+
+  if(page === "barangRusak") renderDamageDropdown();
+}
+  
 const firebaseConfig = {
 apiKey: "AIzaSyD7v9RjzDP80LcrblAwe6DGNs_ujQ0NIkk",
 authDomain: "lab-inventory-management-c59c8.firebaseapp.com",
