@@ -1004,37 +1004,20 @@ let loanChartInstance = null; // global
     });
     document.getElementById('peminjamanTerbaruTable').innerHTML = html;
 
-    // ===== GRAFIK TOTAL BARANG DIPINJAM SELURUH RIWAYAT =====
-const totals = {};
-loans.forEach(l => {
-  if(!l.barang || !l.qty) return;
-  if(!totals[l.barang]) totals[l.barang] = 0;
-  totals[l.barang] += l.qty;
-});
+    // ===== GRAFIK TREND 7 HARI =====
+    let days = [];
+    let counts = [];
+    for (let i = 6; i >= 0; i--) {
+      let d = new Date();
+      d.setDate(d.getDate() - i);
+      days.push(d.toLocaleDateString("id-ID", { day: '2-digit', month: '2-digit' }));
 
-const labels = Object.keys(totals);
-const data = Object.values(totals);
-
-const ctx = document.getElementById('barangDipinjamChart').getContext('2d');
-
-if(barangDipinjamChart) barangDipinjamChart.destroy();
-
-barangDipinjamChart = new Chart(ctx, {
-  type: 'bar',
-  data: {
-    labels,
-    datasets: [{
-      label: 'Total Barang Dipinjam',
-      data,
-      backgroundColor: '#f87171'
-    }]
-  },
-  options: {
-    responsive: true,
-    plugins: { legend: { display: false } },
-    scales: { y: { beginAtZero: true } }
-  }
-});
+      let count = loans.filter(l => {
+        let t = l.time ? (l.time.toDate ? l.time.toDate() : new Date(l.time)) : new Date();
+        return t.toDateString() === d.toDateString();
+      }).length;
+      counts.push(count);
+    }
 
     const ctx = document.getElementById('loanChart').getContext('2d');
 
