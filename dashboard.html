@@ -873,8 +873,10 @@ function logout(){
 
 
 <!-- Chart.js -->
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+let loanChartInstance = null; // global
 function renderDashboard(){
 
   // ===== STATISTICS =====
@@ -920,15 +922,15 @@ function renderDashboard(){
     });
     document.getElementById('peminjamanTerbaruTable').innerHTML = html;
 
-    // grafik tren 7 hari terakhir
+    // ===== GRAFIK TREND 7 HARI =====
     let days = [];
     let counts = [];
-    for(let i=6;i>=0;i--){
+    for (let i = 6; i >= 0; i--) {
       let d = new Date();
-      d.setDate(d.getDate()-i);
-      days.push(d.toLocaleDateString("id-ID",{day:'2-digit',month:'2-digit'}));
+      d.setDate(d.getDate() - i);
+      days.push(d.toLocaleDateString("id-ID", { day: '2-digit', month: '2-digit' }));
 
-      let count = loans.filter(l=>{
+      let count = loans.filter(l => {
         let t = l.time ? (l.time.toDate ? l.time.toDate() : new Date(l.time)) : new Date();
         return t.toDateString() === d.toDateString();
       }).length;
@@ -936,22 +938,27 @@ function renderDashboard(){
     }
 
     const ctx = document.getElementById('loanChart').getContext('2d');
-    new Chart(ctx,{
-      type:'bar',
-      data:{
-        labels:days,
-        datasets:[{
-          label:'Jumlah Peminjaman',
-          data:counts,
-          backgroundColor:'#3b82f6'
+
+    // destroy chart lama jika ada
+    if (loanChartInstance) {
+      loanChartInstance.destroy();
+    }
+
+    loanChartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: days,
+        datasets: [{
+          label: 'Jumlah Peminjaman',
+          data: counts,
+          backgroundColor: '#3b82f6'
         }]
       },
-      options:{
-        responsive:true,
-        plugins:{ legend:{display:false} }
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } }
       }
     });
-
   });
 
   // ===== BARANG HABIS / HAMPIR HABIS =====
