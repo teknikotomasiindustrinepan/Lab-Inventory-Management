@@ -102,25 +102,6 @@ RESET SEMUA DATA
 </section>
 
 
-<section id="areaRiwayat" class="page>
-  <div class="w-full mt-4 border">
-    <thead class="bg-gray-200"> 
-      <table class="w-full mt-4 border">
-      <thead class="bg-gray-200">
-        <tr>
-          <th>Nama Peminjam</th>
-          <th>Nama Barang</th>
-          <th>Jumlah</th>
-          <th>Nama Pengembali</th>
-          <th>Keterangan</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-    <tbody id="riwayatTable"></tbody>
-  </table>
-</div>
-</section>
-  
   
 <!-- RIWAYAT -->
 <section id="riwayat" class="page">
@@ -694,7 +675,7 @@ if(l.status === "kembali"){
   
     // ================= printriwayat =================
 function printRiwayat(){
-  let isi = document.getElementById("areaRiwayat").innerHTML;
+  let isi = document.getElementById("riwayat").innerHTML;
 
   let win = window.open('', '', 'width=900,height=700');
 
