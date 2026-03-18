@@ -90,6 +90,21 @@ body { font-family: sans-serif; background:#f1f5f9;}
     </table>
   </div>
 
+  <!-- TABEL BARANG RUSAK -->
+<div class="bg-white p-4 rounded shadow mb-6">
+  <h3 class="font-bold mb-3">Barang Rusak Terbaru</h3>
+  <table class="w-full border text-sm">
+    <thead class="bg-gray-200">
+      <tr>
+        <th>Nama Barang</th>
+        <th>Jumlah Rusak</th>
+        <th>Tanggal</th>
+      </tr>
+    </thead>
+    <tbody id="dashboardDamageTable"></tbody>
+  </table>
+</div>
+  
   <!-- TABEL PEMINJAMAN TERBARU -->
   <div class="bg-white p-4 rounded shadow">
     <h3 class="font-bold mb-3">Peminjaman Terbaru</h3>
@@ -858,6 +873,31 @@ function logout(){
     });
 }
   
+// ================= barang rusak dashboard =================
+  function renderDashboardDamage() {
+  const tbody = document.getElementById('dashboardDamageTable');
+  if (!tbody) return;
+
+  db.collection("barangRusak")
+    .orderBy("time", "desc")
+    .limit(5) // tampilkan 5 terbaru
+    .get()
+    .then(snap => {
+      let html = "";
+      snap.forEach(doc => {
+        const d = doc.data();
+        const date = d.time.toDate ? d.time.toDate() : new Date(d.time);
+
+        html += `<tr class="border-b">
+          <td>${d.nama}</td>
+          <td>${d.qty}</td>
+          <td>${date.toLocaleString("id-ID")}</td>
+        </tr>`;
+      });
+      tbody.innerHTML = html;
+    });
+}
+  
 // ================= RESET =================
   async function resetSemua(){
 
@@ -1007,13 +1047,15 @@ function renderDashboard(){
   document.getElementById('barangHabisTable').innerHTML = htmlB;
 }
 
-
+// ===== BARANG RUSAK TERBARU =====
+  renderDashboardDamage();  // <-- panggil fungsi render barang rusak di sini
   
  // ===== BARANG RUSAK =====
 // panggil setiap kali barang/loan update
 db.collection("barang").onSnapshot(()=>{ renderDashboard(); });
 db.collection("loan").onSnapshot(()=>{ renderDashboard(); });
 
+  
 
   // Render dropdown barang untuk barang rusak
 function renderDamageDropdown() {
@@ -1133,6 +1175,7 @@ db.collection("barang").onSnapshot(() => { renderDamageDropdown(); renderDashboa
 db.collection("barangRusak").onSnapshot(() => { 
   renderDamageTable(); 
   renderDashboard();  // <-- tambahkan
+  renderDashboardDamage(); 
 });
 </script>
   
