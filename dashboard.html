@@ -81,8 +81,10 @@ table {
 
 #sidebar {
   background: #ffffff;
-  border-right: 1px solid #e2e8f0;
-  box-shadow: 2px 0 6px rgba(0,0,0,0.04);
+  border-right: 2px solid #3b82f6;
+  box-shadow: 
+    0 0 0 1px rgba(59,130,246,0.2),
+    2px 0 10px rgba(59,130,246,0.15);
 }
 
 /* Judul */
@@ -103,7 +105,11 @@ table {
   0% { left: -100%; }
   100% { left: 100%; }
 }
-
+  
+.sidebar-link {
+  background: #ffffff;
+  border: 1px solid #bfdbfe; /* biru muda */
+}
   /* Transisi halus */
 .sidebar-link {
   transition: all 0.2s ease;
@@ -115,6 +121,15 @@ table {
 }
 .sidebar-link {
   font-size: 14px;
+}
+
+.sidebar-link:hover {
+  background: #eff6ff !important; /* biru sangat muda */
+}
+
+.sidebar-link.active {
+  background: #dbeafe !important;
+  border-color: #60a5fa;
 }
   
 body { font-family: sans-serif; background:#f1f5f9;}
