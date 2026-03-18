@@ -29,6 +29,7 @@ body { font-family: sans-serif; background:#f1f5f9;}
     <div id="menu-barang" class="sidebar-link" onclick="navigate('barang')">Barang</div>
     <div id="menu-peminjaman" class="sidebar-link" onclick="navigate('peminjaman')">Peminjaman</div>
     <div id="menu-riwayat" class="sidebar-link" onclick="navigate('riwayat')">Riwayat dan Pengembalian Barang</div>
+    <div id="menu-barang-rusak" class="sidebar-link" onclick="navigate('barangRusak')">Barang Rusak</div>
   </div>
 
   <!-- LOGOUT DI BAWAH -->
@@ -210,6 +211,34 @@ RESET SEMUA DATA
   </div>
 </div>
 
+<!-- BARANG RUSAK -->
+  <section id="barangRusak" class="page">
+
+  <h2 class="font-bold mb-3">Catat Barang Rusak</h2>
+
+  <form id="damageForm" class="space-y-2">
+    <select id="damageBarang" class="w-full border p-2 rounded"></select>
+    <input id="damageQty" type="number" placeholder="Jumlah Rusak" class="w-full border p-2 rounded">
+    <textarea id="damageNote" placeholder="Keterangan" class="w-full border p-2 rounded"></textarea>
+    <button type="submit" class="w-full bg-red-600 text-white p-2 rounded">
+      Simpan
+    </button>
+  </form>
+
+  <h3 class="font-bold mt-6 mb-2">Riwayat Barang Rusak</h3>
+  <table class="w-full border text-sm">
+    <thead class="bg-gray-200">
+      <tr>
+        <th class="p-2">Nama Barang</th>
+        <th class="p-2">Jumlah Rusak</th>
+        <th class="p-2">Keterangan</th>
+        <th class="p-2">Tanggal</th>
+      </tr>
+    </thead>
+    <tbody id="damageTable"></tbody>
+  </table>
+
+</section>
   
 </main>
 </div>
@@ -972,9 +1001,105 @@ function renderDashboard(){
   document.getElementById('barangHabisTable').innerHTML = htmlB;
 }
 
+
+  
+ // ===== BARANG RUSAK =====
 // panggil setiap kali barang/loan update
 db.collection("barang").onSnapshot(()=>{ renderDashboard(); });
 db.collection("loan").onSnapshot(()=>{ renderDashboard(); });
+
+
+  // Render dropdown barang untuk barang rusak
+function renderDamageDropdown() {
+  let select = document.getElementById('damageBarang');
+  select.innerHTML = "";
+  barangList.filter(b => b.stok > 0).forEach(b => {
+    select.innerHTML += `<option value="${b.id}">${b.nama} (stok: ${b.stok})</option>`;
+  });
+}
+
+// Submit barang rusak
+const damageForm = document.getElementById('damageForm');
+
+if(damageForm){
+  damageForm.addEventListener('submit', async e => {
+    e.preventDefault();
+
+    if(!isAdmin()){
+      alert("Hanya admin yang bisa mengisi barang rusak");
+      return;
+    }
+
+    let id = document.getElementById('damageBarang').value;
+    let qty = parseInt(document.getElementById('damageQty').value);
+    let note = document.getElementById('damageNote').value.trim();
+
+    if(!id || isNaN(qty) || qty <= 0){
+      alert("Input tidak valid");
+      return;
+    }
+
+    let ref = db.collection("barang").doc(id);
+
+    await db.runTransaction(async t => {
+      let doc = await t.get(ref);
+      if(!doc.exists) throw "Barang tidak ada";
+
+      let data = doc.data();
+
+      if(data.stok < qty){
+        throw "Stok tidak cukup";
+      }
+
+      // update stok barang
+      t.update(ref, {
+        stok: data.stok - qty
+      });
+
+      // simpan record barang rusak
+      let damageRef = db.collection("damage").doc();
+      t.set(damageRef, {
+        barangId: id,
+        barangName: data.nama,
+        qty,
+        note,
+        time: new Date(),
+        userEmail: currentUser.email
+      });
+
+    }).then(() => {
+      alert("Barang rusak berhasil dicatat");
+      damageForm.reset();
+    }).catch(err => {
+      alert(err);
+    });
+  });
+}
+
+// Render riwayat barang rusak
+function renderDamageTable() {
+  db.collection("damage")
+    .orderBy("time", "desc")
+    .get()
+    .then(snap => {
+      let html = "";
+      snap.forEach(doc => {
+        let d = doc.data();
+        let date = d.time ? (d.time.toDate ? d.time.toDate() : new Date(d.time)) : "-";
+        html += `<tr class="border-b">
+          <td class="p-2">${d.barangName}</td>
+          <td class="p-2">${d.qty}</td>
+          <td class="p-2">${d.note || "-"}</td>
+          <td class="p-2">${date.toLocaleString("id-ID")}</td>
+        </tr>`;
+      });
+      document.getElementById('damageTable').innerHTML = html;
+    });
+}
+
+// Realtime update
+db.collection("barang").onSnapshot(() => { renderDamageDropdown(); renderDashboard(); });
+db.collection("damage").onSnapshot(() => { renderDamageTable(); });
 </script>
   
 </body>
