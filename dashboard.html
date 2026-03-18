@@ -517,9 +517,22 @@ function renderBarang(){
       <td class="p-2 border">${b.lokasi}</td>
       <td class="p-2 border">${b.stok}</td>
       <td class="p-2 border">
-        <button onclick="openEdit('${b.id}','${b.kode}','${b.nama}','${b.lokasi}',${b.stok})">Edit</button>
-        <button onclick="hapusBarang('${b.id}','${b.nama}')">Hapus</button>
-      </td>
+  <div class="flex gap-2">
+    
+    <button 
+      onclick="openEdit('${b.id}','${b.kode}','${b.nama}','${b.lokasi}',${b.stok})"
+      class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs font-semibold transition">
+      Edit
+    </button>
+
+    <button 
+      onclick="hapusBarang('${b.id}','${b.nama}')"
+      class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-semibold transition">
+      Hapus
+    </button>
+
+  </div>
+</td>
     </tr>
     `;
 
