@@ -471,37 +471,36 @@ function renderBarang(){
 
   renderStokTable();
 }
-// ================= INIT =================
+  
+// ================= INIT APP =================
 function initApp(){
 
-// sembunyikan tombol tambah khusus admin
-const btnTambah = document.getElementById("btnTambah");
+  // sembunyikan tombol tambah khusus admin
+  const btnTambah = document.getElementById("btnTambah");
+  if(!isAdmin() && btnTambah) btnTambah.style.display="none";
 
-if(!isAdmin()){
-  if(btnTambah) btnTambah.style.display="none";
+  // ===== REACTIVE LISTENER BARANG =====
+  db.collection("barang").onSnapshot(barangSnap => {
+    barangList = [];
+    barangSnap.forEach(doc => barangList.push({id: doc.id, ...doc.data()}));
+
+    renderBarang();           // tabel barang & dropdown peminjaman
+    renderDamageDropdown();   // dropdown barang rusak
+    renderDashboard();        // update stat, tabel dashboard & chart
+    renderDashboardDamage();  // tabel barang rusak terbaru
+  });
+
+  // ===== REACTIVE LISTENER PEMINJAMAN =====
+  db.collection("loan").onSnapshot(loanSnap => {
+    const loans = [];
+    loanSnap.forEach(doc => loans.push({id: doc.id, ...doc.data()}));
+
+    renderRiwayat(loans);          // tabel riwayat
+    renderBarangDipinjamChart(loans); // chart total barang dipinjam
+    renderLoanChart(loans);         // chart peminjaman 7 hari terakhir
+  });
+
 }
-
-// realtime barang
-db.collection("barang").onSnapshot(snap=>{
-  barangList = [];
-  snap.forEach(doc => { barangList.push({id: doc.id, ...doc.data()}); });
-  renderBarang(); 
-  renderDamageDropdown();  
-  renderDashboard(); // tambahkan ini
-});
-
-// realtime loan
-db.collection("loan")
-  .orderBy("time","desc")
-  .onSnapshot(snap=>{
-    let data=[];
-    snap.forEach(doc=>{
-      data.push({id:doc.id,...doc.data()});
-    });
-    renderRiwayat(data);
-});
-}
-  
 // ================= filter riwayat =================
   async function filterRiwayat(){
 
@@ -969,6 +968,7 @@ for(let i=6; i>=0; i--){
 }
   
 let loanChartInstance = null; // global
+let barangDipinjamChart = null;
   function renderDashboard(){
 
   // ===== STATISTICS =====
@@ -1014,61 +1014,59 @@ let loanChartInstance = null; // global
     });
     document.getElementById('peminjamanTerbaruTable').innerHTML = html;
 
-    // ===== GRAFIK TOTAL BARANG DIPINJAM SELURUH RIWAYAT =====
-const totals = {};
-loans.forEach(l => {
-  if(!l.barang || !l.qty) return;
-  if(!totals[l.barang]) totals[l.barang] = 0;
-  totals[l.barang] += l.qty;
-});
+// ================= CHART PEMINJAMAN 7 HARI =================
+let loanChartInstance = null;
+let barangDipinjamChart = null;
 
-const labels = Object.keys(totals);
-const data = Object.values(totals);
+function renderLoanChart(loans){
+  const today = new Date();
+  const days = [];
+  const counts = [];
 
-const ctx = document.getElementById('barangDipinjamChart').getContext('2d');
+  for(let i=6; i>=0; i--){
+    const d = new Date();
+    d.setDate(today.getDate() - i);
+    days.push(d.toLocaleDateString("id-ID"));
 
-if(barangDipinjamChart) barangDipinjamChart.destroy();
+    const count = loans.filter(l => {
+      const t = l.time?.toDate ? l.time.toDate() : new Date(l.time);
+      return t.toDateString() === d.toDateString();
+    }).length;
 
-barangDipinjamChart = new Chart(ctx, {
-  type: 'bar',
-  data: {
-    labels,
-    datasets: [{
-      label: 'Total Barang Dipinjam',
-      data,
-      backgroundColor: '#f87171'
-    }]
-  },
-  options: {
-    responsive: true,
-    plugins: { legend: { display: false } },
-    scales: { y: { beginAtZero: true } }
+    counts.push(count);
   }
-});
 
-    const ctx = document.getElementById('loanChart').getContext('2d');
+  const ctx = document.getElementById('loanChart').getContext('2d');
+  if(loanChartInstance) loanChartInstance.destroy();
 
-    // destroy chart lama jika ada
-    if (loanChartInstance) {
-      loanChartInstance.destroy();
-    }
-
-    loanChartInstance = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: days,
-        datasets: [{
-          label: 'Jumlah Peminjaman',
-          data: counts,
-          backgroundColor: '#3b82f6'
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: { legend: { display: false } }
-      }
-    });
+  loanChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: { labels: days, datasets: [{ label: 'Jumlah Peminjaman', data: counts, backgroundColor: '#3b82f6' }] },
+    options: { responsive: true, plugins: { legend: { display: false } } }
   });
+}
+
+// ================= CHART TOTAL BARANG DIPINJAM =================
+function renderBarangDipinjamChart(loans){
+  const totals = {};
+  loans.forEach(l => {
+    if(!l.barang || !l.qty) return;
+    if(!totals[l.barang]) totals[l.barang] = 0;
+    totals[l.barang] += l.qty;
+  });
+
+  const labels = Object.keys(totals);
+  const data = Object.values(totals);
+
+  const ctx = document.getElementById('barangDipinjamChart').getContext('2d');
+  if(barangDipinjamChart) barangDipinjamChart.destroy();
+
+  barangDipinjamChart = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets: [{ label: 'Total Barang Dipinjam', data, backgroundColor: '#f87171' }] },
+    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+  });
+}
 
   // ===== BARANG HABIS / HAMPIR HABIS =====
   let htmlB = "";
@@ -1080,10 +1078,7 @@ barangDipinjamChart = new Chart(ctx, {
   });
   document.getElementById('barangHabisTable').innerHTML = htmlB;
 
-
-    let barangDipinjamChart = null; // chart global
-
-function renderBarangDipinjamChart(loans){
+  function renderBarangDipinjamChart(loans){
   // hitung total jumlah per barang
   const totals = {};
   loans.forEach(l => {
