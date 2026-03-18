@@ -410,7 +410,8 @@ th.nama-barang {
                   <th class="p-3 border">Qty</th>
                   <th class="p-3 border">Pengembali</th>
                   <th class="p-3 border">Detail Waktu</th>
-                  <th class="p-3 border">Status/Aksi</th>
+                  <th class="p-3 border">Keterangan</th>
+                  <th class="p-3 border">Status/Aksi</th
                 </tr>
               </thead>
               <tbody id="riwayatTable"></tbody>
@@ -898,32 +899,71 @@ function renderRiwayat(data){
     if(l.status === "kembali") keterangan += `<div class="text-[10px] text-blue-500 font-semibold">Kembali: ${formatDate(l.returnedAt)}</div>`;
 
     html+=`<tr class="border-b text-xs hover:bg-slate-50 transition">
-      <td class="p-3 font-medium text-slate-800">${l.nama}</td>
-      <td class="p-3 nama-barang">${l.barang}</td>
-      <td class="p-3 font-bold">${l.qty}</td>
-      <td class="p-3">
-        ${l.status === "dipinjam" 
-          ? `<input id="ret-${l.id}" placeholder="Penerima..." class="border p-1 text-xs w-full rounded focus:ring-1">`
-          : `<span class="text-green-600 font-bold">${l.returnedByName || '-'}</span>`
-        }
-      </td>
-      <td class="p-3">${keterangan}</td>
-      <td class="p-3">
-        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase ${l.status === 'dipinjam' ? 'bg-orange-100 text-orange-600' : 'bg-green-100 text-green-600'}">
-            ${l.status}
-        </span>
-        <div class="mt-2 space-y-1">
-          ${(l.status=="dipinjam" && isOwner) 
-            ? `<button onclick="kembaliDenganNama('${l.id}','${l.barangId}',${l.qty})" class="block w-full bg-green-500 text-white px-2 py-1 rounded text-[10px] hover:bg-green-600">Terima Kembali</button>` 
-            : ''
-          }
-          ${isAdmin() 
-            ? `<button onclick="hapusRiwayat('${l.id}')" class="block w-full bg-slate-200 text-slate-600 px-2 py-1 rounded text-[10px] hover:bg-red-500 hover:text-white">Hapus</button>` 
-            : ''
-          }
-        </div>
-      </td>
-    </tr>`;
+  <td class="p-3 font-medium text-slate-800">${l.nama}</td>
+
+  <td class="p-3 nama-barang">${l.barang}</td>
+
+  <td class="p-3 font-bold">${l.qty}</td>
+
+  <td class="p-3">
+    ${l.status === "dipinjam" 
+      ? `<input id="ret-${l.id}" placeholder="Penerima..." class="border p-1 text-xs w-full rounded focus:ring-1">`
+      : `<span class="text-green-600 font-bold">${l.returnedByName || '-'}</span>`
+    }
+  </td>
+
+  <!-- DETAIL WAKTU -->
+  <td class="p-3">
+    ${formatDate(l.time)} <br>
+    ${l.status === "kembali" ? formatDate(l.returnedAt) : '-'}
+  </td>
+
+  <!-- KETERANGAN (BARU) -->
+  <td class="p-3 text-left">
+    <div class="text-[11px] text-blue-600">
+      Dipinjam oleh: ${l.userEmail || '-'}
+    </div>
+
+    ${
+      l.status === "kembali"
+      ? `<div class="text-[11px] text-green-600 mt-1">
+           Dikembalikan oleh: ${l.returnedByUser || '-'}
+         </div>`
+      : `<div class="text-[11px] text-gray-400 italic mt-1">
+           Belum dikembalikan
+         </div>`
+    }
+  </td>
+
+  <!-- STATUS / AKSI -->
+  <td class="p-3">
+    <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+      l.status === 'dipinjam' 
+      ? 'bg-orange-100 text-orange-600' 
+      : 'bg-green-100 text-green-600'
+    }">
+        ${l.status}
+    </span>
+
+    <div class="mt-2 space-y-1">
+      ${(l.status=="dipinjam" && isOwner) 
+        ? `<button onclick="kembaliDenganNama('${l.id}','${l.barangId}',${l.qty})"
+            class="block w-full bg-green-500 text-white px-2 py-1 rounded text-[10px] hover:bg-green-600">
+            Terima Kembali
+          </button>` 
+        : ''
+      }
+
+      ${isAdmin() 
+        ? `<button onclick="hapusRiwayat('${l.id}')"
+            class="block w-full bg-slate-200 text-slate-600 px-2 py-1 rounded text-[10px] hover:bg-red-500 hover:text-white">
+            Hapus
+          </button>` 
+        : ''
+      }
+    </div>
+  </td>
+</tr>`;
   });
   document.getElementById('riwayatTable').innerHTML=html;
 }
