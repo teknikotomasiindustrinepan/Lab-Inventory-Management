@@ -13,6 +13,18 @@ body { font-family: sans-serif; background:#f1f5f9;}
 .page { display:none;}
 .page.active { display:block;}
 .custom-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index: 50;}
+  /* Semua isi tabel default rata tengah */
+table th,
+table td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* Kolom "Nama Barang" rata kiri */
+td.nama-barang,
+th.nama-barang {
+  text-align: left !important;
+}
 </style>
 </head>
 
@@ -212,7 +224,7 @@ body { font-family: sans-serif; background:#f1f5f9;}
               <thead class="bg-slate-50 text-left">
                 <tr>
                   <th class="p-3 border">Kode</th>
-                  <th class="p-3 border">Nama Barang</th>
+                  <th class="p-3 border nama-barang">Nama Barang</th>
                   <th class="p-3 border">Status Stok</th>
                 </tr>
               </thead>
@@ -516,7 +528,7 @@ function renderBarang(){
     html+=`
     <tr>
       <td class="p-2 border">${b.kode}</td>
-      <td class="p-2 border">${b.nama}</td>
+      <td class="p-2 border nama-barang">${b.nama}</td>
       <td class="p-2 border">${b.lokasi}</td>
       <td class="p-2 border">${b.stok}</td>
       <td class="p-2 border">
@@ -599,7 +611,7 @@ function renderStokTable(){
 .forEach(b=>{
     html += `<tr class="border-b">
       <td class="p-3">${b.kode}</td>
-      <td class="p-3">${b.nama}</td>
+      <td class="p-3 nama-barang">${b.nama}</td>
       <td class="p-3">
         <span class="px-2 py-1 rounded text-xs font-bold ${
           (!b.stok || b.stok == 0)
@@ -710,7 +722,7 @@ function renderRiwayat(data){
 
     html+=`<tr class="border-b text-xs hover:bg-slate-50 transition">
       <td class="p-3 font-medium text-slate-800">${l.nama}</td>
-      <td class="p-3">${l.barang}</td>
+      <td class="p-3 nama-barang">${l.barang}</td>
       <td class="p-3 font-bold">${l.qty}</td>
       <td class="p-3">
         ${l.status === "dipinjam" 
@@ -795,7 +807,7 @@ function renderDashboard(){
       loans.sort((a,b) => (b.time?.toDate ? b.time.toDate() : 0) - (a.time?.toDate ? a.time.toDate() : 0)).slice(0,5).forEach(l => {
             html += `<tr class="border-b hover:bg-gray-50">
         <td class="p-2">${l.nama}</td>
-        <td class="p-2">${l.barang}</td>
+        <td class="p-2 nama-barang">${l.barang}</td>
         <td class="p-2 font-bold">${l.qty}</td>
         <td class="p-2 text-xs text-gray-400">${formatDate(l.time)}</td>
         <td class="p-2">
