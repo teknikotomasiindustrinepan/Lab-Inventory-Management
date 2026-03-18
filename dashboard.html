@@ -945,9 +945,15 @@ function printRiwayat(){
     const lastTd = row.lastElementChild;
     if(lastTd){
       const statusSpan = lastTd.querySelector("span");
-      lastTd.innerHTML = statusSpan 
-        ? statusSpan.innerText.toUpperCase() 
-        : "-";
+      if (lastTd) {
+  const statusSpan = lastTd.querySelector("span");
+        if (statusSpan) {
+          const text = statusSpan.innerText.trim();
+          lastTd.innerText = text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+        } else {
+          lastTd.innerText = "-";
+        }
+      }
     }
 
     const input = row.querySelector("input");
