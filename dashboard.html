@@ -100,9 +100,42 @@ RESET SEMUA DATA
 </div>
 
 </section>
-
+<!-- area RIWAYAT -->
+<div id="areaRiwayat">
+  <table class="w-full">
+    <thead>
+      <tr>
+        <th>Peminjam</th>
+        <th>Barang</th>
+        <th>Jumlah</th>
+        <th>Pengembali</th>
+        <th>Keterangan</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="tabelRiwayat"></tbody>
+  </table>
+</div>
+  
 <!-- RIWAYAT -->
 <section id="riwayat" class="page">
+
+  <div class="mb-4 space-x-2">
+
+  <input type="date" id="startDate" class="border p-2">
+  <input type="date" id="endDate" class="border p-2">
+
+  <button onclick="filterRiwayat()" 
+    class="bg-blue-500 text-white px-3 py-2 rounded">
+    Filter
+  </button>
+
+  <button onclick="printRiwayat()" 
+    class="bg-green-600 text-white px-3 py-2 rounded">
+    Print
+  </button>
+
+</div>
 <table class="w-full mt-4 border">
   <thead class="bg-gray-200">
     <tr>
@@ -364,7 +397,40 @@ db.collection("loan")
     renderRiwayat(data);
 });
 }
+  
+// ================= filter riwayat =================
+  async function filterRiwayat(){
 
+  let start = document.getElementById("startDate").value;
+  let end   = document.getElementById("endDate").value;
+
+  if(!start || !end){
+    alert("Pilih tanggal dulu");
+    return;
+  }
+
+  let startDate = new Date(start);
+  let endDate   = new Date(end);
+
+  // supaya sampai akhir hari
+  endDate.setHours(23,59,59,999);
+
+  try{
+
+    let snapshot = await db.collection("loan")
+      .where("tanggalPinjam", ">=", startDate)
+      .where("tanggalPinjam", "<=", endDate)
+      .orderBy("tanggalPinjam","desc")
+      .get();
+
+    renderRiwayat(snapshot);
+
+  }catch(err){
+    console.error(err);
+    alert("Error filter: " + err.message);
+  }
+}
+  
 // ================= BARANG =================
   async function hapusBarang(id, nama){
 
@@ -622,7 +688,61 @@ if(l.status === "kembali"){
 
   document.getElementById('riwayatTable').innerHTML=html;
 }
+  
+  // ================= renderriwayat =================
+function renderRiwayat(snapshot){
 
+  let html = "";
+
+  snapshot.forEach(doc => {
+
+    let d = doc.data();
+
+    html += `
+      <tr>
+        <td>${d.namaPeminjam}</td>
+        <td>${d.namaBarang}</td>
+        <td>${d.jumlah}</td>
+        <td>${d.namaPengembali || "-"}</td>
+        <td>
+          Pinjam: ${new Date(d.tanggalPinjam.seconds*1000).toLocaleString()} <br>
+          Kembali: ${d.tanggalKembali ? new Date(d.tanggalKembali.seconds*1000).toLocaleString() : "-"}
+        </td>
+        <td>${d.status}</td>
+      </tr>
+    `;
+  });
+
+  document.getElementById("tabelRiwayat").innerHTML = html;
+}
+
+  // ================= printriwayat =================
+function printRiwayat(){
+
+  let isi = document.getElementById("areaRiwayat").innerHTML;
+
+  let win = window.open('', '', 'width=900,height=700');
+
+  win.document.write(`
+    <html>
+      <head>
+        <title>Print Riwayat</title>
+        <style>
+          table { border-collapse: collapse; width: 100%; }
+          th, td { border: 1px solid black; padding: 8px; }
+          th { background: #eee; }
+        </style>
+      </head>
+      <body>
+        <h3>Riwayat Peminjaman</h3>
+        ${isi}
+      </body>
+    </html>
+  `);
+
+  win.document.close();
+  win.print();
+}
 // ================= PENGEMBALIAN =================
 async function kembaliDenganNama(id, barangId, qty){
 
