@@ -13,30 +13,46 @@ body { font-family: sans-serif; background:#f1f5f9;}
 .page.active { display:block;}
 .custom-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5);}
 
-/* ===== TABEL RATA TENGAH ===== */
-table th,
-table td {
-  text-align: center;
-  vertical-align: middle;
-}
-
+/* ===== TABEL RATA TENGAH & BORDER ===== */
 table {
+  width: 100%;
+  border-collapse: collapse; /* agar garis tidak double */
   margin-left: auto;
   margin-right: auto;
 }
 
-/* ===== KECUALI KOLOM TERTENTU ===== */
-/* Barang: nama & tempat simpan tetap rata kiri */
+table th,
+table td {
+  text-align: center;
+  vertical-align: middle;
+  border: 1px solid #cbd5e1; /* warna garis */
+  padding: 6px 8px;
+}
+
+/* ===== WARNA HEADER ===== */
+table thead th {
+  background-color: #e2e8f0;
+  font-weight: bold;
+}
+
+/* ===== KOLOM KHUSUS RATA KIRI ===== */
+/* Barang: Nama Barang & Tempat Simpan */
 #barangTable td:nth-child(2),
 #barangTable td:nth-child(3),
 #stokTable td:nth-child(1) {
   text-align: left;
 }
 
-/* Riwayat: nama peminjam, nama barang, keterangan tetap rata kiri */
+/* Riwayat: Nama Peminjam, Nama Barang, Keterangan */
 #riwayatTable td:nth-child(2),
 #riwayatTable td:nth-child(3),
 #riwayatTable td:nth-child(6) {
+  text-align: left;
+}
+
+/* Barang rusak: Nama Barang tetap rata kiri */
+#damageTable td:nth-child(2),
+#dashboardDamageTable td:nth-child(1) { 
   text-align: left;
 }
 </style>
