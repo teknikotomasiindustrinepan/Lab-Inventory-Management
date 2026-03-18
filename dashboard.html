@@ -959,6 +959,8 @@ function logout(){
 <script>
   
 let loanChartInstance = null; // global
+let barangDipinjamChart = null; // chart global
+
   function renderDashboard(){
 
   // ===== STATISTICS =====
@@ -1023,9 +1025,10 @@ let loanChartInstance = null; // global
 
     // destroy chart lama jika ada
     if (loanChartInstance) {
-      loanChartInstance.destroy();
-    }
-
+  loanChartInstance.data.labels = newLabels;
+  loanChartInstance.data.datasets[0].data = newData;
+  loanChartInstance.update();
+} else {
     loanChartInstance = new Chart(ctx, {
       type: 'bar',
       data: {
@@ -1054,9 +1057,7 @@ let loanChartInstance = null; // global
   document.getElementById('barangHabisTable').innerHTML = htmlB;
 
 
-    let barangDipinjamChart = null; // chart global
-
-function renderBarangDipinjamChart(loans){
+ function renderBarangDipinjamChart(loans){
   // hitung total jumlah per barang
   const totals = {};
   loans.forEach(l => {
@@ -1095,6 +1096,7 @@ db.collection("loan").onSnapshot(snap => {
   const loans = [];
   snap.forEach(doc => loans.push({id: doc.id, ...doc.data()}));
   renderBarangDipinjamChart(loans);
+   renderLoanChart(loans); // update tren peminjaman
 });
     
 }
