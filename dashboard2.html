@@ -3,501 +3,331 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lab Inventory System | Electronics Edition</title>
+<title>Lab Inventory System</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<!-- Font Google -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --primary: #0891b2; /* Cyan 600 */
-    --secondary: #334155; /* Slate 700 */
-    --accent: #22d3ee; /* Cyan 400 */
-    --bg-main: #f8fafc;
-  }
+body { font-family: sans-serif; background:#f1f5f9;}
+.sidebar-link { padding:10px; cursor:pointer; }
+.sidebar-link.active { background:#334155; color:white;}
+.page { display:none;}
+.page.active { display:block;}
+.custom-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5);}
 
-  body { 
-    
-    font-family: 'Inter', sans-serif; 
-    background: var(--bg-main);
-    color: #1e293b;
-  }
+/* ===== TABEL RATA TENGAH & BORDER ===== */
+table {
+  width: 100%;
+  border-collapse: collapse; /* agar garis tidak double */
+  margin-left: auto;
+  margin-right: auto;
+}
 
-  /* Sidebar Styling */
-  .sidebar {
-    background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
-    box-shadow: 4px 0 10px rgba(0,0,0,0.1);
-  }
+table th,
+table td {
+  text-align: center;
+  vertical-align: middle;
+  border: 1px solid #cbd5e1; /* warna garis */
+  padding: 6px 8px;
+}
 
-  .sidebar-link { 
-    padding: 12px 20px; 
-    cursor: pointer; 
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border-radius: 8px;
-    margin: 4px 12px;
-    color: #94a3b8;
-  }
+/* ===== WARNA HEADER ===== */
+table thead th {
+  background-color: #e2e8f0;
+  font-weight: bold;
+}
 
-  .sidebar-link:hover { 
-    background: rgba(255,255,255,0.05);
-    color: white;
-  }
+/* ===== KOLOM KHUSUS RATA KIRI ===== */
+/* Barang: Nama Barang & Tempat Simpan */
+#barangTable td:nth-child(2),
+#barangTable td:nth-child(3),
+#stokTable td:nth-child(1) {
+  text-align: left;
+}
 
-  .sidebar-link.active { 
-    background: var(--primary); 
-    color: white;
-    box-shadow: 0 4px 12px rgba(8, 145, 178, 0.3);
-  }
+/* Riwayat: Nama Peminjam, Nama Barang, Keterangan */
+#riwayatTable td:nth-child(2),
+#riwayatTable td:nth-child(3),
+#riwayatTable td:nth-child(6) {
+  text-align: left;
+}
 
-  /* Card & Page Styling */
-  .page { display: none; animation: fadeIn 0.3s ease-out; }
-  .page.active { display: block; }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .glass-card {
-    background: white;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-  }
-
-  /* Table Customization */
-  .custom-table-container {
-    overflow-x: auto;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-  }
-
-  table th {
-    background: #f1f5f9;
-    color: #475569;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.75rem;
-    letter-spacing: 0.05em;
-    padding: 12px 16px;
-    text-align: left;
-    border-bottom: 2px solid #e2e8f0;
-  }
-
-  table td {
-    padding: 12px 16px;
-    border-bottom: 1px solid #f1f5f9;
-    font-size: 0.875rem;
-  }
-
-  table tr:last-child td { border-bottom: none; }
-  table tr:hover td { background-color: #f8fafc; }
-
-  /* Badge styling */
-  .badge {
-    padding: 2px 8px;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 500;
-  }
-
-  /* Modal */
-  .custom-modal { 
-    display: none; 
-    position: fixed; 
-    inset: 0; 
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(4px);
-    z-index: 50;
-    align-items: center;
-    justify-content: center;
-  }
-
-  input, select, textarea {
-    border: 1px solid #cbd5e1 !important;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-
-  input:focus, select:focus {
-    outline: none;
-    border-color: var(--primary) !important;
-    box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1) !important;
-  }
-
-  /* Tech Accents */
-  .tech-border {
-    border-left: 4px solid var(--primary);
-  }
-
-  .status-dot {
-    height: 8px;
-    width: 8px;
-    background-color: #10b981;
-    border-radius: 50%;
-    display: inline-block;
-    margin-right: 6px;
-  }
-
-  /* Scrollbar */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: #f1f5f9; }
-  ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-  ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+/* Barang rusak: Nama Barang tetap rata kiri */
+#damageTable td:nth-child(2),
+#dashboardDamageTable td:nth-child(1) { 
+  text-align: left;
+}
 </style>
 </head>
-<body class="flex min-h-screen">
 
+<body>
+<div class="flex">
 <!-- SIDEBAR -->
+<aside class="w-60 bg-slate-900 text-white p-4 flex flex-col justify-between h-screen">
+  <div class="flex flex-col items-center mb-4">
+    <img src="LOGO TE.png" alt="Logo Lab" class="w-20 h-20 mb-2">
+    <h2 class="text-lg font-bold">LabManager TOI Nepan</h2>
   
- <div id="menu-dashboard" class="sidebar-link active" onclick="navigate('dashboard')">
-<div id="menu-barang" class="sidebar-link" onclick="navigate('inventory')">
-<div id="menu-peminjaman" class="sidebar-link" onclick="navigate('peminjaman')">
-<div id="menu-riwayat" class="sidebar-link" onclick="navigate('riwayat')">
-<div id="menu-barangRusak" class="sidebar-link" onclick="navigate('kerusakan')">
-  
-<div class="sidebar w-64 flex flex-col shrink-0">
-  <div class="p-6">
-    <div class="flex items-center gap-3 text-white mb-8">
-      <div class="bg-cyan-500 p-2 rounded-lg">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
-        </svg>
-      </div>
-      <div>
-        <h1 class="font-bold text-lg leading-tight">LAB-INV</h1>
-        <p class="text-[10px] text-cyan-400 tracking-widest font-mono uppercase">Electronics Dept</p>
-      </div>
-    </div>
+    <div id="userInfo" class="mb-4 text-sm text-gray-300"></div>
 
-    <nav class="space-y-1">
-      <div class="sidebar-link active" onclick="navigate('dashboard')">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
-        <span>Dashboard</span>
-      </div>
-      <div class="sidebar-link" onclick="navigate('inventory')">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
-        <span>Inventaris</span>
-      </div>
-      <div class="sidebar-link" onclick="navigate('peminjaman')">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m4-4l-4-4" /></svg>
-        <span>Peminjaman</span>
-      </div>
-      <div class="sidebar-link" onclick="navigate('riwayat')">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-        <span>Riwayat</span>
-      </div>
-      <div class="sidebar-link" onclick="navigate('kerusakan')">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-        <span>Barang Rusak</span>
-      </div>
-    </nav>
+    <div id="menu-dashboard" class="sidebar-link active" onclick="navigate('dashboard')">Dashboard</div>
+    <div id="menu-barang" class="sidebar-link" onclick="navigate('barang')">Data Master Barang</div>
+    <div id="menu-peminjaman" class="sidebar-link" onclick="navigate('peminjaman')">Input Peminjaman</div>
+    <div id="menu-riwayat" class="sidebar-link" onclick="navigate('riwayat')">Riwayat & Pengembalian</div>
+    <div id="menu-barangRusak" class="sidebar-link" onclick="navigate('barangRusak')">Lapor Barang Rusak</div>
   </div>
+
+  <!-- LOGOUT DI BAWAH -->
+  <button onclick="logout()" class="w-full bg-red-500 p-2 rounded mt-4">
+    Logout
+  </button>
+
+</aside>
+
   
-  <div class="mt-auto p-6 border-t border-slate-800">
-    <div id="userInfo" class="flex items-center gap-3 text-slate-400 mb-4">
-      <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-white">U</div>
-      <div class="overflow-hidden">
-        <p class="text-xs font-semibold text-white truncate" id="userName">User</p>
-        <p class="text-[10px] uppercase tracking-tighter" id="userRole">Viewer</p>
-      </div>
+<main class="flex-1 p-6">
+<h1 id="page-title" class="text-xl mb-4">Dashboard LabManager TOI Nepan</h1>
+
+<!-- DASHBOARD -->
+<section id="dashboard" class="page active">
+
+  <!-- KPI BOXES -->
+  <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+    <div class="bg-white p-4 rounded shadow text-center">
+      <h3 class="text-sm text-gray-500">Total Barang</h3>
+      <p id="stat-total" class="text-xl font-bold">0</p>
     </div>
-    <button onclick="handleLogout()" class="w-full bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white py-2 rounded-lg text-sm font-medium transition-colors">
-      Logout
-    </button>
+    <div class="bg-white p-4 rounded shadow text-center">
+      <h3 class="text-sm text-gray-500">Barang Tersedia</h3>
+      <p id="stat-tersedia" class="text-xl font-bold">0</p>
+    </div>
+    <div class="bg-white p-4 rounded shadow text-center">
+      <h3 class="text-sm text-gray-500">Barang Habis</h3>
+      <p id="stat-habis" class="text-xl font-bold">0</p>
+    </div>
+    <div class="bg-white p-4 rounded shadow text-center">
+      <h3 class="text-sm text-gray-500">Total Peminjaman</h3>
+      <p id="stat-peminjaman" class="text-xl font-bold">0</p>
+    </div>
+    <div class="bg-white p-4 rounded shadow text-center">
+      <h3 class="text-sm text-gray-500">Pengembalian Hari Ini</h3>
+      <p id="stat-pengembalian" class="text-xl font-bold">0</p>
+    </div>
+  </div>
+
+  <!-- GRAFIK TREND PEMINJAMAN -->
+  <div class="bg-white p-4 rounded shadow mb-6">
+    <h3 class="font-bold mb-3">Tren Peminjaman 7 Hari Terakhir</h3>
+    <canvas id="loanChart" height="120"></canvas>
+  </div>
+
+  <div class="bg-white p-4 rounded shadow mb-6">
+  <h3 class="font-bold mb-3">Volume Pinjam per Item</h3>
+  <canvas id="barangDipinjamChart" height="120"></canvas>
+</div>
+  
+
+  <!-- TABEL BARANG HABIS / HAMPIR HABIS -->
+  <div class="bg-white p-4 rounded shadow mb-6">
+    <h3 class="font-bold mb-3">Stok Kritis</h3>
+    <table class="w-full border text-sm">
+      <thead class="bg-gray-200">
+        <tr>
+          <th class="p-2">Nama Barang</th>
+          <th class="p-2">Stok</th>
+        </tr>
+      </thead>
+      <tbody id="barangHabisTable"></tbody>
+    </table>
+  </div>
+
+  <!-- TABEL BARANG RUSAK -->
+<div class="bg-white p-4 rounded shadow mb-6">
+  <h3 class="font-bold mb-3">Barang Rusak Terbaru</h3>
+  <table class="w-full border text-sm">
+    <thead class="bg-gray-200">
+      <tr>
+        <th>Nama Barang</th>
+        <th>Jumlah Rusak</th>
+        <th>Tanggal</th>
+      </tr>
+    </thead>
+    <tbody id="dashboardDamageTable"></tbody>
+  </table>
+</div>
+  
+  <!-- TABEL PEMINJAMAN TERBARU -->
+  <div class="bg-white p-4 rounded shadow">
+    <h3 class="font-bold mb-3">Peminjaman Terbaru</h3>
+    <table class="w-full border text-sm">
+      <thead class="bg-gray-200">
+        <tr>
+          <th class="p-2">Nama Peminjam</th>
+          <th class="p-2">Barang</th>
+          <th class="p-2">Jumlah</th>
+          <th class="p-2">Tanggal</th>
+        </tr>
+      </thead>
+      <tbody id="peminjamanTerbaruTable"></tbody>
+    </table>
+  </div>
+
+</section>
+
+<!-- BARANG -->
+<section id="barang" class="page">
+<button id="btnTambah" onclick="toggleModal(true)">+ Tambah</button>
+<table class="w-full mt-4">
+  <thead class="bg-gray-200">
+    <tr>
+      <th>Kode Barang</th>
+      <th>Nama Barang</th>
+      <th>Tempat Simpan</th>
+      <th>Jumlah</th>
+      <th>Aksi</th>
+    </tr>
+  </thead>
+  <tbody id="barangTable"></tbody>
+</table>
+  <button onclick="resetSemua()" 
+class="bg-red-700 text-white px-4 py-2 rounded mt-4">
+RESET SEMUA DATA
+</button>
+</section>
+
+<!-- PEMINJAMAN -->
+<section id="peminjaman" class="page">
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+  <!-- FORM PINJAM -->
+  <div class="bg-white p-4 rounded shadow">
+    <h2 class="font-bold mb-3">Form Peminjaman</h2>
+
+    <form id="loanForm" class="space-y-2">
+      <input id="loanName" placeholder="Nama" class="w-full border p-2 rounded">
+
+      <select id="loanBarang" class="w-full border p-2 rounded"></select>
+
+      <input id="loanQty" type="number" placeholder="Jumlah" class="w-full border p-2 rounded">
+
+      <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded">
+        Pinjam
+      </button>
+    </form>
+  </div>
+
+  <!-- TABEL STOK -->
+  <div class="bg-white p-4 rounded shadow">
+    <h2 class="font-bold mb-3">Stok Barang</h2>
+
+    <table class="w-full text-sm border">
+      <thead class="bg-gray-200">
+        <tr>
+          <th class="p-2">Nama Barang</th>
+          <th class="p-2">Stok</th>
+        </tr>
+      </thead>
+      <tbody id="stokTable"></tbody>
+    </table>
+
+  </div>
+
+</div>
+
+</section>
+
+
+  
+<!-- RIWAYAT -->
+<section id="riwayat" class="page">
+
+  <div class="mb-4 space-x-2">
+
+  <input type="date" id="startDate" class="border p-2">
+  <input type="date" id="endDate" class="border p-2">
+
+  <button onclick="filterRiwayat()" 
+    class="bg-blue-500 text-white px-3 py-2 rounded">
+    Filter
+  </button>
+
+  <button onclick="printRiwayat()" 
+    class="bg-green-600 text-white px-3 py-2 rounded">
+    Print
+  </button>
+ 
+<table class="w-full mt-4 border">
+  <thead class="bg-gray-200">
+    <tr>
+      <th>Kode Barang</th>  <!-- tambahan -->
+      <th>Nama Peminjam</th>
+      <th>Nama Barang</th>
+      <th>Jumlah</th>
+      <th>Nama Pengembali</th>
+      <th>Keterangan</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody id="riwayatTable"></tbody>
+</table>
+
+    </div>
+   
+</section>
+
+<div id="loginPage" class="fixed inset-0 flex items-center justify-center bg-black/50">
+  <div class="bg-white p-6 rounded-xl w-80">
+    <h2 class="text-lg font-bold mb-4">Login</h2>
+    <input id="email" placeholder="Email" class="w-full border p-2 mb-2">
+    <input id="password" type="password" placeholder="Password" class="w-full border p-2 mb-4">
+    <button onclick="login()" class="w-full bg-blue-600 text-white p-2 rounded">Login</button>
   </div>
 </div>
 
-<!-- MAIN CONTENT -->
-<main class="flex-1 p-8 overflow-y-auto">
+<!-- BARANG RUSAK -->
+<section id="barangRusak" class="page">
+  <h2 class="font-bold mb-3">Barang Rusak</h2>
+
+  <form id="damageForm" class="space-y-2">
+    <select id="damageBarang" class="w-full border p-2 rounded">
+      <option value="">-- Pilih Barang --</option>
+    </select>
+
+    <input id="damageQty" type="number" placeholder="Jumlah Rusak" class="w-full border p-2 rounded">
+
+    <button type="submit" class="w-full bg-red-600 text-white p-2 rounded">Laporkan Rusak</button>
+  </form>
+
+  <div class="bg-white p-4 rounded shadow mt-4">
+    <h3 class="font-bold mb-2">Daftar Barang Rusak</h3>
+    <table class="w-full text-sm border">
+      <thead class="bg-gray-200">
+        <tr>
+          <th>Kode Barang</th>  <!-- tambahan -->
+          <th>Nama Barang</th>
+          <th>Jumlah Rusak</th>
+          <th>Tanggal</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="damageTable"></tbody>
+    </table>
+  </div>
+</section>
   
-  <!-- DASHBOARD PAGE -->
-  <div id="dashboard" class="page active">
-    <header class="mb-8">
-      <h2 class="text-2xl font-bold text-slate-800">Sistem Monitoring Lab</h2>
-      <p class="text-slate-500">Ringkasan status inventaris real-time.</p>
-    </header>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      <div class="glass-card p-6 tech-border">
-        <p class="text-sm font-medium text-slate-500 mb-1">Total Item</p>
-        <h3 class="text-3xl font-bold text-slate-800" id="statTotal">0</h3>
-        <div class="mt-2 text-xs text-cyan-600 font-mono tracking-tighter uppercase">Verified Assets</div>
-      </div>
-      <div class="glass-card p-6 border-l-4 border-amber-400">
-        <p class="text-sm font-medium text-slate-500 mb-1">Dipinjam</p>
-        <h3 class="text-3xl font-bold text-slate-800" id="statPinjam">0</h3>
-        <div class="mt-2 text-xs text-amber-600 font-mono tracking-tighter uppercase">Active Sessions</div>
-      </div>
-      <div class="glass-card p-6 border-l-4 border-emerald-400">
-        <p class="text-sm font-medium text-slate-500 mb-1">Tersedia</p>
-        <h3 class="text-3xl font-bold text-slate-800" id="statTersedia">0</h3>
-        <div class="mt-2 text-xs text-emerald-600 font-mono tracking-tighter uppercase">Ready for Use</div>
-      </div>
-      <div class="glass-card p-6 border-l-4 border-red-400">
-        <p class="text-sm font-medium text-slate-500 mb-1">Rusak</p>
-        <h3 class="text-3xl font-bold text-slate-800" id="statRusak">0</h3>
-        <div class="mt-2 text-xs text-red-600 font-mono tracking-tighter uppercase">Maintenance Required</div>
-      </div>
-    </div>
-
-    <!-- Recent Activity Placeholder -->
-    <div class="glass-card p-6">
-      <h4 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
-        <span class="status-dot"></span> Aktifitas Terbaru
-      </h4>
-      <div id="recentActivity" class="space-y-4 text-sm text-slate-600">
-        <p class="italic opacity-50 text-center py-8">Memuat data terbaru...</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- INVENTORY PAGE -->
-  <div id="inventory" class="page">
-    <div class="flex justify-between items-center mb-8">
-      <div>
-        <h2 class="text-2xl font-bold text-slate-800">Daftar Inventaris</h2>
-        <p class="text-slate-500">Kelola semua komponen dan peralatan lab.</p>
-      </div>
-      <button onclick="openModal('addBarangModal')" id="btnAddBarang" class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg font-medium shadow-lg shadow-cyan-900/10 flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
-        Tambah Barang
-      </button>
-    </div>
-
-    <div class="glass-card overflow-hidden">
-      <div class="p-4 bg-slate-50 border-b border-slate-200 flex flex-wrap gap-4">
-        <div class="relative flex-1 min-w-[200px]">
-          <span class="absolute inset-y-0 left-3 flex items-center text-slate-400">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-          </span>
-          <input type="text" id="searchBarang" placeholder="Cari nama atau kode barang..." class="w-full pl-10 pr-4 py-2 rounded-md text-sm">
-        </div>
-      </div>
-      <div class="custom-table-container">
-        <table id="tableBarang">
-          <thead>
-            <tr>
-              <th>Kode</th>
-              <th>Nama Barang</th>
-              <th>Kategori</th>
-              <th>Stok</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Dynamic data -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- PEMINJAMAN PAGE -->
-  <div id="peminjaman" class="page">
-    <div class="flex justify-between items-center mb-8">
-      <div>
-        <h2 class="text-2xl font-bold text-slate-800">Manajemen Peminjaman</h2>
-        <p class="text-slate-500">Alur keluar masuk peminjaman alat.</p>
-      </div>
-      <button onclick="openModal('pinjamModal')" class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg font-medium shadow-lg shadow-cyan-900/10">
-        Buat Pinjaman Baru
-      </button>
-    </div>
-
-    <div class="glass-card overflow-hidden">
-      <div class="custom-table-container">
-        <table id="tablePinjam">
-          <thead>
-            <tr>
-              <th>ID Pinjam</th>
-              <th>Peminjam</th>
-              <th>Barang</th>
-              <th>Qty</th>
-              <th>Tgl Pinjam</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Dynamic data -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- RIWAYAT PAGE -->
-  <div id="riwayat" class="page">
-    <div class="mb-8">
-      <h2 class="text-2xl font-bold text-slate-800">Log Riwayat</h2>
-      <p class="text-slate-500">Daftar transaksi pengembalian dan log sistem.</p>
-    </div>
-    <div class="glass-card overflow-hidden">
-      <div class="custom-table-container">
-        <table id="tableRiwayat">
-          <thead>
-            <tr>
-              <th>ID Pinjam</th>
-              <th>Peminjam</th>
-              <th>Barang</th>
-              <th>Qty</th>
-              <th>Tgl Pinjam</th>
-              <th>Tgl Kembali</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Dynamic data -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- KERUSAKAN PAGE -->
-  <div id="kerusakan" class="page">
-    <div class="flex justify-between items-center mb-8">
-      <div>
-        <h2 class="text-2xl font-bold text-slate-800">Laporan Kerusakan</h2>
-        <p class="text-slate-500">Pencatatan item yang membutuhkan perbaikan.</p>
-      </div>
-      <button onclick="openModal('damageModal')" id="btnAddDamage" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium shadow-lg">
-        Lapor Kerusakan
-      </button>
-    </div>
-
-    <div class="glass-card overflow-hidden border-t-4 border-red-500">
-      <div class="custom-table-container">
-        <table id="tableDamage">
-          <thead>
-            <tr>
-              <th>Kode</th>
-              <th>Nama Barang</th>
-              <th>Qty Rusak</th>
-              <th>Tgl Lapor</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Dynamic data -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
 </main>
-
-<!-- =============================================
-     MODALS (DIBUAT LEBIH ELEGAN)
-     ============================================= -->
-
-<!-- Modal Add Barang -->
-<div id="addBarangModal" class="custom-modal flex">
-  <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
-    <div class="bg-slate-900 p-4 flex justify-between items-center">
-      <h3 class="text-white font-bold">Input Inventaris Baru</h3>
-      <button onclick="closeModal('addBarangModal')" class="text-slate-400 hover:text-white">&times;</button>
-    </div>
-    <div class="p-6">
-      <form id="formBarang" class="space-y-4">
-        <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Kode Barang</label>
-          <input type="text" id="kodeBarang" class="w-full border p-2 rounded-lg text-sm" placeholder="Contoh: ELK-001" required>
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nama Barang</label>
-          <input type="text" id="namaBarang" class="w-full border p-2 rounded-lg text-sm" required>
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Kategori</label>
-          <select id="kategoriBarang" class="w-full border p-2 rounded-lg text-sm">
-            <option value="Komponen Elektronika">Komponen Elektronika</option>
-            <option value="Alat Ukur">Alat Ukur</option>
-            <option value="Alat Solder">Alat Solder</option>
-            <option value="Power Supply">Power Supply</option>
-            <option value="Lainnya">Lainnya</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Jumlah Stok</label>
-          <input type="number" id="stokBarang" class="w-full border p-2 rounded-lg text-sm" min="0" required>
-        </div>
-        <div class="pt-4">
-          <button type="submit" class="w-full bg-cyan-600 text-white py-2 rounded-lg font-bold hover:bg-cyan-700 transition-all">SIMPAN DATA</button>
-        </div>
-      </form>
-    </div>
-  </div>
 </div>
 
-<!-- Modal Pinjam -->
-<div id="pinjamModal" class="custom-modal flex">
-  <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
-    <div class="bg-slate-900 p-4 flex justify-between items-center">
-      <h3 class="text-white font-bold">Formulir Peminjaman</h3>
-      <button onclick="closeModal('pinjamModal')" class="text-slate-400 hover:text-white">&times;</button>
-    </div>
-    <div class="p-6">
-      <form id="formPinjam" class="space-y-4">
-        <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nama Peminjam</label>
-          <input type="text" id="peminjamName" class="w-full border p-2 rounded-lg text-sm" required>
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Pilih Barang</label>
-          <select id="pinjamBarangId" class="w-full border p-2 rounded-lg text-sm" required></select>
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Jumlah (Qty)</label>
-          <input type="number" id="pinjamQty" class="w-full border p-2 rounded-lg text-sm" min="1" required>
-        </div>
-        <div class="pt-4 text-xs text-amber-600 italic">
-          *Pastikan peminjam membawa KTM/Kartu Identitas.
-        </div>
-        <div class="pt-2">
-          <button type="submit" class="w-full bg-cyan-600 text-white py-2 rounded-lg font-bold">KONFIRMASI PINJAMAN</button>
-        </div>
-      </form>
-    </div>
+<!-- MODAL -->
+<div id="modal" class="custom-modal">
+  <div class="bg-white p-4">
+    <input id="kode" placeholder="Kode Barang" readonly><br>
+    <input id="nama" placeholder="Nama Barang"><br>
+    <input id="tempat" placeholder="Tempat Simpan"><br>
+    <input id="stok" type="number" placeholder="Stok"><br>
+    <button onclick="saveBarang()">Simpan</button>
+    <button onclick="toggleModal(false)">Batal</button>
   </div>
 </div>
-
-<!-- Modal Damage -->
-<div id="damageModal" class="custom-modal flex">
-  <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
-    <div class="bg-red-900 p-4 flex justify-between items-center">
-      <h3 class="text-white font-bold">Lapor Kerusakan Alat</h3>
-      <button onclick="closeModal('damageModal')" class="text-slate-400 hover:text-white">&times;</button>
-    </div>
-    <div class="p-6">
-      <form id="formDamage" class="space-y-4">
-        <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Barang Yang Rusak</label>
-          <select id="damageBarangId" class="w-full border p-2 rounded-lg text-sm" required></select>
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Jumlah Rusak</label>
-          <input type="number" id="damageQty" class="w-full border p-2 rounded-lg text-sm" min="1" required>
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Keterangan / Gejala</label>
-          <textarea id="damageNote" class="w-full border p-2 rounded-lg text-sm h-20" placeholder="Misal: Short circuit, pecah, dll"></textarea>
-        </div>
-        <div class="pt-4">
-          <button type="submit" class="w-full bg-red-600 text-white py-2 rounded-lg font-bold">KIRIM LAPORAN</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
 
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
@@ -578,8 +408,8 @@ auth.onAuthStateChanged(async user=>{
     document.getElementById('loginPage').style.display="none";
 
     // PINDAHKAN KE SINI
-    document.getElementById("userName").innerText = currentUser.email;
-    document.getElementById("userRole").innerText = currentRole;
+    document.getElementById("userInfo").innerText =
+      currentUser.email + " (" + currentRole + ")";
 
     applyRoleUI();
     initApp();
@@ -634,9 +464,6 @@ modal.classList.remove("items-center","justify-center");
 }
 
   // ================= FUNCTION KONTROL ROLE =================
-  
-
-  
 function applyRoleUI(){
 
   if(currentRole === "admin"){
@@ -1360,7 +1187,7 @@ if(damageForm){
   damageForm.addEventListener('submit', async e=>{
     e.preventDefault();
 
-    const barangId = document.getElementById('damageBarangId').value;
+    const barangId = document.getElementById('damageBarang').value;
     const qty = parseInt(document.getElementById('damageQty').value);
 
     if(!barangId || isNaN(qty) || qty <= 0){
@@ -1403,7 +1230,7 @@ if(damageForm){
 
 // Render riwayat barang rusak
 function renderDamageTable() {
-  const tbody = document.querySelector('#tableDamage tbody');
+  const tbody = document.getElementById('damageTable');
   if(!tbody) return;
 
   db.collection("barangRusak").orderBy("time","desc").get().then(snap=>{
@@ -1466,30 +1293,6 @@ db.collection("barangRusak").onSnapshot(() => {
   renderDashboardDamage(); 
 });
 </script>
-
-  <!-- LOGIN OVERLAY -->
-<div id="loginPage" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50">
-  <div class="bg-white w-full max-w-sm p-6 rounded-xl shadow-2xl">
-    
-    <h2 class="text-xl font-bold text-slate-800 mb-4 text-center">
-      Login Sistem Lab
-    </h2>
-
-    <input id="email" type="email" placeholder="Email"
-      class="w-full border p-2 rounded-lg mb-3 text-sm">
-
-    <input id="password" type="password" placeholder="Password"
-      class="w-full border p-2 rounded-lg mb-4 text-sm">
-
-    <button onclick="login()"
-      class="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-2 rounded-lg font-semibold">
-      LOGIN
-    </button>
-
-    <p class="text-xs text-center text-slate-400 mt-3">
-      Lab Inventory System
-    </p>
-  </div>
-</div>
+  
 </body>
 </html>
