@@ -16,6 +16,12 @@
   }
 
   body { 
+<div id="menu-dashboard" class="sidebar-link active" onclick="showPage('dashboard')">
+<div id="menu-barang" class="sidebar-link" onclick="showPage('inventory')">
+<div id="menu-peminjaman" class="sidebar-link" onclick="showPage('peminjaman')">
+<div id="menu-riwayat" class="sidebar-link" onclick="showPage('riwayat')">
+<div id="menu-barangRusak" class="sidebar-link" onclick="showPage('kerusakan')">
+    
     font-family: 'Inter', sans-serif; 
     background: var(--bg-main);
     color: #1e293b;
@@ -570,8 +576,8 @@ auth.onAuthStateChanged(async user=>{
     document.getElementById('loginPage').style.display="none";
 
     // PINDAHKAN KE SINI
-    document.getElementById("userInfo").innerText =
-      currentUser.email + " (" + currentRole + ")";
+    document.getElementById("userName").innerText = currentUser.email;
+    document.getElementById("userRole").innerText = currentRole;
 
     applyRoleUI();
     initApp();
@@ -1455,6 +1461,30 @@ db.collection("barangRusak").onSnapshot(() => {
   renderDashboardDamage(); 
 });
 </script>
-  
+
+  <!-- LOGIN OVERLAY -->
+<div id="loginPage" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50">
+  <div class="bg-white w-full max-w-sm p-6 rounded-xl shadow-2xl">
+    
+    <h2 class="text-xl font-bold text-slate-800 mb-4 text-center">
+      Login Sistem Lab
+    </h2>
+
+    <input id="email" type="email" placeholder="Email"
+      class="w-full border p-2 rounded-lg mb-3 text-sm">
+
+    <input id="password" type="password" placeholder="Password"
+      class="w-full border p-2 rounded-lg mb-4 text-sm">
+
+    <button onclick="login()"
+      class="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-2 rounded-lg font-semibold">
+      LOGIN
+    </button>
+
+    <p class="text-xs text-center text-slate-400 mt-3">
+      Lab Inventory System
+    </p>
+  </div>
+</div>
 </body>
 </html>
