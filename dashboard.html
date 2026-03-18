@@ -137,6 +137,7 @@ body { font-family: sans-serif; background:#f1f5f9;}
               <th class="p-2">Barang</th>
               <th class="p-2">Jumlah</th>
               <th class="p-2">Waktu Pinjam</th>
+              <th class="p-2">Status</th>
             </tr>
           </thead>
           <tbody id="peminjamanTerbaruTable"></tbody>
@@ -765,7 +766,22 @@ function renderDashboard(){
       // Peminjaman Terbaru
       let html = "";
       loans.sort((a,b) => (b.time?.toDate ? b.time.toDate() : 0) - (a.time?.toDate ? a.time.toDate() : 0)).slice(0,5).forEach(l => {
-          html += `<tr class="border-b hover:bg-gray-50"><td class="p-2">${l.nama}</td><td class="p-2">${l.barang}</td><td class="p-2 font-bold">${l.qty}</td><td class="p-2 text-xs text-gray-400">${formatDate(l.time)}</td></tr>`;
+            html += `<tr class="border-b hover:bg-gray-50">
+        <td class="p-2">${l.nama}</td>
+        <td class="p-2">${l.barang}</td>
+        <td class="p-2 font-bold">${l.qty}</td>
+        <td class="p-2 text-xs text-gray-400">${formatDate(l.time)}</td>
+        <td class="p-2">
+          <span class="px-2 py-1 rounded text-xs font-bold ${
+            l.status === 'dipinjam'
+              ? 'bg-orange-100 text-orange-600'
+              : 'bg-green-100 text-green-600'
+          }">
+            ${l.status === 'dipinjam' ? 'Dipinjam' : 'Dikembalikan'}
+          </span>
+        </td>
+      </tr>`;    
+        
       });
       document.getElementById('peminjamanTerbaruTable').innerHTML = html;
 
