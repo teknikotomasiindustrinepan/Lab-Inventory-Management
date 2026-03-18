@@ -408,7 +408,13 @@ db.collection("loan")
       .orderBy("tanggalPinjam","desc")
       .get();
 
-    renderRiwayat(snapshot);
+    let data = [];
+
+snapshot.forEach(doc=>{
+  data.push({id:doc.id, ...doc.data()});
+});
+
+renderRiwayat(data);
 
   }catch(err){
     console.error(err);
@@ -674,34 +680,7 @@ if(l.status === "kembali"){
   document.getElementById('riwayatTable').innerHTML=html;
 }
   
-  // ================= renderriwayat =================
-function renderRiwayat(snapshot){
-
-  let html = "";
-
-  snapshot.forEach(doc => {
-
-    let d = doc.data();
-
-    html += `
-      <tr>
-        <td>${d.namaPeminjam}</td>
-        <td>${d.namaBarang}</td>
-        <td>${d.jumlah}</td>
-        <td>${d.namaPengembali || "-"}</td>
-        <td>
-          Pinjam: ${new Date(d.tanggalPinjam.seconds*1000).toLocaleString()} <br>
-          Kembali: ${d.tanggalKembali ? new Date(d.tanggalKembali.seconds*1000).toLocaleString() : "-"}
-        </td>
-        <td>${d.status}</td>
-      </tr>
-    `;
-  });
-
-  document.getElementById("tabelRiwayat").innerHTML = html;
-}
-
-  // ================= printriwayat =================
+    // ================= printriwayat =================
 function printRiwayat(){
 
   let isi = document.getElementById("areaRiwayat").innerHTML;
