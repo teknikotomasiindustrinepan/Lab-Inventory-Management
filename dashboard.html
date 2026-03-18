@@ -1,783 +1,852 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LabManager TOI Nepan</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1e293b; }
-        .sidebar-link { 
-            padding: 12px 16px; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            border-radius: 8px; 
-            transition: all 0.2s; 
-            margin-bottom: 4px;
-            color: #94a3b8;
-        }
-        .sidebar-link:hover { background: rgba(255,255,255,0.05); color: white; }
-        .sidebar-link.active { background: #3b82f6; color: white; font-weight: 600; }
-        .page { display: none; animation: fadeIn 0.3s ease-out; }
-        .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; padding: 20px; }
-        .custom-modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); z-index: 50; }
-        .table-container { overflow-x: auto; border-radius: 12px; border: 1px solid #e2e8f0; }
-        table { width: 100%; text-align: left; border-collapse: collapse; }
-        th { background: #f1f5f9; padding: 12px 16px; font-weight: 600; font-size: 0.875rem; color: #475569; }
-        td { padding: 12px 16px; border-top: 1px solid #f1f5f9; font-size: 0.875rem; }
-        .btn-primary { background: #3b82f6; color: white; padding: 10px 20px; border-radius: 8px; font-weight: 500; transition: 0.2s; }
-        .btn-primary:hover { background: #2563eb; }
-        .input-field { border: 1px solid #cbd5e1; padding: 10px; border-radius: 8px; outline: none; transition: 0.2s; width: 100%; }
-        .input-field:focus { border-color: #3b82f6; ring: 2px #3b82f6; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab Inventory System</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body { font-family: sans-serif; background:#f1f5f9;}
+.sidebar-link { padding:10px; cursor:pointer; transition: all 0.2s; border-radius: 4px; margin-bottom: 2px; }
+.sidebar-link:hover { background: #1e293b; }
+.sidebar-link.active { background:#334155; color:white; font-weight: bold;}
+.page { display:none;}
+.page.active { display:block;}
+.custom-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index: 50;}
+</style>
 </head>
 
 <body>
-<div class="flex min-h-screen">
-    <!-- SIDEBAR -->
-    <aside class="w-72 bg-slate-900 text-white p-6 flex flex-col sticky top-0 h-screen shrink-0">
-        <div>
-            <div class="flex items-center gap-3 mb-8 px-2">
-                <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-xl">L</div>
-                <h2 class="text-lg font-bold tracking-tight">LabManager TOI</h2>
-            </div>
+<div class="flex">
+<!-- SIDEBAR -->
+<aside id="sidebar" class="w-64 bg-slate-900 text-white p-4 flex flex-col justify-between h-screen sticky top-0">
 
-            <div id="userInfo" class="mb-8 p-3 bg-slate-800 rounded-lg text-xs text-slate-400 break-all border border-slate-700">
-                Memuat profil...
-            </div>
+  <div>
+    <h2 class="text-lg font-bold mb-6 border-b border-slate-700 pb-2">LabManager TOI Nepan</h2>
 
-            <nav class="space-y-1">
-                <div id="menu-dashboard" class="sidebar-link active" onclick="navigate('dashboard')">
-                    <span class="mr-3 text-lg">📊</span> Dashboard
-                </div>
-                <div id="menu-barang" class="sidebar-link" onclick="navigate('barang')">
-                    <span class="mr-3 text-lg">📦</span> Inventaris Barang
-                </div>
-                <div id="menu-peminjaman" class="sidebar-link" onclick="navigate('peminjaman')">
-                    <span class="mr-3 text-lg">📝</span> Form Pinjam
-                </div>
-                <div id="menu-riwayat" class="sidebar-link" onclick="navigate('riwayat')">
-                    <span class="mr-3 text-lg">🔄</span> Riwayat & Return
-                </div>
-                <div id="menu-barangRusak" class="sidebar-link" onclick="navigate('barangRusak')">
-                    <span class="mr-3 text-lg">⚠️</span> Barang Rusak
-                </div>
-            </nav>
-        </div>
+    <div id="userInfo" class="mb-6 p-3 bg-slate-800 rounded text-xs text-gray-300 break-all"></div>
 
-        <button onclick="logout()" class="mt-auto w-full bg-slate-800 hover:bg-red-500/20 hover:text-red-400 p-3 rounded-lg font-medium transition-all duration-200 border border-slate-700">
-            Keluar Sistem
-        </button>
-    </aside>
+    <nav class="space-y-1">
+      <div id="menu-dashboard" class="sidebar-link active" onclick="navigate('dashboard')">Dashboard</div>
+      <div id="menu-barang" class="sidebar-link" onclick="navigate('barang')">Data Master Barang</div>
+      <div id="menu-peminjaman" class="sidebar-link" onclick="navigate('peminjaman')">Input Peminjaman</div>
+      <div id="menu-riwayat" class="sidebar-link" onclick="navigate('riwayat')">Riwayat & Pengembalian</div>
+      <div id="menu-barangRusak" class="sidebar-link" onclick="navigate('barangRusak')">Lapor Barang Rusak</div>
+    </nav>
+  </div>
 
-    <main class="flex-1 overflow-y-auto bg-slate-50">
-        <header class="bg-white border-b border-slate-200 p-6 flex justify-between items-center sticky top-0 z-30">
-            <h1 id="page-title" class="text-2xl font-bold text-slate-800 capitalize">Dashboard</h1>
-            <div class="text-sm text-slate-500 font-medium" id="current-date"></div>
-        </header>
+  <!-- LOGOUT DI BAWAH -->
+  <button onclick="logout()" class="w-full bg-red-600 hover:bg-red-700 p-2 rounded mt-4 transition font-semibold">
+    Logout
+  </button>
 
-        <div class="p-8">
-            <!-- DASHBOARD PAGE -->
-            <section id="dashboard" class="page active">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-                    <div class="card flex flex-col items-center justify-center border-l-4 border-l-blue-500">
-                        <span class="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1">Total Barang</span>
-                        <p id="stat-total" class="text-3xl font-bold text-slate-800">0</p>
-                    </div>
-                    <div class="card flex flex-col items-center justify-center border-l-4 border-l-emerald-500">
-                        <span class="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1">Tersedia</span>
-                        <p id="stat-tersedia" class="text-3xl font-bold text-slate-800">0</p>
-                    </div>
-                    <div class="card flex flex-col items-center justify-center border-l-4 border-l-rose-500">
-                        <span class="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1">Stok Habis</span>
-                        <p id="stat-habis" class="text-3xl font-bold text-slate-800">0</p>
-                    </div>
-                    <div class="card flex flex-col items-center justify-center border-l-4 border-l-amber-500">
-                        <span class="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1">Dipinjam</span>
-                        <p id="stat-peminjaman" class="text-3xl font-bold text-slate-800">0</p>
-                    </div>
-                    <div class="card flex flex-col items-center justify-center border-l-4 border-l-indigo-500">
-                        <span class="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1">Balik Hari Ini</span>
-                        <p id="stat-pengembalian" class="text-3xl font-bold text-slate-800">0</p>
-                    </div>
-                </div>
+</aside>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                    <div class="card">
-                        <h3 class="font-bold text-slate-800 mb-6 flex items-center"><span class="mr-2">📈</span> Tren 7 Hari Terakhir</h3>
-                        <canvas id="loanChart" height="200"></canvas>
-                    </div>
-                    <div class="card">
-                        <h3 class="font-bold text-slate-800 mb-6 flex items-center"><span class="mr-2">📊</span> Distribusi Peminjaman</h3>
-                        <canvas id="barangDipinjamChart" height="200"></canvas>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div class="card lg:col-span-1">
-                        <h3 class="font-bold text-slate-800 mb-4 text-sm flex items-center text-rose-600">
-                            <span class="mr-2">🚨</span> Perlu Restok
-                        </h3>
-                        <div class="table-container">
-                            <table class="text-xs">
-                                <thead>
-                                    <tr>
-                                        <th>Barang</th>
-                                        <th>Stok</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="barangHabisTable"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    
-                    <div class="card lg:col-span-2">
-                        <h3 class="font-bold text-slate-800 mb-4 text-sm flex items-center">
-                            <span class="mr-2">🆕</span> Peminjaman Terbaru
-                        </h3>
-                        <div class="table-container">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Peminjam</th>
-                                        <th>Barang</th>
-                                        <th>Qty</th>
-                                        <th>Waktu</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="peminjamanTerbaruTable"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card mt-8">
-                    <h3 class="font-bold text-slate-800 mb-4 text-sm flex items-center text-rose-700">
-                        <span class="mr-2">🛠️</span> Laporan Kerusakan Terbaru
-                    </h3>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Nama Barang</th>
-                                    <th>Jumlah Rusak</th>
-                                    <th>Tanggal Lapor</th>
-                                </tr>
-                            </thead>
-                            <tbody id="dashboardDamageTable"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- BARANG PAGE -->
-            <section id="barang" class="page">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-lg font-semibold text-slate-700">Manajemen Inventaris</h2>
-                    <button id="btnTambah" onclick="toggleModal(true)" class="btn-primary flex items-center">
-                        <span class="mr-2">+</span> Tambah Barang Baru
-                    </button>
-                </div>
-                
-                <div class="card">
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Nama Barang</th>
-                                    <th>Stok Tersedia</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="barangTable"></tbody>
-                        </table>
-                    </div>
-                    <div class="mt-8 pt-6 border-t border-slate-100">
-                        <p class="text-sm text-slate-500 mb-4 italic text-center">Tindakan berbahaya di bawah ini akan menghapus semua riwayat dan menolkan stok.</p>
-                        <div class="flex justify-center">
-                            <button onclick="resetSemua()" class="px-6 py-2 bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-600 hover:text-white transition-all font-semibold">
-                                RESET DATABASE SISTEM
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- PEMINJAMAN PAGE -->
-            <section id="peminjaman" class="page">
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    <div class="lg:col-span-5 card">
-                        <h2 class="font-bold text-slate-800 mb-6 flex items-center">
-                            <span class="p-2 bg-blue-100 text-blue-600 rounded-lg mr-3">🖋️</span> 
-                            Input Peminjaman
-                        </h2>
-                        <form id="loanForm" class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nama Peminjam</label>
-                                <input id="loanName" placeholder="Contoh: Budi Santoso" class="input-field">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Pilih Barang</label>
-                                <select id="loanBarang" class="input-field"></select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Jumlah</label>
-                                <input id="loanQty" type="number" placeholder="0" class="input-field">
-                            </div>
-                            <button type="submit" class="w-full btn-primary mt-4 py-3 text-lg shadow-lg shadow-blue-500/30">
-                                Konfirmasi Peminjaman
-                            </button>
-                        </form>
-                    </div>
-
-                    <div class="lg:col-span-7 card">
-                        <h2 class="font-bold text-slate-800 mb-6 flex items-center">
-                            <span class="p-2 bg-emerald-100 text-emerald-600 rounded-lg mr-3">📦</span> 
-                            Status Stok Real-time
-                        </h2>
-                        <div class="table-container">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Nama Barang</th>
-                                        <th>Stok Tersedia</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="stokTable"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- RIWAYAT PAGE -->
-            <section id="riwayat" class="page">
-                <div class="card mb-6 flex flex-wrap gap-4 items-end">
-                    <div class="flex-1 min-w-[200px]">
-                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Dari Tanggal</label>
-                        <input type="date" id="startDate" class="input-field">
-                    </div>
-                    <div class="flex-1 min-w-[200px]">
-                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Sampai Tanggal</label>
-                        <input type="date" id="endDate" class="input-field">
-                    </div>
-                    <button onclick="filterRiwayat()" class="bg-slate-800 text-white px-6 py-2.5 rounded-lg hover:bg-slate-700">Filter</button>
-                    <button onclick="printRiwayat()" class="bg-emerald-600 text-white px-6 py-2.5 rounded-lg hover:bg-emerald-700">Cetak Laporan</button>
-                </div>
-
-                <div class="card">
-                    <div class="table-container">
-                        <table class="min-w-[1000px]">
-                            <thead>
-                                <tr>
-                                    <th>Peminjam</th>
-                                    <th>Barang</th>
-                                    <th>Qty</th>
-                                    <th>Penerima</th>
-                                    <th>Keterangan Waktu</th>
-                                    <th>Status & Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="riwayatTable"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- BARANG RUSAK PAGE -->
-            <section id="barangRusak" class="page">
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    <div class="lg:col-span-4 card self-start">
-                        <h2 class="font-bold text-slate-800 mb-6 flex items-center text-rose-600">
-                            <span class="p-2 bg-rose-100 rounded-lg mr-3">⚠️</span> Lapor Kerusakan
-                        </h2>
-                        <form id="damageForm" class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Barang</label>
-                                <select id="damageBarang" class="input-field">
-                                    <option value="">-- Pilih Barang --</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Jumlah Rusak</label>
-                                <input id="damageQty" type="number" placeholder="0" class="input-field">
-                            </div>
-                            <button type="submit" class="w-full bg-rose-600 text-white p-3 rounded-lg font-bold hover:bg-rose-700 shadow-lg shadow-rose-200">
-                                Kirim Laporan
-                            </button>
-                        </form>
-                    </div>
-
-                    <div class="lg:col-span-8 card">
-                        <h3 class="font-bold text-slate-800 mb-6">Daftar Kerusakan Barang</h3>
-                        <div class="table-container">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Nama Barang</th>
-                                        <th>Jumlah</th>
-                                        <th>Waktu Kejadian</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="damageTable"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </div>
-    </main>
+  
+<main class="flex-1 p-6 overflow-y-auto">
+<div class="flex justify-between items-center mb-6">
+    <h1 id="page-title" class="text-2xl font-bold text-slate-800 capitalize">Dashboard</h1>
+    <div id="roleBadge" class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider"></div>
 </div>
 
-<!-- MODAL TAMBAH/EDIT -->
-<div id="modal" class="custom-modal flex items-center justify-center">
-    <div class="bg-white p-8 rounded-2xl w-full max-w-md shadow-2xl">
-        <h3 class="text-xl font-bold mb-6 text-slate-800 border-b pb-4">Form Data Barang</h3>
+<!-- DASHBOARD -->
+<section id="dashboard" class="page active">
+
+  <!-- KPI BOXES -->
+  <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+    <div class="bg-white p-4 rounded shadow text-center border-b-4 border-blue-500">
+      <h3 class="text-sm text-gray-500">Total Barang</h3>
+      <p id="stat-total" class="text-xl font-bold text-blue-600">0</p>
+    </div>
+    <div class="bg-white p-4 rounded shadow text-center border-b-4 border-green-500">
+      <h3 class="text-sm text-gray-500">Barang Tersedia</h3>
+      <p id="stat-tersedia" class="text-xl font-bold text-green-600">0</p>
+    </div>
+    <div class="bg-white p-4 rounded shadow text-center border-b-4 border-red-500">
+      <h3 class="text-sm text-gray-500">Barang Habis</h3>
+      <p id="stat-habis" class="text-xl font-bold text-red-600">0</p>
+    </div>
+    <div class="bg-white p-4 rounded shadow text-center border-b-4 border-purple-500">
+      <h3 class="text-sm text-gray-500">Total Peminjaman</h3>
+      <p id="stat-peminjaman" class="text-xl font-bold text-purple-600">0</p>
+    </div>
+    <div class="bg-white p-4 rounded shadow text-center border-b-4 border-orange-500">
+      <h3 class="text-sm text-gray-500">Kembali Hari Ini</h3>
+      <p id="stat-pengembalian" class="text-xl font-bold text-orange-600">0</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <!-- GRAFIK TREND PEMINJAMAN -->
+      <div class="bg-white p-4 rounded shadow">
+        <h3 class="font-bold mb-3 text-slate-700">Tren Peminjaman (7 Hari)</h3>
+        <canvas id="loanChart" height="150"></canvas>
+      </div>
+
+      <div class="bg-white p-4 rounded shadow">
+        <h3 class="font-bold mb-3 text-slate-700">Volume Pinjam per Item</h3>
+        <canvas id="barangDipinjamChart" height="150"></canvas>
+      </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- TABEL BARANG HABIS -->
+      <div class="bg-white p-4 rounded shadow">
+        <h3 class="font-bold mb-3 text-red-600 flex items-center">
+            <span class="mr-2">⚠️</span> Stok Kritis
+        </h3>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 text-gray-600 uppercase text-xs text-left">
+                <tr>
+                  <th class="p-2">Nama Barang</th>
+                  <th class="p-2">Stok</th>
+                </tr>
+              </thead>
+              <tbody id="barangHabisTable"></tbody>
+            </table>
+        </div>
+      </div>
+
+      <!-- TABEL BARANG RUSAK -->
+      <div class="bg-white p-4 rounded shadow">
+        <h3 class="font-bold mb-3 text-slate-700">Barang Rusak Terbaru</h3>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 text-gray-600 uppercase text-xs text-left">
+                <tr>
+                  <th class="p-2">Nama Barang</th>
+                  <th class="p-2">Jumlah</th>
+                  <th class="p-2">Tanggal</th>
+                </tr>
+              </thead>
+              <tbody id="dashboardDamageTable"></tbody>
+            </table>
+        </div>
+      </div>
+  </div>
+
+  <!-- TABEL PEMINJAMAN TERBARU -->
+  <div class="bg-white p-4 rounded shadow mt-6">
+    <h3 class="font-bold mb-3 text-slate-700">Peminjaman Terbaru</h3>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 text-gray-600 uppercase text-xs text-left">
+            <tr>
+              <th class="p-2">Nama Peminjam</th>
+              <th class="p-2">Barang</th>
+              <th class="p-2">Jumlah</th>
+              <th class="p-2">Waktu Pinjam</th>
+            </tr>
+          </thead>
+          <tbody id="peminjamanTerbaruTable"></tbody>
+        </table>
+    </div>
+  </div>
+
+</section>
+
+<!-- BARANG (ADMIN ONLY) -->
+<section id="barang" class="page">
+    <div class="bg-white p-6 rounded-lg shadow">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-semibold">Master Data Inventaris</h2>
+            <button id="btnTambah" onclick="toggleModal(true)" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition flex items-center">
+                <span class="mr-1">+</span> Tambah Barang
+            </button>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse">
+                <thead class="bg-slate-100 text-left">
+                    <tr>
+                        <th class="p-3 border">Nama Barang</th>
+                        <th class="p-3 border">Stok Tersedia</th>
+                        <th class="p-3 border">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="barangTable"></tbody>
+            </table>
+        </div>
+        <div class="mt-8 pt-6 border-t border-red-100">
+            <h3 class="text-red-600 font-bold mb-2">Danger Zone</h3>
+            <button onclick="resetSemua()" class="bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded transition text-sm">
+                RESET SEMUA DATA SISTEM
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- PEMINJAMAN (MAIN FOR USER) -->
+<section id="peminjaman" class="page">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- FORM PINJAM -->
+      <div class="bg-white p-6 rounded shadow border-t-4 border-blue-500">
+        <h2 class="font-bold text-lg mb-4 text-slate-800">Formulir Peminjaman Baru</h2>
+        <form id="loanForm" class="space-y-4">
+          <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Nama Peminjam</label>
+              <input id="loanName" placeholder="Masukkan nama lengkap" class="w-full border p-3 rounded focus:ring-2 focus:ring-blue-400 focus:outline-none">
+          </div>
+          <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Barang</label>
+              <select id="loanBarang" class="w-full border p-3 rounded focus:ring-2 focus:ring-blue-400 focus:outline-none bg-white"></select>
+          </div>
+          <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Jumlah</label>
+              <input id="loanQty" type="number" placeholder="0" class="w-full border p-3 rounded focus:ring-2 focus:ring-blue-400 focus:outline-none">
+          </div>
+          <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded font-bold shadow-md transition transform active:scale-95">
+            Konfirmasi Peminjaman
+          </button>
+        </form>
+      </div>
+
+      <!-- TABEL STOK -->
+      <div class="bg-white p-6 rounded shadow">
+        <h2 class="font-bold text-lg mb-4 text-slate-800">Informasi Stok Real-time</h2>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm border">
+              <thead class="bg-slate-50 text-left">
+                <tr>
+                  <th class="p-3 border">Nama Barang</th>
+                  <th class="p-3 border">Status Stok</th>
+                </tr>
+              </thead>
+              <tbody id="stokTable"></tbody>
+            </table>
+        </div>
+      </div>
+    </div>
+</section>
+
+<!-- RIWAYAT -->
+<section id="riwayat" class="page">
+    <div class="bg-white p-6 rounded shadow">
+        <div class="flex flex-wrap gap-3 mb-6 items-end bg-slate-50 p-4 rounded border">
+            <div>
+                <label class="block text-xs font-bold text-gray-500 mb-1 uppercase">Dari Tanggal</label>
+                <input type="date" id="startDate" class="border p-2 rounded text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-500 mb-1 uppercase">Sampai Tanggal</label>
+                <input type="date" id="endDate" class="border p-2 rounded text-sm">
+            </div>
+            <button onclick="filterRiwayat()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm font-semibold transition">
+                Cari Data
+            </button>
+            <button onclick="printRiwayat()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-semibold transition">
+                Cetak Laporan
+            </button>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full border text-sm text-left">
+              <thead class="bg-slate-200 text-slate-700">
+                <tr>
+                  <th class="p-3 border">Peminjam</th>
+                  <th class="p-3 border">Barang</th>
+                  <th class="p-3 border">Qty</th>
+                  <th class="p-3 border">Pengembali</th>
+                  <th class="p-3 border">Detail Waktu</th>
+                  <th class="p-3 border">Status/Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="riwayatTable"></tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- BARANG RUSAK -->
+<section id="barangRusak" class="page">
+  <div class="max-w-2xl bg-white p-6 rounded shadow border-t-4 border-red-500 mb-8">
+      <h2 class="font-bold text-lg mb-4 text-red-700">Laporan Kerusakan Barang</h2>
+      <form id="damageForm" class="space-y-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Barang yang Rusak</label>
+            <select id="damageBarang" class="w-full border p-3 rounded focus:ring-2 focus:ring-red-400 focus:outline-none bg-white">
+              <option value="">-- Pilih Barang --</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Jumlah Unit Rusak</label>
+            <input id="damageQty" type="number" placeholder="0" class="w-full border p-3 rounded focus:ring-2 focus:ring-red-400 focus:outline-none">
+        </div>
+        <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white p-3 rounded font-bold shadow transition transform active:scale-95">
+            Kirim Laporan Kerusakan
+        </button>
+      </form>
+  </div>
+
+  <div class="bg-white p-6 rounded shadow">
+    <h3 class="font-bold text-lg mb-4 text-slate-800">Daftar Laporan Kerusakan</h3>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm border text-left">
+          <thead class="bg-slate-50">
+            <tr>
+              <th class="p-3 border">Nama Barang</th>
+              <th class="p-3 border">Jumlah</th>
+              <th class="p-3 border">Tanggal Lapor</th>
+              <th class="p-3 border">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="damageTable"></tbody>
+        </table>
+    </div>
+  </div>
+</section>
+  
+</main>
+</div>
+
+<!-- MODAL ADD/EDIT BARANG -->
+<div id="modal" class="custom-modal">
+    <div class="bg-white p-6 rounded-lg w-full max-w-md shadow-2xl">
+        <h2 id="modalTitle" class="text-xl font-bold mb-4">Data Barang</h2>
         <div class="space-y-4">
             <div>
-                <label class="block text-sm font-semibold text-slate-600 mb-1">Nama Alat/Bahan</label>
-                <input id="nama" placeholder="Contoh: Osiloskop" class="input-field">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nama Barang</label>
+                <input id="nama" placeholder="Contoh: Kabel Jumper" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-400 outline-none">
             </div>
             <div>
-                <label class="block text-sm font-semibold text-slate-600 mb-1">Stok Awal</label>
-                <input id="stok" type="number" placeholder="0" class="input-field">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Stok Awal</label>
+                <input id="stok" type="number" placeholder="0" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-400 outline-none">
             </div>
-        </div>
-        <div class="flex gap-3 mt-8">
-            <button onclick="saveBarang()" class="flex-1 btn-primary">Simpan Data</button>
-            <button onclick="toggleModal(false)" class="flex-1 bg-slate-100 text-slate-600 py-2.5 rounded-lg hover:bg-slate-200 font-medium">Batal</button>
+            <div class="flex justify-end space-x-2 pt-4">
+                <button onclick="toggleModal(false)" class="px-4 py-2 text-gray-600 font-medium">Batal</button>
+                <button onclick="saveBarang()" class="px-6 py-2 bg-blue-600 text-white rounded font-bold hover:bg-blue-700 transition">Simpan Data</button>
+            </div>
         </div>
     </div>
 </div>
 
 <!-- LOGIN PAGE -->
-<div id="loginPage" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900 overflow-hidden">
-    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20"></div>
-    <div class="bg-white p-10 rounded-3xl w-full max-w-md shadow-2xl relative z-10 border border-slate-200">
-        <div class="text-center mb-8">
-            <div class="w-16 h-16 bg-blue-600 rounded-2xl mx-auto flex items-center justify-center text-white text-3xl font-bold mb-4 shadow-xl shadow-blue-200">L</div>
-            <h2 class="text-2xl font-black text-slate-800">LabManager</h2>
-            <p class="text-slate-500">Teknik Otomasi Industri Nepan</p>
-        </div>
-        <div class="space-y-4">
-            <div class="relative">
-                <input id="email" placeholder="Email Instansi" class="input-field pl-10 h-12">
-                <span class="absolute left-3 top-3.5 text-slate-400">📧</span>
-            </div>
-            <div class="relative">
-                <input id="password" type="password" placeholder="Password" class="input-field pl-10 h-12">
-                <span class="absolute left-3 top-3.5 text-slate-400">🔒</span>
-            </div>
-            <button onclick="login()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-blue-200 mt-2">
-                Masuk ke Dashboard
-            </button>
-        </div>
-        <p class="text-center text-xs text-slate-400 mt-8 uppercase tracking-widest font-bold">Lab Management System v2.0</p>
+<div id="loginPage" class="fixed inset-0 flex items-center justify-center bg-slate-900 z-[100]">
+  <div class="bg-white p-8 rounded-2xl w-full max-w-sm shadow-2xl">
+    <div class="text-center mb-8">
+        <div class="inline-block p-4 bg-blue-100 rounded-full mb-3 text-3xl">🏗️</div>
+        <h2 class="text-2xl font-bold text-slate-800">LabManager Login</h2>
+        <p class="text-gray-500 text-sm">Masuk untuk mengakses sistem inventaris</p>
     </div>
+    <div class="space-y-4">
+        <input id="email" type="email" placeholder="Email Instansi" class="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none transition">
+        <input id="password" type="password" placeholder="Password" class="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none transition">
+        <button onclick="login()" class="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg font-bold text-lg shadow-lg transition transform active:scale-95">
+            Masuk Sekarang
+        </button>
+    </div>
+    <p class="mt-8 text-center text-xs text-gray-400">Copyright &copy; TOI Nepan 2024</p>
+  </div>
 </div>
 
-<!-- Firebase Scripts -->
+<!-- Firebase Legacy Scripts -->
 <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
 
 <script>
-    // Penambahan UI Date
-    document.getElementById('current-date').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+const firebaseConfig = {
+    apiKey: "AIzaSyD7v9RjzDP80LcrblAwe6DGNs_ujQ0NIkk",
+    authDomain: "lab-inventory-management-c59c8.firebaseapp.com",
+    projectId: "lab-inventory-management-c59c8"
+};
 
-    // KONFIGURASI FIREBASE (Tetap Sesuai Input)
-    const firebaseConfig = {
-        apiKey: "AIzaSyD7v9RjzDP80LcrblAwe6DGNs_ujQ0NIkk",
-        authDomain: "lab-inventory-management-c59c8.firebaseapp.com",
-        projectId: "lab-inventory-management-c59c8"
-    };
+firebase.initializeApp(firebaseConfig);
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const auth = firebase.auth();
+const db = firebase.firestore();
+const auth = firebase.auth();
 
-    let barangList = [];
-    let currentUser = null;
-    let currentRole = null;
-    let editId = null;
+let barangList = [];
+let currentUser = null;
+let currentRole = null;
+let editId = null;
 
-    // --- LOGIKA KRUSIAL (DIPERTAHANKAN SEPENUHNYA) ---
+// ================= AUTH =================
+function login(){
+  let email = document.getElementById('email').value.trim();
+  let password = document.getElementById('password').value;
 
-    function login(){
-        let email = document.getElementById('email').value.trim();
-        let password = document.getElementById('password').value;
-        if(!email || !password){ alert("Email dan password wajib diisi"); return; }
-        auth.signInWithEmailAndPassword(email, password).catch(err => alert(err.message));
-    }
+  if(!email || !password){
+    alert("Email dan password wajib diisi");
+    return;
+  }
 
-    auth.onAuthStateChanged(async user => {
-        if(user){
-            currentUser = user;
-            currentRole = (user.email === "teknikotomasiindustri.nepan@gmail.com") ? "admin" : "user";
-            document.getElementById('loginPage').style.display="none";
-            document.getElementById("userInfo").innerHTML = `
-                <div class="font-bold text-slate-200 mb-1">${currentRole.toUpperCase()}</div>
-                <div>${user.email}</div>
-            `;
-            applyRoleUI();
-            initApp();
-        } else {
-            currentUser = null;
-            currentRole = null;
-            document.getElementById('loginPage').style.display="flex";
-        }
+  auth.signInWithEmailAndPassword(email, password)
+    .catch(err => {
+      console.error("LOGIN ERROR:", err);
+      alert("Gagal Login: " + err.message);
     });
+}
 
-    function applyRoleUI(){
-        const isAdminVal = currentRole === "admin";
-        document.getElementById("menu-dashboard").style.display = isAdminVal ? "flex" : "none";
-        document.getElementById("menu-barang").style.display = isAdminVal ? "flex" : "none";
-        document.getElementById("menu-barangRusak").style.display = isAdminVal ? "flex" : "none";
-        if(!isAdminVal) navigate("peminjaman");
+auth.onAuthStateChanged(async user => {
+  if(user){
+    currentUser = user;
+    const adminEmail = "teknikotomasiindustri.nepan@gmail.com";
+    currentRole = (user.email === adminEmail) ? "admin" : "user";
+
+    document.getElementById('loginPage').style.display = "none";
+    document.getElementById("userInfo").innerText = currentUser.email;
+    
+    // UI Role-based setup
+    const badge = document.getElementById("roleBadge");
+    badge.innerText = currentRole;
+    badge.className = `px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${currentRole === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`;
+
+    applyRoleUI();
+    initApp();
+  } else {
+    currentUser = null;
+    currentRole = null;
+    document.getElementById('loginPage').style.display = "flex";
+    document.getElementById("userInfo").innerText = "";
+  }
+});
+
+// ================= ROLE & UI =================
+function isAdmin(){
+    return currentRole === "admin";
+}
+
+function applyRoleUI(){
+  if(isAdmin()){
+    // Admin: Akses semua
+    document.querySelectorAll('.sidebar-link').forEach(el => el.style.display = "block");
+    navigate("dashboard");
+  } else {
+    // User: Sembunyikan Dashboard dan Data Master Barang
+    document.getElementById("menu-dashboard").style.display = "none";
+    document.getElementById("menu-barang").style.display = "none";
+    document.getElementById("menu-barangRusak").style.display = "none";
+    
+    // Tampilkan Peminjaman & Riwayat
+    document.getElementById("menu-peminjaman").style.display = "block";
+    document.getElementById("menu-riwayat").style.display = "block";
+
+    // LANGSUNG ARAHKAN KE PEMINJAMAN SEBAGAI HOME USER
+    navigate("peminjaman");
+  }
+}
+
+// ================= NAVIGASI =================
+window.navigate = function(page){
+  // Check access for user
+  if(!isAdmin() && (page === 'dashboard' || page === 'barang' || page === 'barangRusak')) {
+      navigate('peminjaman');
+      return;
+  }
+
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(page).classList.add('active');
+  document.getElementById('page-title').innerText = page.replace(/([A-Z])/g, ' $1');
+
+  document.querySelectorAll('.sidebar-link').forEach(l=>l.classList.remove('active'));
+  const activeMenu = document.getElementById("menu-" + page);
+  if(activeMenu) activeMenu.classList.add('active');
+
+  if(page === "barangRusak") renderDamageDropdown();
+  if(page === "dashboard") renderDashboard();
+};
+
+// ================= MODAL =================
+function toggleModal(show){
+    if(!isAdmin()){
+        alert("Akses dibatasi hanya untuk Admin.");
+        return;
+    }
+    const modal = document.getElementById('modal');
+    modal.style.display = show ? "flex" : "none";
+    if(show) modal.classList.add("items-center","justify-center");
+    if(!show) {
+        editId = null;
+        document.getElementById('nama').value = "";
+        document.getElementById('stok').value = "";
+    }
+}
+
+function openEdit(id, nama, stok){
+  if(!isAdmin()) return;
+  editId = id;
+  document.getElementById('nama').value = nama;
+  document.getElementById('stok').value = stok;
+  document.getElementById('modalTitle').innerText = "Edit Barang";
+  toggleModal(true);
+}
+
+// ================= BARANG =================
+function renderBarang(){
+  let html="";
+  let opt="";
+
+  barangList.sort((a,b) => a.nama.localeCompare(b.nama)).forEach(b=>{
+    html+=`<tr class="hover:bg-gray-50 transition">
+      <td class="p-3 border font-medium">${b.nama}</td>
+      <td class="p-3 border font-bold ${(!b.stok || b.stok == 0) ? 'text-red-500' : 'text-slate-700'}">${b.stok ?? 0}</td>
+      <td class="p-3 border space-x-2">
+            <button onclick="openEdit('${b.id}','${b.nama}',${b.stok})" class="text-blue-600 hover:underline font-semibold">Edit</button>
+            <button onclick="hapusBarang('${b.id}','${b.nama}')" class="text-red-600 hover:underline font-semibold">Hapus</button>
+      </td>
+    </tr>`;
+
+    if(b.stok > 0){
+      opt+=`<option value="${b.id}">${b.nama} (Stok: ${b.stok})</option>`;
+    }
+  });
+
+  document.getElementById('barangTable').innerHTML=html;
+  document.getElementById('loanBarang').innerHTML=opt;
+  renderStokTable();
+}
+
+async function saveBarang(){
+  if(!isAdmin()) return;
+  let nama = document.getElementById('nama').value.trim();
+  let stok = parseInt(document.getElementById('stok').value);
+
+  if(!nama || isNaN(stok) || stok < 0){
+    alert("Silakan lengkapi data dengan benar.");
+    return;
+  }
+
+  try{
+    if(editId){
+      await db.collection("barang").doc(editId).update({ nama, stok });
+      alert("Update berhasil!");
+    }else{
+      await db.collection("barang").add({ nama, stok, createdAt: new Date() });
+      alert("Barang baru ditambahkan!");
+    }
+    toggleModal(false);
+  }catch(err){ alert("Gagal menyimpan: " + err.message); }
+}
+
+async function hapusBarang(id, nama){
+  if(!isAdmin()) return;
+  if(!confirm(`Hapus data "${nama}"? Data riwayat peminjaman yang masih aktif akan menghalangi penghapusan ini.`)) return;
+
+  try{
+    let cek = await db.collection("loan").where("barangId","==",id).where("status","==","dipinjam").get();
+    if(!cek.empty){
+      alert("Gagal: Barang sedang dalam masa peminjaman oleh user.");
+      return;
+    }
+    await db.collection("barang").doc(id).delete();
+  }catch(err){ alert(err.message); }
+}
+
+function renderStokTable(){
+  let html = "";
+  barangList.forEach(b=>{
+    html += `<tr class="border-b">
+      <td class="p-3">${b.nama}</td>
+      <td class="p-3">
+        <span class="px-2 py-1 rounded text-xs font-bold ${(!b.stok || b.stok == 0) ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}">
+            ${b.stok ?? 0} Unit
+        </span>
+      </td>
+    </tr>`;
+  });
+  document.getElementById('stokTable').innerHTML = html;
+}
+
+// ================= INIT =================
+function initApp(){
+  db.collection("barang").onSnapshot(snap=>{
+    barangList=[];
+    snap.forEach(doc=>{ barangList.push({id:doc.id,...doc.data()}); });
+    renderBarang(); 
+    renderDashboard();
+    renderDamageDropdown();
+  });
+
+  db.collection("loan").orderBy("time","desc").onSnapshot(snap=>{
+    let data=[];
+    snap.forEach(doc=>{ data.push({id:doc.id,...doc.data()}); });
+    renderRiwayat(data);
+    renderDashboard();
+    renderBarangDipinjamChart(data);
+  });
+
+  db.collection("barangRusak").onSnapshot(() => {
+    renderDamageTable();
+    renderDashboardDamage();
+  });
+}
+
+// ================= PEMINJAMAN =================
+const loanForm = document.getElementById('loanForm');
+if(loanForm){
+  loanForm.addEventListener('submit', async e=>{
+    e.preventDefault();
+    let id = document.getElementById('loanBarang').value;
+    let qty = parseInt(document.getElementById('loanQty').value);
+    let nama = document.getElementById('loanName').value.trim();
+
+    if(!nama || !id || isNaN(qty) || qty <= 0){
+      alert("Lengkapi data peminjaman!");
+      return;
     }
 
-    window.navigate = function(page){
-        document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-        document.getElementById(page).classList.add('active');
-        document.getElementById('page-title').innerText = page === 'barang' ? 'Inventaris Barang' : page;
-        document.querySelectorAll('.sidebar-link').forEach(l=>l.classList.remove('active'));
-        document.getElementById("menu-" + page).classList.add('active');
-        if(page === "barangRusak") renderDamageDropdown();
-    };
+    let ref = db.collection("barang").doc(id);
+    await db.runTransaction(async (t)=>{
+      let doc = await t.get(ref);
+      if(!doc.exists) throw "Barang tidak ditemukan";
+      let data = doc.data();
+      if(data.stok < qty) throw "Stok tidak mencukupi permintaan.";
 
-    function toggleModal(show){
-        if(currentRole !== "admin") return alert("Akses Admin Diperlukan");
-        document.getElementById('modal').style.display = show ? "flex" : "none";
-        if(!show) { editId = null; document.getElementById('nama').value = ""; document.getElementById('stok').value = ""; }
-    }
+      t.update(ref,{ stok: data.stok - qty });
+      t.set(db.collection("loan").doc(),{
+        nama, barang: data.nama, barangId: id, qty,
+        status:"dipinjam", time:new Date(),
+        userId: currentUser.uid, userEmail: currentUser.email
+      });
+    }).then(() => {
+      alert("Peminjaman Berhasil Dicatat!");
+      loanForm.reset();
+    }).catch(err => alert(err));
+  });
+}
 
-    function initApp(){
-        const btnTambah = document.getElementById("btnTambah");
-        if(currentRole !== "admin" && btnTambah) btnTambah.style.display="none";
+// ================= PENGEMBALIAN =================
+async function kembaliDenganNama(id, barangId, qty){
+  let input = document.getElementById("ret-" + id);
+  let namaPengembali = input ? input.value.trim() : "";
 
-        db.collection("barang").onSnapshot(snap=>{
-            barangList=[];
-            snap.forEach(doc=>barangList.push({id:doc.id,...doc.data()}));
-            renderBarang();
-            renderDamageDropdown();
-            document.getElementById('stat-total').innerText=barangList.length;
-        });
+  if(!namaPengembali){
+    alert("Isi Nama Pengembali barang!");
+    return;
+  }
 
-        db.collection("loan").orderBy("time","desc").onSnapshot(snap=>{
-            let data=[];
-            snap.forEach(doc=>data.push({id:doc.id,...doc.data()}));
-            renderRiwayat(data);
-        });
-    }
+  let ref = db.collection("barang").doc(barangId);
+  await db.runTransaction(async (t)=>{
+    let doc = await t.get(ref);
+    if(!doc.exists) throw "Barang tidak ditemukan";
+    t.update(ref,{ stok: doc.data().stok + qty });
+    t.update(db.collection("loan").doc(id),{
+      status: "kembali",
+      returnedByName: namaPengembali,
+      returnedByUser: currentUser.email,
+      returnedAt: new Date()
+    });
+  }).then(() => alert("Data Pengembalian Berhasil Disimpan.")).catch(err => alert(err));
+}
 
-    // --- RENDER FUNCTIONS (Tampilan dipercantik) ---
+// ================= RIWAYAT UI =================
+function renderRiwayat(data){
+  let html="";
+  data.forEach(l=>{
+    let isOwner = currentUser && (isAdmin() || l.userId === currentUser.uid);
+    let keterangan = `<div class="text-[10px] text-gray-400">Pinjam: ${formatDate(l.time)}</div>`;
+    if(l.status === "kembali") keterangan += `<div class="text-[10px] text-blue-500 font-semibold">Kembali: ${formatDate(l.returnedAt)}</div>`;
 
-    function renderBarang(){
-        let html="";
-        let opt="";
-        barangList.forEach(b=>{
-            html+=`<tr class="hover:bg-slate-50 transition">
-                <td class="font-medium text-slate-700">${b.nama}</td>
-                <td><span class="px-2 py-1 rounded ${b.stok > 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'} font-bold">${b.stok ?? 0}</span></td>
-                <td>
-                    ${currentRole === 'admin' ? `
-                        <div class="flex gap-2">
-                            <button onclick="openEdit('${b.id}','${b.nama}',${b.stok})" class="text-blue-600 hover:text-blue-800 font-medium text-xs">Edit</button>
-                            <button onclick="hapusBarang('${b.id}','${b.nama}')" class="text-rose-600 hover:text-rose-800 font-medium text-xs">Hapus</button>
-                        </div>
-                    ` : '-'}
-                </td>
-            </tr>`;
-            if(b.stok > 0) opt+=`<option value="${b.id}">${b.nama} (Stok: ${b.stok})</option>`;
-        });
-        document.getElementById('barangTable').innerHTML=html;
-        document.getElementById('loanBarang').innerHTML=opt;
-        renderStokTable();
-    }
-
-    function renderStokTable(){
-        let html = "";
-        barangList.forEach(b=>{
-            html += `<tr>
-                <td class="font-medium">${b.nama}</td>
-                <td class="${(!b.stok || b.stok == 0) ? 'text-rose-600 font-bold' : 'text-slate-600'}">${b.stok ?? 0}</td>
-            </tr>`;
-        });
-        document.getElementById('stokTable').innerHTML = html;
-    }
-
-    async function saveBarang(){
-        let nama = document.getElementById('nama').value.trim();
-        let stok = parseInt(document.getElementById('stok').value);
-        if(!nama || isNaN(stok)) return alert("Data tidak valid");
-        try{
-            if(editId) await db.collection("barang").doc(editId).update({nama, stok});
-            else await db.collection("barang").add({nama, stok, createdAt: new Date()});
-            toggleModal(false);
-        }catch(e){alert(e.message)}
-    }
-
-    function openEdit(id, nama, stok){
-        editId = id;
-        document.getElementById('nama').value = nama;
-        document.getElementById('stok').value = stok;
-        toggleModal(true);
-    }
-
-    async function hapusBarang(id, nama){
-        if(!confirm(`Hapus ${nama}?`)) return;
-        let cek = await db.collection("loan").where("barangId","==",id).where("status","==","dipinjam").get();
-        if(!cek.empty) return alert("Barang sedang dipinjam!");
-        await db.collection("barang").doc(id).delete();
-    }
-
-    // --- LOAN LOGIC ---
-    const loanForm = document.getElementById('loanForm');
-    if(loanForm){
-        loanForm.addEventListener('submit', async e=>{
-            e.preventDefault();
-            let id = document.getElementById('loanBarang').value;
-            let qty = parseInt(document.getElementById('loanQty').value);
-            let nama = document.getElementById('loanName').value.trim();
-            if(!nama || !id || qty <= 0) return alert("Data tidak valid");
-            let ref = db.collection("barang").doc(id);
-            await db.runTransaction(async (t)=>{
-                let doc = await t.get(ref);
-                let data = doc.data();
-                if(data.stok < qty) throw "Stok tidak cukup";
-                t.update(ref,{ stok: data.stok - qty });
-                t.set(db.collection("loan").doc(),{
-                    nama, barang: data.nama, barangId: id, qty, status:"dipinjam",
-                    time:new Date(), userId: currentUser.uid, userEmail: currentUser.email
-                });
-            }).then(()=> { alert("Berhasil dipinjam"); loanForm.reset(); })
-              .catch(err=> alert(err));
-        });
-    }
-
-    function renderRiwayat(data){
-        let html="";
-        data.forEach(l=>{
-            let statusBadge = l.status === 'dipinjam' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700';
-            let ket = `<div class="text-[10px] leading-tight text-slate-400">
-                📌 P: ${formatDate(l.time)}<br>
-                👤 ${l.userEmail || '-'}
-            </div>`;
-            if(l.status === 'kembali') ket += `<div class="text-[10px] leading-tight text-emerald-500 mt-1">
-                ✅ K: ${formatDate(l.returnedAt)}<br>
-                👤 ${l.returnedByUser || '-'}
-            </div>`;
-
-            html+=`<tr class="hover:bg-slate-50 border-b border-slate-100">
-                <td class="font-bold text-slate-700">${l.nama}</td>
-                <td>${l.barang}</td>
-                <td class="font-mono">${l.qty}</td>
-                <td>
-                    ${l.status === "dipinjam" 
-                        ? `<input id="ret-${l.id}" placeholder="Nama Penerima" class="border p-1 rounded text-xs w-full max-w-[120px]">` 
-                        : `<span class="font-medium text-slate-600">${l.returnedByName || "-"}</span>`}
-                </td>
-                <td>${ket}</td>
-                <td>
-                    <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${statusBadge}">${l.status}</span>
-                    <div class="mt-2 flex gap-1">
-                        ${(l.status=="dipinjam" && (currentRole==='admin' || l.userId === currentUser.uid)) 
-                            ? `<button onclick="kembaliDenganNama('${l.id}','${l.barangId}',${l.qty})" class="bg-emerald-600 text-white px-2 py-1 rounded text-[10px] font-bold">RETURN</button>` : ''}
-                        ${currentRole === 'admin' ? `<button onclick="hapusRiwayat('${l.id}')" class="bg-rose-100 text-rose-600 px-2 py-1 rounded text-[10px]">HAPUS</button>` : ''}
-                    </div>
-                </td>
-            </tr>`;
-        });
-        document.getElementById('riwayatTable').innerHTML=html;
-    }
-
-    async function kembaliDenganNama(id, barangId, qty){
-        let input = document.getElementById("ret-" + id);
-        let namaPenerima = input ? input.value.trim() : "";
-        if(!namaPenerima) return alert("Isi nama penerima/pengembali!");
-        let ref = db.collection("barang").doc(barangId);
-        await db.runTransaction(async (t)=>{
-            let doc = await t.get(ref);
-            t.update(ref,{ stok: doc.data().stok + qty });
-            t.update(db.collection("loan").doc(id),{
-                status: "kembali", returnedByName: namaPenerima, returnedByUser: currentUser.email, returnedAt: new Date()
-            });
-        }).then(()=> alert("Berhasil dikembalikan"));
-    }
-
-    function formatDate(date){
-        if(!date) return "-";
-        let d = date.toDate ? date.toDate() : new Date(date);
-        return d.toLocaleString("id-ID", {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'});
-    }
-
-    async function hapusRiwayat(id){
-        if(confirm("Hapus riwayat?")) await db.collection("loan").doc(id).delete();
-    }
-
-    function logout(){ auth.signOut(); }
-
-    // --- DASHBOARD CHARTS & STATS ---
-    let loanChartInstance = null;
-    let barangDipinjamChart = null;
-
-    function renderDashboard(){
-        document.getElementById('stat-tersedia').innerText = barangList.filter(b => b.stok > 0).length;
-        document.getElementById('stat-habis').innerText = barangList.filter(b => !b.stok || b.stok == 0).length;
-
-        db.collection("loan").get().then(snap=>{
-            let loans = []; snap.forEach(doc=>loans.push({id:doc.id,...doc.data()}));
-            document.getElementById('stat-peminjaman').innerText = loans.filter(l=>l.status==='dipinjam').length;
-            
-            let today = new Date().toDateString();
-            document.getElementById('stat-pengembalian').innerText = loans.filter(l=>l.returnedAt && new Date(l.returnedAt.toDate()).toDateString() === today).length;
-
-            // Render Table Peminjaman Terbaru
-            let top5 = loans.sort((a,b)=> (b.time?.toDate()||0) - (a.time?.toDate()||0)).slice(0,5);
-            document.getElementById('peminjamanTerbaruTable').innerHTML = top5.map(l=>`
-                <tr class="border-b border-slate-100">
-                    <td class="py-2 font-medium">${l.nama}</td>
-                    <td class="py-2 text-slate-500">${l.barang}</td>
-                    <td class="py-2 font-bold">${l.qty}</td>
-                    <td class="py-2 text-[10px] text-slate-400">${formatDate(l.time)}</td>
-                </tr>
-            `).join('');
-
-            updateCharts(loans);
-        });
-
-        // Barang Habis
-        document.getElementById('barangHabisTable').innerHTML = barangList.filter(b => b.stok <= 2).map(b=>`
-            <tr>
-                <td>${b.nama}</td>
-                <td class="font-bold ${b.stok===0?'text-rose-600':''}">${b.stok}</td>
-            </tr>
-        `).join('');
-
-        renderDashboardDamage();
-    }
-
-    function updateCharts(loans){
-        // Trend 7 Hari
-        let days = []; let counts = [];
-        for (let i = 6; i >= 0; i--) {
-            let d = new Date(); d.setDate(d.getDate() - i);
-            days.push(d.toLocaleDateString("id-ID", { day:'numeric', month:'short' }));
-            counts.push(loans.filter(l => new Date(l.time.toDate()).toDateString() === d.toDateString()).length);
+    html+=`<tr class="border-b text-xs hover:bg-slate-50 transition">
+      <td class="p-3 font-medium text-slate-800">${l.nama}</td>
+      <td class="p-3">${l.barang}</td>
+      <td class="p-3 font-bold">${l.qty}</td>
+      <td class="p-3">
+        ${l.status === "dipinjam" 
+          ? `<input id="ret-${l.id}" placeholder="Penerima..." class="border p-1 text-xs w-full rounded focus:ring-1">`
+          : `<span class="text-green-600 font-bold">${l.returnedByName || '-'}</span>`
         }
-        if(loanChartInstance) loanChartInstance.destroy();
-        loanChartInstance = new Chart(document.getElementById('loanChart'), {
-            type: 'line',
-            data: { labels: days, datasets: [{ label: 'Pinjaman', data: counts, borderColor: '#3b82f6', tension: 0.4, fill: true, backgroundColor: 'rgba(59, 130, 246, 0.1)' }] },
-            options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+      </td>
+      <td class="p-3">${keterangan}</td>
+      <td class="p-3">
+        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase ${l.status === 'dipinjam' ? 'bg-orange-100 text-orange-600' : 'bg-green-100 text-green-600'}">
+            ${l.status}
+        </span>
+        <div class="mt-2 space-y-1">
+          ${(l.status=="dipinjam" && isOwner) 
+            ? `<button onclick="kembaliDenganNama('${l.id}','${l.barangId}',${l.qty})" class="block w-full bg-green-500 text-white px-2 py-1 rounded text-[10px] hover:bg-green-600">Terima Kembali</button>` 
+            : ''
+          }
+          ${isAdmin() 
+            ? `<button onclick="hapusRiwayat('${l.id}')" class="block w-full bg-slate-200 text-slate-600 px-2 py-1 rounded text-[10px] hover:bg-red-500 hover:text-white">Hapus</button>` 
+            : ''
+          }
+        </div>
+      </td>
+    </tr>`;
+  });
+  document.getElementById('riwayatTable').innerHTML=html;
+}
+
+async function hapusRiwayat(id){
+    if(!isAdmin()) return;
+    if(confirm("Hapus data riwayat ini?")) await db.collection("loan").doc(id).delete();
+}
+
+// ================= UTILS =================
+function formatDate(date){
+  if(!date) return "-";
+  let d = date.toDate ? date.toDate() : new Date(date);
+  return d.toLocaleString("id-ID", { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+}
+
+function logout(){
+  auth.signOut().then(() => window.location.reload());
+}
+
+async function resetSemua(){
+  if(!isAdmin()) return;
+  if(prompt("Ketik 'RESET' untuk konfirmasi penghapusan seluruh riwayat dan pengosongan stok:") !== "RESET") return;
+
+  try {
+    let batch = db.batch();
+    let bSnap = await db.collection("barang").get();
+    bSnap.forEach(doc => batch.update(doc.ref, { stok: 0 }));
+    let lSnap = await db.collection("loan").get();
+    lSnap.forEach(doc => batch.delete(doc.ref));
+    await batch.commit();
+    alert("Sistem berhasil direset.");
+  } catch(e) { alert(e.message); }
+}
+
+// ================= DASHBOARD RENDER =================
+let loanChartInstance = null;
+let barangDipinjamChart = null;
+
+function renderDashboard(){
+  if(!isAdmin()) return; // Dashboard only for admin
+  
+  // Stats
+  document.getElementById('stat-total').innerText = barangList.length;
+  document.getElementById('stat-tersedia').innerText = barangList.filter(b => b.stok > 0).length;
+  document.getElementById('stat-habis').innerText = barangList.filter(b => !b.stok || b.stok == 0).length;
+
+  db.collection("loan").get().then(snap => {
+      let loans = [];
+      snap.forEach(d => loans.push({id:d.id,...d.data()}));
+      document.getElementById('stat-peminjaman').innerText = loans.length;
+      
+      let todayStr = new Date().toDateString();
+      document.getElementById('stat-pengembalian').innerText = loans.filter(l => l.returnedAt && new Date(l.returnedAt.toDate()).toDateString() === todayStr).length;
+
+      // Peminjaman Terbaru
+      let html = "";
+      loans.sort((a,b) => (b.time?.toDate ? b.time.toDate() : 0) - (a.time?.toDate ? a.time.toDate() : 0)).slice(0,5).forEach(l => {
+          html += `<tr class="border-b hover:bg-gray-50"><td class="p-2">${l.nama}</td><td class="p-2">${l.barang}</td><td class="p-2 font-bold">${l.qty}</td><td class="p-2 text-xs text-gray-400">${formatDate(l.time)}</td></tr>`;
+      });
+      document.getElementById('peminjamanTerbaruTable').innerHTML = html;
+
+      // Trend Chart
+      let days = []; let counts = [];
+      for(let i=6; i>=0; i--){
+          let d = new Date(); d.setDate(d.getDate()-i);
+          days.push(d.toLocaleDateString("id-ID",{day:'numeric', month:'short'}));
+          counts.push(loans.filter(l => l.time && new Date(l.time.toDate()).toDateString() === d.toDateString()).length);
+      }
+      
+      const ctx = document.getElementById('loanChart').getContext('2d');
+      if(loanChartInstance) loanChartInstance.destroy();
+      loanChartInstance = new Chart(ctx, {
+          type:'line',
+          data: { labels: days, datasets:[{ label:'Peminjaman', data:counts, borderColor:'#3b82f6', fill:true, backgroundColor:'rgba(59, 130, 246, 0.1)', tension:0.4 }] },
+          options: { responsive:true, plugins:{legend:{display:false}} }
+      });
+  });
+
+  // Stok Kritis
+  let critHtml = "";
+  barangList.filter(b => !b.stok || b.stok <= 2).sort((a,b) => (a.stok||0)-(b.stok||0)).forEach(b => {
+      critHtml += `<tr class="border-b"><td class="p-2">${b.nama}</td><td class="p-2 font-bold text-red-600">${b.stok||0}</td></tr>`;
+  });
+  document.getElementById('barangHabisTable').innerHTML = critHtml;
+}
+
+function renderBarangDipinjamChart(loans){
+  if(!isAdmin() || !document.getElementById('barangDipinjamChart')) return;
+  const totals = {};
+  loans.forEach(l => { if(l.barang && l.qty){ totals[l.barang] = (totals[l.barang] || 0) + l.qty; }});
+  const labels = Object.keys(totals);
+  const data = Object.values(totals);
+  const ctx = document.getElementById('barangDipinjamChart').getContext('2d');
+  if(barangDipinjamChart) barangDipinjamChart.destroy();
+  barangDipinjamChart = new Chart(ctx, {
+      type: 'bar',
+      data: { labels, datasets:[{ label:'Total Volume', data, backgroundColor:'#f87171' }] },
+      options: { responsive:true, indexAxis:'y', plugins:{legend:{display:false}} }
+  });
+}
+
+// ================= BARANG RUSAK LOGIC =================
+function renderDamageDropdown() {
+  const select = document.getElementById('damageBarang');
+  if(!select) return;
+  select.innerHTML = '<option value="">-- Pilih Barang --</option>';
+  barangList.forEach(b => { select.innerHTML += `<option value="${b.id}">${b.nama} (Stok: ${b.stok||0})</option>`; });
+}
+
+document.getElementById('damageForm')?.addEventListener('submit', async e => {
+  e.preventDefault();
+  const bId = document.getElementById('damageBarang').value;
+  const qty = parseInt(document.getElementById('damageQty').value);
+  if(!bId || isNaN(qty) || qty <= 0) return alert("Pilih barang dan jumlah kerusakan!");
+
+  const ref = db.collection("barang").doc(bId);
+  try {
+    await db.runTransaction(async t => {
+        const doc = await t.get(ref);
+        if(!doc.exists) throw "Data barang hilang.";
+        if(doc.data().stok < qty) throw "Stok tidak cukup untuk dilaporkan rusak sejumlah itu.";
+        t.update(ref, { stok: doc.data().stok - qty });
+        t.set(db.collection("barangRusak").doc(), { barangId:bId, nama:doc.data().nama, qty, time:new Date(), reporter:currentUser.email });
+    });
+    alert("Laporan Kerusakan Disimpan.");
+    document.getElementById('damageForm').reset();
+  } catch(e) { alert(e); }
+});
+
+function renderDamageTable() {
+    db.collection("barangRusak").orderBy("time","desc").get().then(snap => {
+        let html = "";
+        snap.forEach(doc => {
+            const d = doc.data();
+            html += `<tr class="border-b text-xs">
+                <td class="p-3">${d.nama}</td>
+                <td class="p-3 font-bold text-red-600">${d.qty}</td>
+                <td class="p-3">${formatDate(d.time)}</td>
+                <td class="p-3">${isAdmin() ? `<button onclick="hapusDamage('${doc.id}')" class="text-red-500 font-bold">Hapus</button>` : '-'}</td>
+            </tr>`;
         });
+        document.getElementById('damageTable').innerHTML = html;
+    });
+}
 
-        // Distribusi Barang
-        const totals = {};
-        loans.forEach(l => { if(!totals[l.barang]) totals[l.barang] = 0; totals[l.barang] += l.qty; });
-        if(barangDipinjamChart) barangDipinjamChart.destroy();
-        barangDipinjamChart = new Chart(document.getElementById('barangDipinjamChart'), {
-            type: 'bar',
-            data: { labels: Object.keys(totals).slice(0,5), datasets: [{ data: Object.values(totals).slice(0,5), backgroundColor: '#6366f1' }] },
-            options: { responsive: true, indexAxis: 'y', plugins: { legend: { display: false } } }
+function renderDashboardDamage() {
+    if(!isAdmin()) return;
+    db.collection("barangRusak").orderBy("time","desc").limit(5).get().then(snap => {
+        let html = "";
+        snap.forEach(doc => {
+            const d = doc.data();
+            html += `<tr class="border-b"><td>${d.nama}</td><td>${d.qty}</td><td class="text-[10px] text-gray-400">${formatDate(d.time)}</td></tr>`;
         });
-    }
+        document.getElementById('dashboardDamageTable').innerHTML = html;
+    });
+}
 
-    // --- DAMAGE LOGIC ---
-    function renderDamageDropdown() {
-        const select = document.getElementById('damageBarang');
-        if(!select) return;
-        select.innerHTML = '<option value="">-- Pilih Barang --</option>' + 
-            barangList.filter(b => b.stok > 0).map(b => `<option value="${b.id}">${b.nama} (Stok: ${b.stok})</option>`).join('');
-    }
+async function hapusDamage(id){ if(isAdmin() && confirm("Hapus data kerusakan?")) await db.collection("barangRusak").doc(id).delete(); }
 
-    const damageForm = document.getElementById('damageForm');
-    if(damageForm){
-        damageForm.addEventListener('submit', async e=>{
-            e.preventDefault();
-            const bId = document.getElementById('damageBarang').value;
-            const qty = parseInt(document.getElementById('damageQty').value);
-            if(!bId || qty <= 0) return alert("Input tidak valid");
-            const ref = db.collection("barang").doc(bId);
-            try{
-                await db.runTransaction(async t=>{
-                    const doc = await t.get(ref);
-                    const data = doc.data();
-                    if(data.stok < qty) throw "Stok kurang";
-                    t.update(ref, { stok: data.stok - qty });
-                    t.set(db.collection("barangRusak").doc(), { barangId: bId, nama: data.nama, qty, time: new Date(), userEmail: currentUser.email });
-                });
-                alert("Berhasil dilaporkan"); damageForm.reset();
-            }catch(err){alert(err)}
-        });
-    }
+// Print Logic
+function printRiwayat(){
+  let win = window.open('', '', 'width=900,height=700');
+  win.document.write(`<html><head><title>Laporan Inventaris</title><style>table{width:100%;border-collapse:collapse;}th,td{border:1px solid black;padding:8px;text-align:left;}th{background:#f2f2f2;}</style></head><body><h2>Riwayat Peminjaman & Pengembalian TOI Nepan</h2>${document.getElementById("riwayat").innerHTML}</body></html>`);
+  win.document.close(); win.print();
+}
 
-    function renderDamageTable() {
-        db.collection("barangRusak").orderBy("time","desc").get().then(snap=>{
-            document.getElementById('damageTable').innerHTML = snap.docs.map(doc => {
-                const d = doc.data();
-                return `<tr>
-                    <td>${d.nama}</td>
-                    <td class="text-rose-600 font-bold">${d.qty}</td>
-                    <td>${formatDate(d.time)}</td>
-                    <td>${currentRole === 'admin' ? `<button onclick="hapusDamage('${doc.id}')" class="text-rose-600 font-bold">Hapus</button>` : '-'}</td>
-                </tr>`;
-            }).join('');
-        });
-    }
-
-    async function hapusDamage(id){ if(confirm("Hapus data?")) await db.collection("barangRusak").doc(id).delete(); }
-
-    function renderDashboardDamage() {
-        db.collection("barangRusak").orderBy("time", "desc").limit(5).get().then(snap => {
-            document.getElementById('dashboardDamageTable').innerHTML = snap.docs.map(doc => {
-                const d = doc.data();
-                return `<tr><td>${d.nama}</td><td>${d.qty}</td><td>${formatDate(d.time)}</td></tr>`;
-            }).join('');
-        });
-    }
-
-    async function resetSemua(){
-        if(prompt("Ketik 'RESET' untuk konfirmasi penghapusan seluruh data") !== "RESET") return;
-        try{
-            let bSnap = await db.collection("barang").get();
-            let batch = db.batch();
-            bSnap.forEach(d=>batch.update(d.ref, {stok:0}));
-            await batch.commit();
-            let lSnap = await db.collection("loan").get();
-            let batch2 = db.batch();
-            lSnap.forEach(d=>batch2.delete(d.ref));
-            await batch2.commit();
-            alert("Reset Berhasil");
-        }catch(e){alert(e)}
-    }
-
-    function filterRiwayat(){
-        let start = document.getElementById("startDate").value;
-        let end = document.getElementById("endDate").value;
-        if(!start || !end) return alert("Pilih tanggal!");
-        db.collection("loan").where("time", ">=", new Date(start)).where("time", "<=", new Date(end + "T23:59:59"))
-          .get().then(snap => { let d = []; snap.forEach(doc=>d.push({id:doc.id, ...doc.data()})); renderRiwayat(d); });
-    }
-
-    function printRiwayat(){
-        let win = window.open('', '', 'width=900,height=700');
-        win.document.write(`<html><head><title>Laporan Lab</title><style>table{width:100%;border-collapse:collapse;} th,td{border:1px solid #ddd;padding:8px;text-align:left;} th{background:#f2f2f2;}</style></head>
-        <body><h2>Laporan Inventaris Lab</h2>${document.getElementById("riwayatTable").parentElement.innerHTML}</body></html>`);
-        win.document.close(); win.print();
-    }
-
-    // Listeners Realtime
-    db.collection("barang").onSnapshot(() => { renderDashboard(); renderDamageDropdown(); });
-    db.collection("loan").onSnapshot(() => renderDashboard());
-    db.collection("barangRusak").onSnapshot(() => { renderDamageTable(); renderDashboardDamage(); });
-
+// Filter Logic
+async function filterRiwayat(){
+  let s = document.getElementById("startDate").value;
+  let e = document.getElementById("endDate").value;
+  if(!s || !e) return alert("Pilih range tanggal!");
+  let sD = new Date(s); let eD = new Date(e); eD.setHours(23,59,59);
+  db.collection("loan").where("time",">=",sD).where("time","<=",eD).orderBy("time","desc").get().then(snap => {
+      let data = []; snap.forEach(d => data.push({id:d.id, ...d.data()}));
+      renderRiwayat(data);
+  });
+}
 </script>
+
+<!-- Charts Lib -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </body>
 </html>
