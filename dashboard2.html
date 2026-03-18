@@ -157,41 +157,38 @@
 <!-- SIDEBAR -->
 <div class="sidebar w-64 flex flex-col shrink-0">
   <div class="p-6">
-    <div class="flex items-center gap-3 text-white mb-8">
-      <div class="bg-cyan-500 p-2 rounded-lg">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
-        </svg>
-      </div>
-      <div>
-        <h1 class="font-bold text-lg leading-tight">LAB-INV</h1>
-        <p class="text-[10px] text-cyan-400 tracking-widest font-mono uppercase">Electronics Dept</p>
-      </div>
+  <!-- Logo + Nama Lab -->
+  <div class="flex items-center gap-3 mb-8">
+    <img src="logo.png" alt="Logo Lab" class="w-12 h-12 rounded-lg">
+    <div>
+      <h1 class="font-bold text-lg leading-tight text-white">LAB-INV</h1>
+      <p class="text-[10px] text-cyan-400 tracking-widest font-mono uppercase">TOI SMK NEGERI 1 JAPARA</p>
     </div>
-
-    <nav class="space-y-1">
-      <div class="sidebar-link active" onclick="showPage('dashboard')">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
-        <span>Dashboard</span>
-      </div>
-      <div class="sidebar-link" onclick="showPage('inventory')">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
-        <span>Inventaris</span>
-      </div>
-      <div class="sidebar-link" onclick="showPage('peminjaman')">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m4-4l-4-4" /></svg>
-        <span>Peminjaman</span>
-      </div>
-      <div class="sidebar-link" onclick="showPage('riwayat')">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-        <span>Riwayat</span>
-      </div>
-      <div class="sidebar-link" onclick="showPage('kerusakan')">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-        <span>Barang Rusak</span>
-      </div>
-    </nav>
   </div>
+
+  <nav class="space-y-1">
+    <div class="sidebar-link active" onclick="showPage('dashboard')">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+      <span>Dashboard</span>
+    </div>
+    <div class="sidebar-link" onclick="showPage('inventory')">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+      <span>Inventaris</span>
+    </div>
+    <div class="sidebar-link" onclick="showPage('peminjaman')">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m4-4l-4-4" /></svg>
+      <span>Peminjaman</span>
+    </div>
+    <div class="sidebar-link" onclick="showPage('riwayat')">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+      <span>Riwayat</span>
+    </div>
+    <div class="sidebar-link" onclick="showPage('kerusakan')">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+      <span>Barang Rusak</span>
+    </div>
+  </nav>
+</div>
   
   <div class="mt-auto p-6 border-t border-slate-800">
     <div id="userInfo" class="flex items-center gap-3 text-slate-400 mb-4">
