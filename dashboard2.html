@@ -7,12 +7,23 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
 body { font-family: sans-serif; background:#f1f5f9;}
-.sidebar-link { padding:10px; cursor:pointer; }
-.sidebar-link.active { background:#334155; color:white;}
+.sidebar-link {
+  padding: 10px;
+  cursor: pointer;
+  text-align: left;   /* penting */
+  width: 100%;
+}
+
+.sidebar-link.active {
+  background: #334155;
+  color: white;
+}
 .page { display:none;}
 .page.active { display:block;}
 .custom-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5);}
 
+  
+  
 /* ===== TABEL RATA TENGAH & BORDER ===== */
 table {
   width: 100%;
@@ -62,12 +73,10 @@ table thead th {
 <div class="flex">
 <!-- SIDEBAR -->
 <aside class="w-60 bg-slate-900 text-white p-4 flex flex-col justify-between h-screen">
-  <div class="flex flex-col items-center mb-4">
+  <div class="flex flex-col w-full mb-4">
     <img src="LOGO TE.png" alt="Logo Lab" class="w-20 h-20 mb-2">
     <h2 class="text-lg font-bold">LabManager TOI Nepan</h2>
   
-    <div id="userInfo" class="mb-4 text-sm text-gray-300"></div>
-
     <div id="menu-dashboard" class="sidebar-link active" onclick="navigate('dashboard')">Dashboard</div>
     <div id="menu-barang" class="sidebar-link" onclick="navigate('barang')">Data Master Barang</div>
     <div id="menu-peminjaman" class="sidebar-link" onclick="navigate('peminjaman')">Input Peminjaman</div>
@@ -84,7 +93,15 @@ table thead th {
 
   
 <main class="flex-1 p-6">
-<h1 id="page-title" class="text-xl mb-4">Dashboard LabManager TOI Nepan</h1>
+<div class="flex justify-between items-center mb-4">
+  <h1 id="page-title" class="text-xl font-bold">
+    Dashboard LabManager TOI Nepan
+  </h1>
+
+  <div id="userBox" class="text-sm bg-white px-3 py-1 rounded shadow">
+    -
+  </div>
+</div>
 
 <!-- DASHBOARD -->
 <section id="dashboard" class="page active">
@@ -408,8 +425,8 @@ auth.onAuthStateChanged(async user=>{
     document.getElementById('loginPage').style.display="none";
 
     // PINDAHKAN KE SINI
-    document.getElementById("userInfo").innerText =
-      currentUser.email + " (" + currentRole + ")";
+   document.getElementById("userBox").innerText =
+  currentUser.email + " (" + currentRole.toUpperCase() + ")";
 
     applyRoleUI();
     initApp();
@@ -419,7 +436,7 @@ auth.onAuthStateChanged(async user=>{
     currentRole = null;
 
     document.getElementById('loginPage').style.display="flex";
-    document.getElementById("userInfo").innerText = "";
+    document.getElementById("userBox").innerText = "";
   }
 });
   //returnedByName   // input manual (siapa yang beneran ngembaliin)
