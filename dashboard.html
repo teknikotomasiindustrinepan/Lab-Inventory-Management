@@ -6,9 +6,63 @@
 <title>Lab Inventory System</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
+/* ===== TABEL MODERN ===== */
 
+table tr:hover {
+  background: rgba(0,255,255,0.05);
+  transition: 0.2s;
+}
+
+table th {
+  letter-spacing: 0.5px;
+}
+
+table {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+  /* ===== GLOW BOX EFFECT ===== */
+
+.bg-white {
+  transition: 0.3s;
+}
+
+.bg-white:hover {
+  box-shadow: 0 0 20px rgba(0,255,255,0.2);
+}
+
+  /* ===== ANIMASI PAGE ===== */
+
+.page.active {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity:0; transform: translateY(10px); }
+  to { opacity:1; transform: translateY(0); }
+}
+  
   /* ===== SIDEBAR ELEKTRONIKA UPGRADE ===== */
+.kpi-card {
+  position: relative;
+  overflow: hidden;
+}
 
+.kpi-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent, rgba(0,255,255,0.2), transparent);
+  opacity: 0;
+  transition: 0.5s;
+}
+
+.kpi-card:hover::after {
+  opacity: 1;
+}
+  
 #sidebar {
   background: linear-gradient(180deg, #020617, #0f172a);
   border-right: 2px solid rgba(0,255,255,0.2);
@@ -106,6 +160,7 @@ td.nama-barang,
 th.nama-barang {
   text-align: left !important;
 }
+  
 </style>
 </head>
 
@@ -115,8 +170,8 @@ th.nama-barang {
 <aside id="sidebar" class="w-64 bg-slate-900 text-white p-4 flex flex-col justify-between h-screen sticky top-0">
 
   <div>
-    <h2 class="text-lg font-bold mb-6 border-b border-slate-700 pb-2 text-cyan-300">
-  ⚡ Lab-Invent TOI<br>
+    <h2 class="text-lg font-bold mb-6 border-b border-slate-700 pb-2">
+  Lab-Invent TOI<br>
   <span class="text-xs text-gray-400">SMK Negeri 1 Japara</span>
 </h2>
 
@@ -154,9 +209,18 @@ th.nama-barang {
 
   
 <main class="flex-1 p-6 overflow-y-auto">
-<div class="flex justify-between items-center mb-6">
-    <h1 id="page-title" class="text-2xl font-bold text-slate-800 capitalize">Dashboard</h1>
-    <div id="roleBadge" class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider"></div>
+<div class="flex justify-between items-center mb-6 bg-white p-4 rounded-xl shadow border-l-4 border-cyan-400">
+    <div>
+        <h1 id="page-title" class="text-2xl font-bold text-slate-800 capitalize">Dashboard</h1>
+        <p class="text-xs text-gray-500">Sistem Inventaris Laboratorium • Real-time Monitoring</p>
+    </div>
+
+    <div class="flex items-center gap-3">
+        <div id="roleBadge" class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider"></div>
+        
+        <!-- Jam realtime -->
+        <div id="liveClock" class="text-xs text-gray-500 font-mono"></div>
+    </div>
 </div>
 
 <!-- DASHBOARD -->
@@ -164,7 +228,7 @@ th.nama-barang {
 
   <!-- KPI BOXES -->
   <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-    <div class="bg-white p-4 rounded shadow text-center border-b-4 border-blue-500">
+    <div class="kpi-card bg-white p-4 rounded-xl shadow text-center border-b-4 border-cyan-400 hover:scale-105 transition">
       <h3 class="text-sm text-gray-500">Total Barang</h3>
       <p id="stat-total" class="text-xl font-bold text-blue-600">0</p>
     </div>
@@ -476,6 +540,13 @@ th.nama-barang {
 <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
 
 <script>
+
+setInterval(()=>{
+  const now = new Date();
+  document.getElementById("liveClock").innerText =
+    now.toLocaleTimeString("id-ID");
+},1000);
+  
 const firebaseConfig = {
     apiKey: "AIzaSyD7v9RjzDP80LcrblAwe6DGNs_ujQ0NIkk",
     authDomain: "lab-inventory-management-c59c8.firebaseapp.com",
@@ -909,7 +980,7 @@ function renderDashboard(){
         <td class="p-2 font-bold">${l.qty}</td>
         <td class="p-2 text-xs text-gray-400">${formatDate(l.time)}</td>
         <td class="p-2">
-          <span class="px-2 py-1 rounded text-xs font-bold ${
+          <span class="px-2 py-1 rounded-full text-xs font-bold tracking-wide" ${
             l.status === 'dipinjam'
               ? 'bg-orange-100 text-orange-600'
               : 'bg-green-100 text-green-600'
@@ -934,7 +1005,8 @@ function renderDashboard(){
       if(loanChartInstance) loanChartInstance.destroy();
       loanChartInstance = new Chart(ctx, {
           type:'line',
-          data: { labels: days, datasets:[{ label:'Peminjaman', data:counts, borderColor:'#3b82f6', fill:true, backgroundColor:'rgba(59, 130, 246, 0.1)', tension:0.4 }] },
+          data: { labels: days, datasets:[{ label:'Peminjaman', data:counts, borderColor:'#3b82f6', fill:true, backgroundColor:'rgba(0,255,255,0.1)'
+borderColor:'#22d3ee', tension:0.4 }] },
           options: { responsive:true, plugins:{legend:{display:false}} }
       });
   });
