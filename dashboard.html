@@ -945,7 +945,9 @@ function printRiwayat(){
     const lastTd = row.lastElementChild;
     if(lastTd){
       const statusSpan = lastTd.querySelector("span");
-      lastTd.innerHTML = statusSpan ? statusSpan.innerText : "-";
+      lastTd.innerHTML = statusSpan 
+        ? statusSpan.innerText.toUpperCase() 
+        : "-";
     }
 
     const input = row.querySelector("input");
