@@ -346,7 +346,6 @@ window.navigate = function(page){
   // render dropdown khusus Barang Rusak
   if(page === "barangRusak") renderDamageDropdown();
 };
-}
 
 // ================= MODAL =================
 function toggleModal(show){
@@ -1099,7 +1098,7 @@ function renderDamageTable() {
 
 // Realtime update
 db.collection("barang").onSnapshot(() => { renderDamageDropdown(); renderDashboard(); });
-db.collection("damage").onSnapshot(() => { renderDamageTable(); });
+db.collection("barangRusak").onSnapshot(() => { renderDamageTable(); });
 </script>
   
 </body>
