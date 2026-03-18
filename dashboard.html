@@ -1010,11 +1010,23 @@ function renderDashboard(){
       const ctx = document.getElementById('loanChart').getContext('2d');
       if(loanChartInstance) loanChartInstance.destroy();
       loanChartInstance = new Chart(ctx, {
-          type:'line',
-          data: { labels: days, datasets:[{ label:'Peminjaman', data:counts, borderColor:'#3b82f6', fill:true, backgroundColor:'rgba(0,255,255,0.1)'
-borderColor:'#22d3ee', tension:0.4 }] },
-          options: { responsive:true, plugins:{legend:{display:false}} }
-      });
+      type:'line',
+      data: { 
+        labels: days, 
+        datasets:[{ 
+          label:'Peminjaman', 
+          data:counts, 
+          fill:true, 
+          backgroundColor:'rgba(0,255,255,0.1)',
+          borderColor:'#22d3ee',
+          tension:0.4 
+        }] 
+      },
+      options: { 
+        responsive:true, 
+        plugins:{ legend:{display:false} } 
+      }
+    });
   });
 
   // Stok Kritis
