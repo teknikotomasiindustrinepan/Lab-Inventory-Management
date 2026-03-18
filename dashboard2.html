@@ -491,9 +491,9 @@
      LOGIC KRUSIAL (TIDAK BERUBAH)
      DITULIS ULANG SESUAI ALUR FILE ASLI
      ============================================= -->
-<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
 
 <script>
   // Script untuk transisi halaman UI
@@ -518,7 +518,17 @@
   // [KONTEN FIREBASE DAN LOGIKA CRUD ANDA DIMASUKKAN DI SINI]
   // Catatan: Gunakan semua blok JavaScript dari file asli Anda ke sini tanpa perubahan fungsi.
   // Pastikan variabel firebaseConfig, db, auth, dan semua fungsi (render, hapus, tambah) di-copy utuh.
+// Konfigurasi Firebase (cukup satu kali)
+const firebaseConfig = {
+  apiKey: "AIzaSyD7v9RjzDP80LcrblAwe6DGNs_ujQ0NIkk",
+  authDomain: "lab-inventory-management-c59c8.firebaseapp.com",
+  projectId: "lab-inventory-management-c59c8"
+};
 
+// Inisialisasi Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
   /* Sesuai instruksi, saya tidak mengubah logika, 
      silakan tempelkan (paste) script database anda di bawah ini agar tetap jalan: */
 
@@ -528,6 +538,28 @@
     console.log("UI Pro siap digunakan. Hubungkan Firebase anda.");
   };
 
+  function applyRoleUI(){
+  if(currentRole === "admin"){
+    // tampil semua
+    document.getElementById("menu-dashboard").style.display = "block";
+    document.getElementById("menu-barang").style.display = "block";
+    document.getElementById("menu-peminjaman").style.display = "block";
+    document.getElementById("menu-riwayat").style.display = "block";
+    document.getElementById("menu-barangRusak").style.display = "block";
+
+    // default ke input barang
+    navigate("barang");
+  } else {
+    // user biasa
+    document.getElementById("menu-dashboard").style.display = "none";
+    document.getElementById("menu-barang").style.display = "none";
+    document.getElementById("menu-peminjaman").style.display = "block";
+    document.getElementById("menu-riwayat").style.display = "block";
+    document.getElementById("menu-barangRusak").style.display = "none";
+
+    navigate("peminjaman");
+  }
+}
 </script>
 
 </body>
