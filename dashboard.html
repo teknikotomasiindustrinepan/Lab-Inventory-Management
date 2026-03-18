@@ -1077,7 +1077,7 @@ if(damageForm){
 }
 
 // Render riwayat barang rusak
-function renderDamageTable() {
+ffunction renderDamageTable() {
   const tbody = document.getElementById('damageTable');
   if(!tbody) return;
 
@@ -1086,16 +1086,47 @@ function renderDamageTable() {
     snap.forEach(doc=>{
       const d = doc.data();
       const date = d.time.toDate ? d.time.toDate() : new Date(d.time);
+
       html += `<tr class="border-b">
         <td>${d.nama}</td>
         <td>${d.qty}</td>
         <td>${date.toLocaleString("id-ID")}</td>
+        <td>
+          ${isAdmin() 
+            ? `<button onclick="hapusDamage('${doc.id}')" 
+                 class="bg-red-500 text-white px-2 py-1 rounded text-sm">
+                 Hapus
+               </button>` 
+            : ""
+          }
+        </td>
       </tr>`;
     });
     tbody.innerHTML = html;
   });
 }
 
+// hapusdamage
+  async function hapusDamage(id) {
+  if(!isAdmin()){
+    alert("Hanya admin yang bisa menghapus data");
+    return;
+  }
+
+  const konfirmasi = confirm("Yakin ingin menghapus data barang rusak ini?");
+  if(!konfirmasi) return;
+
+  try {
+    await db.collection("barangRusak").doc(id).delete();
+    alert("Data berhasil dihapus");
+    renderDamageTable(); // update tabel setelah hapus
+    renderDamageDropdown(); // update dropdown kalau stok berubah
+  } catch(err) {
+    console.error(err);
+    alert("Gagal menghapus data: " + err.message);
+  }
+}
+  
 // Realtime update
 db.collection("barang").onSnapshot(() => { renderDamageDropdown(); renderDashboard(); });
 db.collection("barangRusak").onSnapshot(() => { renderDamageTable(); });
