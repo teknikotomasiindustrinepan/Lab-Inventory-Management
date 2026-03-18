@@ -133,7 +133,16 @@ body { font-family: sans-serif; background:#f1f5f9;}
 <section id="barang" class="page">
 <button id="btnTambah" onclick="toggleModal(true)">+ Tambah</button>
 <table class="w-full mt-4">
-<tbody id="barangTable"></tbody>
+  <thead class="bg-gray-200">
+    <tr>
+      <th>Kode Barang</th>
+      <th>Nama Barang</th>
+      <th>Tempat Simpan</th>
+      <th>Jumlah</th>
+      <th>Aksi</th>
+    </tr>
+  </thead>
+  <tbody id="barangTable"></tbody>
 </table>
   <button onclick="resetSemua()" 
 class="bg-red-700 text-white px-4 py-2 rounded mt-4">
@@ -266,12 +275,14 @@ RESET SEMUA DATA
 
 <!-- MODAL -->
 <div id="modal" class="custom-modal">
-<div class="bg-white p-4">
-<input id="nama" placeholder="Nama"><br>
-<input id="stok" type="number" placeholder="Stok"><br>
-<button onclick="saveBarang()">Simpan</button>
-<button onclick="toggleModal(false)">Batal</button>
-</div>
+  <div class="bg-white p-4">
+    <input id="kode" placeholder="Kode Barang" readonly><br>
+    <input id="nama" placeholder="Nama Barang"><br>
+    <input id="tempat" placeholder="Tempat Simpan"><br>
+    <input id="stok" type="number" placeholder="Stok"><br>
+    <button onclick="saveBarang()">Simpan</button>
+    <button onclick="toggleModal(false)">Batal</button>
+  </div>
 </div>
 
 <!-- Firebase -->
@@ -411,59 +422,58 @@ function applyRoleUI(){
 }
 
   // ================= open edit=================
-function openEdit(id, nama, stok){
-
-  if(!isAdmin()){
-    alert("Hanya admin");
-    return;
-  }
-
+function openEdit(id, kode, nama, tempat, stok){
+  if(!isAdmin()){ alert("Hanya admin"); return; }
   editId = id;
 
+  document.getElementById('kode').value = kode;
   document.getElementById('nama').value = nama;
+  document.getElementById('tempat').value = tempat;
   document.getElementById('stok').value = stok;
 
   toggleModal(true);
 }
-  
+
+   // ================= generate barang =================
+  function generateKodeBarang(length = 6) {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let kode = "";
+  for(let i=0;i<length;i++){
+    kode += chars.charAt(Math.floor(Math.random()*chars.length));
+  }
+  return kode;
+}
+
   
   // ================= renderbarang =================
 function renderBarang(){
   let html="";
   let opt="";
 
-  barangList.forEach(b=>{
+  // urutkan alphabet berdasarkan nama
+  const sortedBarang = barangList.sort((a,b)=> a.nama.localeCompare(b.nama));
 
+  sortedBarang.forEach(b=>{
     html+=`<tr class="border-b">
-      <td>${b.nama}</td>
-      <td>${b.stok ?? 0}</td>
+      <td class="p-2">${b.kode || '-'}</td>
+      <td class="p-2">${b.nama}</td>
+      <td class="p-2">${b.tempat || '-'}</td>
+      <td class="p-2">${b.stok ?? 0}</td>
 
       ${
         isAdmin()
         ? `<td class="space-x-2">
-            <button 
-              onclick="openEdit('${b.id}','${b.nama}',${b.stok})"
-              class="bg-blue-500 text-white px-2 py-1 rounded text-sm">
-              Edit
-            </button>
-
-            <button 
-              onclick="hapusBarang('${b.id}','${b.nama}')"
-              class="bg-yellow-500 text-white px-2 py-1 rounded text-sm">
-              Hapus
-            </button>
-          </td>`
-        : ''
+            <button onclick="openEdit('${b.id}','${b.kode}','${b.nama}','${b.tempat}',${b.stok})"
+              class="bg-blue-500 text-white px-2 py-1 rounded text-sm">Edit</button>
+            <button onclick="hapusBarang('${b.id}','${b.nama}')"
+              class="bg-yellow-500 text-white px-2 py-1 rounded text-sm">Hapus</button>
+          </td>` : ''
       }
-
     </tr>`;
 
     if(b.stok > 0){
-      opt+=`<option value="${b.id}">
-        ${b.nama} (stok: ${b.stok})
-      </option>`;
+      opt+=`<option value="${b.id}">${b.nama} (stok: ${b.stok})</option>`;
     }
-
   });
 
   document.getElementById('barangTable').innerHTML=html;
@@ -578,51 +588,39 @@ renderRiwayat(data);
 }
   
 async function saveBarang(){
+  if(!isAdmin()){ alert("Akses ditolak"); return; }
 
-  if(!isAdmin()){
-    alert("Akses ditolak");
-    return;
-  }
+  let kode   = document.getElementById('kode').value;
+  let nama   = document.getElementById('nama').value.trim();
+  let tempat = document.getElementById('tempat').value.trim();
+  let stok   = parseInt(document.getElementById('stok').value);
 
-  let nama = document.getElementById('nama').value.trim();
-  let stok = parseInt(document.getElementById('stok').value);
-
-  if(!nama || isNaN(stok) || stok < 0){
+  if(!nama || !tempat || isNaN(stok) || stok < 0){
     alert("Input tidak valid");
     return;
   }
 
   try{
-
     if(editId){
-      // 🔥 UPDATE
-      await db.collection("barang").doc(editId).update({
-        nama,
-        stok
-      });
-
-      alert("Barang berhasil diupdate");
-
+      // update
+      await db.collection("barang").doc(editId).update({ nama, tempat, stok });
       editId = null;
-
-    }else{
-      // 🔥 ADD
-      await db.collection("barang").add({
-        nama,
-        stok,
-        createdAt: new Date()
-      });
-
+      alert("Barang berhasil diupdate");
+    } else {
+      // tambah baru
+      kode = generateKodeBarang();
+      await db.collection("barang").add({ kode, nama, tempat, stok, createdAt: new Date() });
       alert("Barang berhasil ditambahkan");
     }
 
     // reset form
-    document.getElementById('nama').value="";
-    document.getElementById('stok').value="";
+    document.getElementById('kode').value = "";
+    document.getElementById('nama').value = "";
+    document.getElementById('tempat').value = "";
+    document.getElementById('stok').value = "";
 
     toggleModal(false);
-
-  }catch(err){
+  } catch(err){
     console.error(err);
     alert("Error: " + err.message);
   }
