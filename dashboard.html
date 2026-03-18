@@ -137,22 +137,7 @@ RESET SEMUA DATA
 </table>
 
     </div>
-  <div id="areaRiwayat">
-  <table class="w-full mt-4 border">
-    <thead class="bg-gray-200"> 
-      <tr>
-        <th>Nama Peminjam</th>
-        <th>Nama Barang</th>
-        <th>Jumlah</th>
-        <th>Nama Pengembali</th>
-        <th>Keterangan</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody id="riwayatTable"></tbody>
-  </table>
-</div>
-  
+   
 </section>
 
 <div id="loginPage" class="fixed inset-0 flex items-center justify-center bg-black/50">
@@ -689,7 +674,7 @@ if(l.status === "kembali"){
   
     // ================= printriwayat =================
 function printRiwayat(){
-  let isi = document.getElementById("areaRiwayat").innerHTML;
+  let isi = document.getElementById("riwayatTable").innerHTML;
 
   let win = window.open('', '', 'width=900,height=700');
 
