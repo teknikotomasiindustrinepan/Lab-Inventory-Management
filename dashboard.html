@@ -871,15 +871,20 @@ function renderDamageTable() {
 
 function renderDashboardDamage() {
     if(!isAdmin()) return;
+
     db.collection("barangRusak").orderBy("time","desc").limit(5).get().then(snap => {
         let html = "";
+
         snap.forEach(doc => {
             const d = doc.data();
+
             html += `<tr class="border-b">
-            <td>${d.nama}</td>
-            <td>${d.qty}</td>
-            <td>${formatDate(d.time)}</td>
+                <td class="p-2">${d.nama}</td>
+                <td class="p-2">${d.qty}</td>
+                <td class="p-2">${formatDate(d.time)}</td>
+            </tr>`;
         });
+
         document.getElementById('dashboardDamageTable').innerHTML = html;
     });
 }
