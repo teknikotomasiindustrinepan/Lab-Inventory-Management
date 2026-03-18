@@ -430,21 +430,6 @@ function isAdmin(){
 return currentRole === "admin";
 }
 
-// ================= NAVIGASI =================
-window.navigate = function(page){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById(page).classList.add('active');
-
-  document.getElementById('page-title').innerText = page;
-
-  // TAMBAHAN
-  document.querySelectorAll('.sidebar-link').forEach(l=>l.classList.remove('active'));
-  document.getElementById("menu-" + page).classList.add('active');
-
-  // render dropdown khusus Barang Rusak
-  if(page === "barangRusak") renderDamageDropdown();
-};
-
 // ================= MODAL =================
 function toggleModal(show){
 if(!isAdmin()){
