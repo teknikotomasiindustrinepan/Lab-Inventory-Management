@@ -342,6 +342,10 @@ window.navigate = function(page){
   // TAMBAHAN
   document.querySelectorAll('.sidebar-link').forEach(l=>l.classList.remove('active'));
   document.getElementById("menu-" + page).classList.add('active');
+
+  // render dropdown khusus Barang Rusak
+  if(page === "barangRusak") renderDamageDropdown();
+};
 }
 
 // ================= MODAL =================
@@ -463,7 +467,8 @@ barangList=[];
 snap.forEach(doc=>{
 barangList.push({id:doc.id,...doc.data()});
 });
-renderBarang();
+renderBarang(); 
+renderDamageDropdown();    // update dropdown Barang Rusak
 document.getElementById('stat-total').innerText=barangList.length;
 });
 
@@ -1016,12 +1021,10 @@ function renderDamageDropdown() {
   const select = document.getElementById('damageBarang');
   if(!select) return;
 
-  select.innerHTML = "";
-  if(barangList.length === 0){
-    select.innerHTML = `<option value="">-- Tidak ada barang --</option>`;
-    return;
-  }
+  // kosongkan dulu
+  select.innerHTML = '<option value="">-- Pilih Barang --</option>';
 
+  // ambil hanya barang yang stok > 0
   barangList.filter(b => b.stok > 0).forEach(b => {
     select.innerHTML += `<option value="${b.id}">${b.nama} (stok: ${b.stok})</option>`;
   });
