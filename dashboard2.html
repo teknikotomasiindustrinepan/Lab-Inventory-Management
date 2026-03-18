@@ -131,21 +131,25 @@ const auth = firebase.auth();
 
 
 /*************************************************
- * 2. STATE
+ * 2. GLOBAL STATE
  *************************************************/
 let barangList = [];
 let currentUser = null;
 let currentRole = null;
+let editId = null;
 
 
 /*************************************************
- * 3. AUTH
+ * 3. AUTH (LOGIN & SESSION)
  *************************************************/
 function login(){
-  const email = emailInput();
-  const password = passInput();
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
 
-  if(!email || !password) return alert("Isi semua");
+  if(!email || !password){
+    alert("Email & password wajib diisi");
+    return;
+  }
 
   auth.signInWithEmailAndPassword(email, password)
     .catch(err => alert(err.message));
@@ -154,14 +158,19 @@ function login(){
 auth.onAuthStateChanged(user=>{
   if(user){
     currentUser = user;
-    currentRole = user.email === "admin@gmail.com" ? "admin" : "user";
 
-    hideLogin();
-    showUser();
+    // Tentukan role
+    currentRole = (user.email === "admin@gmail.com") ? "admin" : "user";
+
+    document.getElementById('loginPage').style.display="none";
+    document.getElementById("userInfo").innerText =
+      `${user.email} (${currentRole})`;
+
     applyRoleUI();
     initApp();
+
   }else{
-    showLogin();
+    document.getElementById('loginPage').style.display="flex";
   }
 });
 
@@ -171,16 +180,29 @@ function logout(){
 
 
 /*************************************************
- * 4. NAVIGATION
+ * 4. NAVIGATION (Pindah Halaman)
  *************************************************/
+const pageTitles = {
+  dashboard: "Dashboard",
+  barang: "Data Barang",
+  peminjaman: "Peminjaman",
+  riwayat: "Riwayat",
+  barangRusak: "Barang Rusak"
+};
+
 function navigate(page){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById(page).classList.add('active');
+
+  document.getElementById('page-title').innerText = pageTitles[page];
+
+  document.querySelectorAll('.sidebar-link').forEach(l=>l.classList.remove('active'));
+  document.getElementById("menu-" + page).classList.add('active');
 }
 
 
 /*************************************************
- * 5. ROLE
+ * 5. ROLE MANAGEMENT
  *************************************************/
 function isAdmin(){
   return currentRole === "admin";
@@ -188,41 +210,50 @@ function isAdmin(){
 
 function applyRoleUI(){
   if(!isAdmin()){
-    document.getElementById("menu-dashboard").style.display="none";
+    document.getElementById("menu-dashboard").style.display = "none";
+    document.getElementById("menu-barang").style.display = "none";
+    document.getElementById("menu-barangRusak").style.display = "none";
+
     navigate("peminjaman");
   }
 }
 
 
 /*************************************************
- * 6. BARANG
+ * 6. BARANG (CRUD)
  *************************************************/
 function renderBarang(){
   let html = "";
-  let opt = "";
 
   barangList.forEach(b=>{
-    html += `<tr><td>${b.kode}</td><td>${b.nama}</td><td>${b.stok}</td></tr>`;
-
-    if(b.stok > 0){
-      opt += `<option value="${b.id}">${b.nama}</option>`;
-    }
+    html += `
+      <tr>
+        <td>${b.kode}</td>
+        <td>${b.nama}</td>
+        <td>${b.tempat}</td>
+        <td>${b.stok}</td>
+      </tr>
+    `;
   });
 
-  barangTable().innerHTML = html;
-  loanSelect().innerHTML = opt;
+  document.getElementById('barangTable').innerHTML = html;
 }
 
 async function saveBarang(){
-  const nama = namaInput();
-  const stok = parseInt(stokInput());
+  if(!isAdmin()) return alert("Hanya admin");
 
-  if(!nama || isNaN(stok)) return alert("Input salah");
+  const nama = document.getElementById('nama').value;
+  const tempat = document.getElementById('tempat').value;
+  const stok = parseInt(document.getElementById('stok').value);
+
+  if(!nama || !tempat || isNaN(stok)){
+    alert("Input tidak valid");
+    return;
+  }
 
   await db.collection("barang").add({
-    nama,
-    stok,
-    kode: randomKode()
+    nama, tempat, stok,
+    kode: generateKodeBarang()
   });
 
   toggleModal(false);
@@ -232,41 +263,56 @@ async function saveBarang(){
 /*************************************************
  * 7. PEMINJAMAN
  *************************************************/
-loanForm()?.addEventListener("submit", async e=>{
-  e.preventDefault();
+function initLoanForm(){
+  const form = document.getElementById('loanForm');
 
-  const id = loanSelect().value;
-  const qty = parseInt(qtyInput());
+  form.addEventListener('submit', async e=>{
+    e.preventDefault();
 
-  await db.runTransaction(async t=>{
-    const ref = db.collection("barang").doc(id);
-    const doc = await t.get(ref);
+    const barangId = document.getElementById('loanBarang').value;
+    const qty = parseInt(document.getElementById('loanQty').value);
 
-    if(doc.data().stok < qty) throw "Stok kurang";
+    await db.runTransaction(async t=>{
+      const ref = db.collection("barang").doc(barangId);
+      const doc = await t.get(ref);
 
-    t.update(ref,{ stok: doc.data().stok - qty });
+      if(doc.data().stok < qty){
+        throw "Stok tidak cukup";
+      }
 
-    t.set(db.collection("loan").doc(),{
-      barangId:id,
-      qty,
-      status:"dipinjam",
-      time:new Date()
+      t.update(ref, { stok: doc.data().stok - qty });
+
+      t.set(db.collection("loan").doc(), {
+        barangId,
+        qty,
+        status: "dipinjam",
+        time: new Date()
+      });
     });
-  });
 
-  alert("Berhasil");
-});
+    alert("Berhasil pinjam");
+  });
+}
 
 
 /*************************************************
  * 8. RIWAYAT
  *************************************************/
 function renderRiwayat(data){
-  let html="";
+  let html = "";
+
   data.forEach(l=>{
-    html += `<tr><td>${l.nama||'-'}</td><td>${l.barang||'-'}</td><td>${l.qty}</td></tr>`;
+    html += `
+      <tr>
+        <td>${l.nama}</td>
+        <td>${l.barang}</td>
+        <td>${l.qty}</td>
+        <td>${l.status}</td>
+      </tr>
+    `;
   });
-  riwayatTable().innerHTML = html;
+
+  document.getElementById('riwayatTable').innerHTML = html;
 }
 
 
@@ -279,21 +325,28 @@ function renderDashboard(){
 
 
 /*************************************************
- * 10. INIT
+ * 10. INIT APP
  *************************************************/
 function initApp(){
 
+  // realtime barang
   db.collection("barang").onSnapshot(snap=>{
     barangList = [];
-    snap.forEach(doc=> barangList.push({id:doc.id,...doc.data()}));
+    snap.forEach(doc=>{
+      barangList.push({id:doc.id,...doc.data()});
+    });
 
     renderBarang();
     renderDashboard();
   });
 
+  // realtime loan
   db.collection("loan").onSnapshot(snap=>{
-    let data=[];
-    snap.forEach(doc=> data.push(doc.data()));
+    let data = [];
+    snap.forEach(doc=>{
+      data.push(doc.data());
+    });
+
     renderRiwayat(data);
   });
 }
@@ -302,33 +355,13 @@ function initApp(){
 /*************************************************
  * 11. UTILITIES
  *************************************************/
-function randomKode(){
-  return Math.random().toString(36).substring(2,6).toUpperCase();
+function generateKodeBarang(){
+  return Math.random().toString(36).substring(2,8).toUpperCase();
 }
 
 function toggleModal(show){
-  document.getElementById('modal').style.display = show ? "flex":"none";
+  document.getElementById('modal').style.display = show ? "flex" : "none";
 }
-
-// shortcut DOM
-const emailInput = ()=>document.getElementById("email").value;
-const passInput  = ()=>document.getElementById("password").value;
-const namaInput  = ()=>document.getElementById("nama").value;
-const stokInput  = ()=>document.getElementById("stok").value;
-const qtyInput   = ()=>document.getElementById("loanQty").value;
-
-const barangTable = ()=>document.getElementById("barangTable");
-const riwayatTable = ()=>document.getElementById("riwayatTable");
-const loanSelect = ()=>document.getElementById("loanBarang");
-const loanForm = ()=>document.getElementById("loanForm");
-
-function hideLogin(){ document.getElementById("loginPage").style.display="none"; }
-function showLogin(){ document.getElementById("loginPage").style.display="flex"; }
-function showUser(){
-  document.getElementById("userInfo").innerText =
-    currentUser.email + " (" + currentRole + ")";
-}
-
 </script>
 
 </body>
