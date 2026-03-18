@@ -29,7 +29,7 @@ body { font-family: sans-serif; background:#f1f5f9;}
     <div id="menu-barang" class="sidebar-link" onclick="navigate('barang')">Barang</div>
     <div id="menu-peminjaman" class="sidebar-link" onclick="navigate('peminjaman')">Peminjaman</div>
     <div id="menu-riwayat" class="sidebar-link" onclick="navigate('riwayat')">Riwayat dan Pengembalian Barang</div>
-    <div id="menu-barang-rusak" class="sidebar-link" onclick="navigate('barangRusak')">Barang Rusak</div>
+    <div id="menu-barangRusak" class="sidebar-link" onclick="navigate('barangRusak')">Barang Rusak</div>
   </div>
 
   <!-- LOGOUT DI BAWAH -->
@@ -212,32 +212,32 @@ RESET SEMUA DATA
 </div>
 
 <!-- BARANG RUSAK -->
-  <section id="barangRusak" class="page">
-
-  <h2 class="font-bold mb-3">Catat Barang Rusak</h2>
+<section id="barangRusak" class="page">
+  <h2 class="font-bold mb-3">Barang Rusak</h2>
 
   <form id="damageForm" class="space-y-2">
-    <select id="damageBarang" class="w-full border p-2 rounded"></select>
+    <select id="damageBarang" class="w-full border p-2 rounded">
+      <option value="">-- Pilih Barang --</option>
+    </select>
+
     <input id="damageQty" type="number" placeholder="Jumlah Rusak" class="w-full border p-2 rounded">
-    <textarea id="damageNote" placeholder="Keterangan" class="w-full border p-2 rounded"></textarea>
-    <button type="submit" class="w-full bg-red-600 text-white p-2 rounded">
-      Simpan
-    </button>
+
+    <button type="submit" class="w-full bg-red-600 text-white p-2 rounded">Laporkan Rusak</button>
   </form>
 
-  <h3 class="font-bold mt-6 mb-2">Riwayat Barang Rusak</h3>
-  <table class="w-full border text-sm">
-    <thead class="bg-gray-200">
-      <tr>
-        <th class="p-2">Nama Barang</th>
-        <th class="p-2">Jumlah Rusak</th>
-        <th class="p-2">Keterangan</th>
-        <th class="p-2">Tanggal</th>
-      </tr>
-    </thead>
-    <tbody id="damageTable"></tbody>
-  </table>
-
+  <div class="bg-white p-4 rounded shadow mt-4">
+    <h3 class="font-bold mb-2">Daftar Barang Rusak</h3>
+    <table class="w-full text-sm border">
+      <thead class="bg-gray-200">
+        <tr>
+          <th>Nama Barang</th>
+          <th>Jumlah Rusak</th>
+          <th>Tanggal</th>
+        </tr>
+      </thead>
+      <tbody id="damageTable"></tbody>
+    </table>
+  </div>
 </section>
   
 </main>
@@ -371,6 +371,7 @@ function applyRoleUI(){
     document.getElementById("menu-barang").style.display = "block";
     document.getElementById("menu-peminjaman").style.display = "block";
     document.getElementById("menu-riwayat").style.display = "block";
+    document.getElementById("menu-barangRusak").style.display = "block";
 
   }else{
     // user biasa
@@ -378,6 +379,7 @@ function applyRoleUI(){
     document.getElementById("menu-barang").style.display = "none";
     document.getElementById("menu-peminjaman").style.display = "block";
     document.getElementById("menu-riwayat").style.display = "block";
+    document.getElementById("menu-barangRusak").style.display = "none";
 
     // default langsung ke peminjaman
     navigate("peminjaman");
@@ -1011,8 +1013,15 @@ db.collection("loan").onSnapshot(()=>{ renderDashboard(); });
 
   // Render dropdown barang untuk barang rusak
 function renderDamageDropdown() {
-  let select = document.getElementById('damageBarang');
+  const select = document.getElementById('damageBarang');
+  if(!select) return;
+
   select.innerHTML = "";
+  if(barangList.length === 0){
+    select.innerHTML = `<option value="">-- Tidak ada barang --</option>`;
+    return;
+  }
+
   barangList.filter(b => b.stok > 0).forEach(b => {
     select.innerHTML += `<option value="${b.id}">${b.nama} (stok: ${b.stok})</option>`;
   });
@@ -1022,79 +1031,67 @@ function renderDamageDropdown() {
 const damageForm = document.getElementById('damageForm');
 
 if(damageForm){
-  damageForm.addEventListener('submit', async e => {
+  damageForm.addEventListener('submit', async e=>{
     e.preventDefault();
 
-    if(!isAdmin()){
-      alert("Hanya admin yang bisa mengisi barang rusak");
-      return;
-    }
+    const barangId = document.getElementById('damageBarang').value;
+    const qty = parseInt(document.getElementById('damageQty').value);
 
-    let id = document.getElementById('damageBarang').value;
-    let qty = parseInt(document.getElementById('damageQty').value);
-    let note = document.getElementById('damageNote').value.trim();
-
-    if(!id || isNaN(qty) || qty <= 0){
+    if(!barangId || isNaN(qty) || qty <= 0){
       alert("Input tidak valid");
       return;
     }
 
-    let ref = db.collection("barang").doc(id);
+    const ref = db.collection("barang").doc(barangId);
+    const damageRef = db.collection("barangRusak").doc(); // collection baru
 
-    await db.runTransaction(async t => {
-      let doc = await t.get(ref);
-      if(!doc.exists) throw "Barang tidak ada";
+    try{
+      await db.runTransaction(async t=>{
+        const doc = await t.get(ref);
+        if(!doc.exists) throw "Barang tidak ditemukan";
 
-      let data = doc.data();
+        const data = doc.data();
 
-      if(data.stok < qty){
-        throw "Stok tidak cukup";
-      }
+        if(data.stok < qty) throw "Stok tidak cukup";
 
-      // update stok barang
-      t.update(ref, {
-        stok: data.stok - qty
+        t.update(ref, { stok: data.stok - qty });
+        t.set(damageRef, {
+          barangId,
+          nama: data.nama,
+          qty,
+          time: new Date(),
+          userEmail: currentUser.email
+        });
       });
 
-      // simpan record barang rusak
-      let damageRef = db.collection("damage").doc();
-      t.set(damageRef, {
-        barangId: id,
-        barangName: data.nama,
-        qty,
-        note,
-        time: new Date(),
-        userEmail: currentUser.email
-      });
-
-    }).then(() => {
-      alert("Barang rusak berhasil dicatat");
+      alert("Barang rusak berhasil dilaporkan");
       damageForm.reset();
-    }).catch(err => {
+      renderDamageTable();
+      renderDamageDropdown(); // update dropdown
+    }catch(err){
       alert(err);
-    });
+    }
   });
 }
 
 // Render riwayat barang rusak
 function renderDamageTable() {
-  db.collection("damage")
-    .orderBy("time", "desc")
-    .get()
-    .then(snap => {
-      let html = "";
-      snap.forEach(doc => {
-        let d = doc.data();
-        let date = d.time ? (d.time.toDate ? d.time.toDate() : new Date(d.time)) : "-";
-        html += `<tr class="border-b">
-          <td class="p-2">${d.barangName}</td>
-          <td class="p-2">${d.qty}</td>
-          <td class="p-2">${d.note || "-"}</td>
-          <td class="p-2">${date.toLocaleString("id-ID")}</td>
-        </tr>`;
-      });
-      document.getElementById('damageTable').innerHTML = html;
+  const tbody = document.getElementById('damageTable');
+  if(!tbody) return;
+
+  db.collection("barangRusak").orderBy("time","desc").get().then(snap=>{
+    let html = "";
+    snap.forEach(doc=>{
+      const d = doc.data();
+      const date = d.time.toDate ? d.time.toDate() : new Date(d.time);
+      html += `<tr class="border-b">
+        <td>${d.nama}</td>
+        <td>${d.qty}</td>
+        <td>${date.toLocaleString("id-ID")}</td>
+      </tr>`;
     });
+    tbody.innerHTML = html;
+  });
 }
 
 // Realtime update
