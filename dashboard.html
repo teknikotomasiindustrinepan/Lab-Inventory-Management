@@ -215,7 +215,7 @@ th.nama-barang {
 
   
 <main class="flex-1 p-6 overflow-y-auto">
-<div class="flex justify-between items-center mb-6 kpi-card bg-white p-4 rounded-xl shadow border-l-4 border-cyan-400 hover:scale-105 transition">
+<div class="flex justify-between items-center mb-6 bg-white p-4 rounded-xl shadow border-l-4 border-cyan-400">
     <div>
         <h1 id="page-title" class="text-2xl font-bold text-slate-800 capitalize">Dashboard</h1>
         <p class="text-xs text-gray-500">Sistem Inventaris Laboratorium • Real-time Monitoring</p>
@@ -256,22 +256,22 @@ th.nama-barang {
     </div>
   </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 border-blue-500">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
       <!-- GRAFIK TREND PEMINJAMAN -->
-      <div class="bg-white p-4 rounded shadow">
+      <div class="bg-white p-4 rounded shadow border-t-4 border-blue-500">
         <h3 class="font-bold mb-3 text-slate-700">Tren Peminjaman (7 Hari)</h3>
         <canvas id="loanChart" height="150"></canvas>
       </div>
 
-      <div class="bg-white p-4 rounded shadow border-blue-500">
+      <div class="bg-white p-4 rounded shadow border-t-4 border-blue-500">
         <h3 class="font-bold mb-3 text-slate-700">Volume Pinjam per Item</h3>
         <canvas id="barangDipinjamChart" height="150"></canvas>
       </div>
   </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 border-blue-500">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- TABEL BARANG HABIS -->
-      <div class="bg-white p-4 rounded shadow">
+      <div class="bg-white p-4 rounded shadow border-t-4 border-blue-500">
         <h3 class="font-bold mb-3 text-red-600 flex items-center">
             <span class="mr-2">⚠️</span> Stok Kritis
         </h3>
@@ -289,7 +289,7 @@ th.nama-barang {
       </div>
 
       <!-- TABEL BARANG RUSAK -->
-      <div class="bg-white p-4 rounded shadow border-blue-500">
+      <div class="bg-white p-4 rounded shadow border-t-4 border-blue-500">
         <h3 class="font-bold mb-3 text-slate-700">Barang Rusak Terbaru</h3>
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
@@ -307,7 +307,7 @@ th.nama-barang {
   </div>
 
   <!-- TABEL PEMINJAMAN TERBARU -->
-  <div class="bg-white p-4 rounded shadow mt-6 border-blue-500">
+  <div class="bg-white p-4 rounded shadow mt-6 border-t-4 border-blue-500">
     <h3 class="font-bold mb-3 text-slate-700">Peminjaman Terbaru</h3>
     <div class="overflow-x-auto">
         <table class="w-full text-sm">
@@ -329,7 +329,7 @@ th.nama-barang {
 
 <!-- BARANG (ADMIN ONLY) -->
 <section id="barang" class="page">
-    <div class="bg-white p-6 rounded-lg shadow border-blue-500">
+    <div class="bg-white p-6 rounded-lg shadow border-t-4 border-blue-500">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-lg font-semibold">Master Data Inventaris</h2>
             <button id="btnTambah" onclick="toggleModal(true)" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition flex items-center">
@@ -363,7 +363,7 @@ th.nama-barang {
 <section id="peminjaman" class="page">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <!-- FORM PINJAM -->
-      <div class="bg-white p-6 rounded shadow border-t-4 border-blue-500">
+      <div class="bg-white p-6 rounded shadow border-t-4 border-t-4 border-blue-500">
         <h2 class="font-bold text-lg mb-4 text-slate-800">Formulir Peminjaman Baru</h2>
         <form id="loanForm" class="space-y-4">
           <div>
@@ -385,7 +385,7 @@ th.nama-barang {
       </div>
 
       <!-- TABEL STOK -->
-      <div class="bg-white p-6 rounded shadow border-blue-500">
+      <div class="bg-white p-6 rounded shadow border-t-4 border-t-4 border-blue-500">
         <h2 class="font-bold text-lg mb-4 text-slate-800">Informasi Stok Real-time</h2>
         <div class="overflow-x-auto">
             <table class="w-full text-sm border">
@@ -405,7 +405,7 @@ th.nama-barang {
 
 <!-- RIWAYAT -->
 <section id="riwayat" class="page">
-    <div class="bg-white p-6 rounded shadow border-blue-500">
+    <div class="bg-white p-6 rounded shadow border-t-4 border-blue-500">
         <div class="flex flex-wrap gap-3 mb-6 items-end bg-slate-50 p-4 rounded border">
             <div>
                 <label class="block text-xs font-bold text-gray-500 mb-1 uppercase">Dari Tanggal</label>
@@ -462,7 +462,7 @@ th.nama-barang {
       </form>
   </div>
 
-  <div class="bg-white p-6 rounded shadow border-blue-500">
+  <div class="bg-white p-6 rounded shadow border-t-4 border-blue-500">
     <h3 class="font-bold text-lg mb-4 text-slate-800">Daftar Laporan Kerusakan</h3>
     <div class="overflow-x-auto">
         <table class="w-full text-sm border text-left">
