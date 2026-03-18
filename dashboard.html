@@ -121,6 +121,13 @@ RESET SEMUA DATA
   </button>
 
 </div>
+  <div id="areaRiwayat">
+  <table class="w-full mt-4 border">
+    <thead class="bg-gray-200"> ... </thead>
+    <tbody id="riwayatTable"></tbody>
+  </table>
+</div>
+  
 <table class="w-full mt-4 border">
   <thead class="bg-gray-200">
     <tr>
@@ -670,8 +677,7 @@ if(l.status === "kembali"){
   
     // ================= printriwayat =================
 function printRiwayat(){
-
-  let isi = document.getElementById("riwayatTable").innerHTML=html;
+  let isi = document.getElementById("areaRiwayat").innerHTML;
 
   let win = window.open('', '', 'width=900,height=700');
 
