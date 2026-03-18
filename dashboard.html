@@ -159,8 +159,10 @@ body { font-family: sans-serif; background:#f1f5f9;}
             <table class="w-full border-collapse">
                 <thead class="bg-slate-100 text-left">
                     <tr>
-                        <th class="p-3 border">Nama Barang</th>
-                        <th class="p-3 border">Stok Tersedia</th>
+                        <th class="p-3 border">Kode</th>
+                        <th class="p-3 border">Nama</th>
+                        <th class="p-3 border">Lokasi</th>
+                        <th class="p-3 border">Stok</th>
                         <th class="p-3 border">Aksi</th>
                     </tr>
                 </thead>
@@ -305,16 +307,21 @@ body { font-family: sans-serif; background:#f1f5f9;}
         <h2 id="modalTitle" class="text-xl font-bold mb-4">Data Barang</h2>
         <div class="space-y-4">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Nama Barang</label>
-                <input id="nama" placeholder="Contoh: Kabel Jumper" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-400 outline-none">
+                <label>Kode Barang</label>
+                <input id="kode" readonly class="w-full border p-2 bg-gray-100">
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Stok Awal</label>
-                <input id="stok" type="number" placeholder="0" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-400 outline-none">
+                <label>Nama Barang</label>
+                <input id="nama" class="w-full border p-2">
             </div>
-            <div class="flex justify-end space-x-2 pt-4">
-                <button onclick="toggleModal(false)" class="px-4 py-2 text-gray-600 font-medium">Batal</button>
-                <button onclick="saveBarang()" class="px-6 py-2 bg-blue-600 text-white rounded font-bold hover:bg-blue-700 transition">Simpan Data</button>
+        
+            <div>
+                <label>Lokasi</label>
+                <input id="lokasi" class="w-full border p-2" placeholder="Contoh: Rak A1">
+            </div>
+            <div>
+                <label>Stok</label>
+                <input id="stok" type="number" class="w-full border p-2">
             </div>
         </div>
     </div>
@@ -449,26 +456,38 @@ window.navigate = function(page){
 
 // ================= MODAL =================
 function toggleModal(show){
-    if(!isAdmin()){
-        alert("Akses dibatasi hanya untuk Admin.");
-        return;
-    }
+    if(!isAdmin()) return;
+
     const modal = document.getElementById('modal');
     modal.style.display = show ? "flex" : "none";
-    if(show) modal.classList.add("items-center","justify-center");
-    if(!show) {
+
+    if(show){
+        modal.classList.add("items-center","justify-center");
+
+        if(!editId){
+            document.getElementById('kode').value = generateKodeBarang();
+        }
+    }
+
+    if(!show){
         editId = null;
         document.getElementById('nama').value = "";
         document.getElementById('stok').value = "";
+        document.getElementById('lokasi').value = "";
+        document.getElementById('kode').value = "";
     }
 }
 
-function openEdit(id, nama, stok){
+function openEdit(id, kode, nama, lokasi, stok){
   if(!isAdmin()) return;
+
   editId = id;
+
+  document.getElementById('kode').value = kode;
   document.getElementById('nama').value = nama;
+  document.getElementById('lokasi').value = lokasi;
   document.getElementById('stok').value = stok;
-  document.getElementById('modalTitle').innerText = "Edit Barang";
+
   toggleModal(true);
 }
 
@@ -477,48 +496,59 @@ function renderBarang(){
   let html="";
   let opt="";
 
-  barangList.sort((a,b) => a.nama.localeCompare(b.nama)).forEach(b=>{
-    html+=`<tr class="hover:bg-gray-50 transition">
-      <td class="p-3 border font-medium">${b.nama}</td>
-      <td class="p-3 border font-bold ${(!b.stok || b.stok == 0) ? 'text-red-500' : 'text-slate-700'}">${b.stok ?? 0}</td>
-      <td class="p-3 border space-x-2">
-            <button onclick="openEdit('${b.id}','${b.nama}',${b.stok})" class="text-blue-600 hover:underline font-semibold">Edit</button>
-            <button onclick="hapusBarang('${b.id}','${b.nama}')" class="text-red-600 hover:underline font-semibold">Hapus</button>
+  barangList.forEach(b=>{
+    html+=`
+    <tr>
+      <td class="p-2 border">${b.kode}</td>
+      <td class="p-2 border">${b.nama}</td>
+      <td class="p-2 border">${b.lokasi}</td>
+      <td class="p-2 border">${b.stok}</td>
+      <td class="p-2 border">
+        <button onclick="openEdit('${b.id}','${b.kode}','${b.nama}','${b.lokasi}',${b.stok})">Edit</button>
+        <button onclick="hapusBarang('${b.id}','${b.nama}')">Hapus</button>
       </td>
-    </tr>`;
+    </tr>
+    `;
 
     if(b.stok > 0){
-      opt+=`<option value="${b.id}">${b.nama} (Stok: ${b.stok})</option>`;
+      opt += `<option value="${b.id}">${b.nama} (${b.kode})</option>`;
     }
   });
 
   document.getElementById('barangTable').innerHTML=html;
   document.getElementById('loanBarang').innerHTML=opt;
-  renderStokTable();
 }
 
 async function saveBarang(){
   if(!isAdmin()) return;
+
+  let kode = document.getElementById('kode').value;
   let nama = document.getElementById('nama').value.trim();
+  let lokasi = document.getElementById('lokasi').value.trim();
   let stok = parseInt(document.getElementById('stok').value);
 
-  if(!nama || isNaN(stok) || stok < 0){
-    alert("Silakan lengkapi data dengan benar.");
+  if(!kode || !nama || !lokasi || isNaN(stok)){
+    alert("Lengkapi semua data!");
     return;
   }
 
   try{
     if(editId){
-      await db.collection("barang").doc(editId).update({ nama, stok });
-      alert("Update berhasil!");
+      await db.collection("barang").doc(editId).update({ kode, nama, lokasi, stok });
     }else{
-      await db.collection("barang").add({ nama, stok, createdAt: new Date() });
-      alert("Barang baru ditambahkan!");
+      await db.collection("barang").add({ kode, nama, lokasi, stok, createdAt:new Date() });
     }
+
     toggleModal(false);
-  }catch(err){ alert("Gagal menyimpan: " + err.message); }
+  }catch(err){
+    alert(err.message);
+  }
 }
 
+function generateKodeBarang(){
+  return "BRG-" + Math.random().toString(36).substring(2,7).toUpperCase();
+}
+  
 async function hapusBarang(id, nama){
   if(!isAdmin()) return;
   if(!confirm(`Hapus data "${nama}"? Data riwayat peminjaman yang masih aktif akan menghalangi penghapusan ini.`)) return;
@@ -817,7 +847,13 @@ function renderDashboardDamage() {
         let html = "";
         snap.forEach(doc => {
             const d = doc.data();
-            html += `<tr class="border-b"><td>${d.nama}</td><td>${d.qty}</td><td class="text-[10px] text-gray-400">${formatDate(d.time)}</td></tr>`;
+            html += `<tr class="border-b">
+            <td>${d.kode || '-'}</td>
+            <td>${d.nama}</td>
+            <td>${d.lokasi || '-'}</td>
+            <td>${d.qty}</td>
+            <td>${formatDate(d.time)}</td>
+            <td class="text-[10px] text-gray-400">${formatDate(d.time)}</td></tr>`;
         });
         document.getElementById('dashboardDamageTable').innerHTML = html;
     });
