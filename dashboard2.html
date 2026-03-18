@@ -16,11 +16,6 @@
   }
 
   body { 
-<div id="menu-dashboard" class="sidebar-link active" onclick="showPage('dashboard')">
-<div id="menu-barang" class="sidebar-link" onclick="showPage('inventory')">
-<div id="menu-peminjaman" class="sidebar-link" onclick="showPage('peminjaman')">
-<div id="menu-riwayat" class="sidebar-link" onclick="showPage('riwayat')">
-<div id="menu-barangRusak" class="sidebar-link" onclick="showPage('kerusakan')">
     
     font-family: 'Inter', sans-serif; 
     background: var(--bg-main);
@@ -161,6 +156,13 @@
 <body class="flex min-h-screen">
 
 <!-- SIDEBAR -->
+  
+ <div id="menu-dashboard" class="sidebar-link active" onclick="navigate('dashboard')">
+<div id="menu-barang" class="sidebar-link" onclick="navigate('inventory')">
+<div id="menu-peminjaman" class="sidebar-link" onclick="navigate('peminjaman')">
+<div id="menu-riwayat" class="sidebar-link" onclick="navigate('riwayat')">
+<div id="menu-barangRusak" class="sidebar-link" onclick="navigate('kerusakan')">
+  
 <div class="sidebar w-64 flex flex-col shrink-0">
   <div class="p-6">
     <div class="flex items-center gap-3 text-white mb-8">
@@ -176,23 +178,23 @@
     </div>
 
     <nav class="space-y-1">
-      <div class="sidebar-link active" onclick="showPage('dashboard')">
+      <div class="sidebar-link active" onclick="navigate('dashboard')">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
         <span>Dashboard</span>
       </div>
-      <div class="sidebar-link" onclick="showPage('inventory')">
+      <div class="sidebar-link" onclick="navigate('inventory')">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
         <span>Inventaris</span>
       </div>
-      <div class="sidebar-link" onclick="showPage('peminjaman')">
+      <div class="sidebar-link" onclick="navigate('peminjaman')">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m4-4l-4-4" /></svg>
         <span>Peminjaman</span>
       </div>
-      <div class="sidebar-link" onclick="showPage('riwayat')">
+      <div class="sidebar-link" onclick="navigate('riwayat')">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
         <span>Riwayat</span>
       </div>
-      <div class="sidebar-link" onclick="showPage('kerusakan')">
+      <div class="sidebar-link" onclick="navigate('kerusakan')">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
         <span>Barang Rusak</span>
       </div>
@@ -632,6 +634,9 @@ modal.classList.remove("items-center","justify-center");
 }
 
   // ================= FUNCTION KONTROL ROLE =================
+  
+
+  
 function applyRoleUI(){
 
   if(currentRole === "admin"){
@@ -1355,7 +1360,7 @@ if(damageForm){
   damageForm.addEventListener('submit', async e=>{
     e.preventDefault();
 
-    const barangId = document.getElementById('damageBarang').value;
+    const barangId = document.getElementById('damageBarangId').value;
     const qty = parseInt(document.getElementById('damageQty').value);
 
     if(!barangId || isNaN(qty) || qty <= 0){
@@ -1398,7 +1403,7 @@ if(damageForm){
 
 // Render riwayat barang rusak
 function renderDamageTable() {
-  const tbody = document.getElementById('damageTable');
+  const tbody = document.querySelector('#tableDamage tbody');
   if(!tbody) return;
 
   db.collection("barangRusak").orderBy("time","desc").get().then(snap=>{
