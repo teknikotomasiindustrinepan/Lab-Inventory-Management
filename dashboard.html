@@ -1070,6 +1070,7 @@ if(damageForm){
       damageForm.reset();
       renderDamageTable();
       renderDamageDropdown(); // update dropdown
+      renderDashboard();  // <-- tambahkan ini
     }catch(err){
       alert(err);
     }
@@ -1129,7 +1130,10 @@ function renderDamageTable() {
   
 // Realtime update
 db.collection("barang").onSnapshot(() => { renderDamageDropdown(); renderDashboard(); });
-db.collection("barangRusak").onSnapshot(() => { renderDamageTable(); });
+db.collection("barangRusak").onSnapshot(() => { 
+  renderDamageTable(); 
+  renderDashboard();  // <-- tambahkan
+});
 </script>
   
 </body>
