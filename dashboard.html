@@ -920,8 +920,32 @@ async function hapusDamage(id){ if(isAdmin() && confirm("Hapus data kerusakan?")
 
 // Print Logic
 function printRiwayat(){
-  const tableWrapper = document.querySelector("#riwayat table");
-  const tableHTML = tableWrapper.outerHTML;
+  const originalTable = document.querySelector("#riwayat table");
+
+  // Clone tabel supaya tidak merusak tampilan asli
+  const clonedTable = originalTable.cloneNode(true);
+
+  // 🔥 Hapus tombol & input di kolom aksi
+  const rows = clonedTable.querySelectorAll("tbody tr");
+
+  rows.forEach(row => {
+    const lastTd = row.lastElementChild;
+
+    if(lastTd){
+      // Ambil status saja
+      const statusSpan = lastTd.querySelector("span");
+      lastTd.innerHTML = statusSpan ? statusSpan.innerText : "-";
+    }
+
+    // Hapus input nama pengembali
+    const input = row.querySelector("input");
+    if(input){
+      input.parentElement.innerHTML = "-";
+    }
+  });
+
+  const today = new Date();
+  const tanggal = today.toLocaleDateString("id-ID");
 
   let win = window.open('', '', 'width=1000,height=700');
 
@@ -930,42 +954,55 @@ function printRiwayat(){
     <head>
       <title>Laporan Inventaris</title>
       <style>
-        body { 
-          font-family: Arial, sans-serif; 
-          padding:20px; 
+        body { font-family: Arial, sans-serif; padding:20px; }
+        h2 { text-align:center; margin-bottom:20px; }
+
+        table { width:100%; border-collapse:collapse; margin-top:10px; }
+        th, td { border:1px solid black; padding:8px; font-size:12px; }
+        th { background:#e5e7eb; text-transform:uppercase; }
+
+        .footer {
+          margin-top:50px;
+          width:100%;
         }
 
-        h2 { 
-          text-align:center; 
-          margin-bottom:20px; 
+        .ttd {
+          display:flex;
+          justify-content:space-between;
+          margin-top:60px;
         }
 
-        table { 
-          width:100%; 
-          border-collapse:collapse; 
-          margin-top:10px;
+        .ttd div {
+          text-align:center;
+          width:40%;
         }
-
-        th, td { 
-          border:1px solid black; 
-          padding:8px; 
-          font-size:12px;
-        }
-
-        th { 
-          background:#e5e7eb; 
-          text-transform:uppercase;
-        }
-
-        td { 
-          vertical-align:top;
-        }
-
       </style>
     </head>
     <body>
+
       <h2>Laporan Riwayat Peminjaman & Pengembalian</h2>
-      ${tableHTML}
+
+      ${clonedTable.outerHTML}
+
+      <div class="footer">
+        <p style="text-align:right;">Kuningan, ${tanggal}</p>
+
+        <div class="ttd">
+          <div>
+            Mengetahui,<br>
+            Kaprodi Teknik Elektronika
+            <br><br><br><br>
+            ______________________
+          </div>
+
+          <div>
+            Toolman
+            <br><br><br><br>
+            ______________________
+          </div>
+        </div>
+      </div>
+
     </body>
     </html>
   `);
