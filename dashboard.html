@@ -848,9 +848,7 @@ function renderDashboardDamage() {
         snap.forEach(doc => {
             const d = doc.data();
             html += `<tr class="border-b">
-            <td>${d.kode || '-'}</td>
             <td>${d.nama}</td>
-            <td>${d.lokasi || '-'}</td>
             <td>${d.qty}</td>
             <td>${formatDate(d.time)}</td>
             <td class="text-[10px] text-gray-400">${formatDate(d.time)}</td></tr>`;
