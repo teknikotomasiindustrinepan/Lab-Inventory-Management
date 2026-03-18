@@ -921,27 +921,35 @@ async function hapusDamage(id){ if(isAdmin() && confirm("Hapus data kerusakan?")
 // Print Logic
 function printRiwayat(){
   const originalTable = document.querySelector("#riwayat table");
-
-  // Clone tabel supaya tidak merusak tampilan asli
   const clonedTable = originalTable.cloneNode(true);
 
-  // 🔥 Hapus tombol & input di kolom aksi
+  // 🔥 Rapikan isi tabel
   const rows = clonedTable.querySelectorAll("tbody tr");
 
   rows.forEach(row => {
-    const lastTd = row.lastElementChild;
+    const cells = row.querySelectorAll("td");
 
+    // Hapus tombol & input
+    const lastTd = row.lastElementChild;
     if(lastTd){
-      // Ambil status saja
       const statusSpan = lastTd.querySelector("span");
       lastTd.innerHTML = statusSpan ? statusSpan.innerText : "-";
     }
 
-    // Hapus input nama pengembali
     const input = row.querySelector("input");
     if(input){
       input.parentElement.innerHTML = "-";
     }
+
+    // 🔥 Alignment kolom
+    cells.forEach((td, index) => {
+      // Kolom yang rata kiri (barang saja di tabel ini)
+      if(index === 1){
+        td.style.textAlign = "left";
+      } else {
+        td.style.textAlign = "center";
+      }
+    });
   });
 
   const today = new Date();
@@ -954,58 +962,105 @@ function printRiwayat(){
     <head>
       <title>Laporan Inventaris</title>
       <style>
-        body { font-family: Arial, sans-serif; padding:20px; }
-        h2 { text-align:center; margin-bottom:20px; }
+        body { 
+          font-family: Arial, sans-serif; 
+          padding:20px; 
+          font-size:12px;
+          color:#000;
+        }
 
-        table { width:100%; border-collapse:collapse; margin-top:10px; }
-        th, td { border:1px solid black; padding:8px; font-size:12px; }
-        th { background:#e5e7eb; text-transform:uppercase; }
+        h2 { 
+          text-align:center; 
+          margin-bottom:10px; 
+          font-size:16px;
+        }
+
+        table { 
+          width:100%; 
+          border-collapse:collapse; 
+          margin-top:10px;
+        }
+
+        th, td { 
+          border:1px solid black; 
+          padding:6px; 
+          font-size:12px;
+        }
+
+        th { 
+          background:#f2f2f2; 
+          text-align:center;
+          font-weight:bold;
+        }
+
+        td { 
+          vertical-align:middle;
+        }
 
         .footer {
-          margin-top:50px;
+          margin-top:20px; /* 🔥 diperkecil biar dekat tabel */
+        }
+
+        .tanggal {
+          text-align:right;
+          font-size:12px;
+          margin-bottom:10px;
+        }
+
+        .mengetahui {
+          font-size:12px;
+          margin-bottom:10px;
+        }
+
+        .ttd-table {
           width:100%;
-        }
-
-        .ttd {
-          display:flex;
-          justify-content:space-between;
-          margin-top:60px;
-        }
-
-        .ttd div {
           text-align:center;
-          width:40%;
+          border:none;
+          font-size:12px;
         }
+
+        .ttd-table td {
+          border:none;
+          padding:5px;
+        }
+
+        .jabatan {
+          font-weight:bold;
+        }
+
+        .spasi-ttd {
+          height:70px;
+        }
+
       </style>
     </head>
     <body>
 
-      <h2>Laporan Riwayat Peminjaman & Pengembalian</h2>
+      <h2>LAPORAN RIWAYAT PEMINJAMAN & PENGEMBALIAN</h2>
 
       ${clonedTable.outerHTML}
 
-        <div class="footer">
-          <p style="text-align:right;">Kuningan, ${tanggal}</p>
-        
-          <p style="margin-top:40px;">Mengetahui,</p>
-        
-          <table style="width:100%; margin-top:20px; text-align:center; border:none;">
-            <tr>
-              <td style="border:none;">Kaprodi Teknik Elektronika</td>
-              <td style="border:none;">Toolman</td>
-            </tr>
-        
-            <tr>
-              <td style="border:none; height:80px;"></td>
-              <td style="border:none;"></td>
-            </tr>
-        
-            <tr>
-              <td style="border:none;">______________________</td>
-              <td style="border:none;">______________________</td>
-            </tr>
-          </table>
-        </div>
+      <div class="footer">
+        <div class="tanggal">Kuningan, ${tanggal}</div>
+
+        <div class="mengetahui">Mengetahui,</div>
+
+        <table class="ttd-table">
+          <tr>
+            <td class="jabatan">Kaprodi Teknik Elektronika</td>
+            <td class="jabatan">Toolman</td>
+          </tr>
+
+          <tr>
+            <td class="spasi-ttd"></td>
+            <td></td>
+          </tr>
+
+          <tr>
+            <td>______________________</td>
+            <td>______________________</td>
+          </tr>
+        </table>
       </div>
 
     </body>
