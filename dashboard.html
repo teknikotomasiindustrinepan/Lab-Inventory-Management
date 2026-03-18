@@ -550,11 +550,27 @@ th.nama-barang {
 <script>
 
   function isiPeriodePrint() {
-  const dari = document.getElementById("filterDari")?.value || "-";
-  const sampai = document.getElementById("filterSampai")?.value || "-";
+  const dari = document.getElementById("startDate").value;
+  const sampai = document.getElementById("endDate").value;
 
-  document.getElementById("periodePrint").innerText =
-    `${dari} sampai dengan ${sampai}`;
+  let teks = "";
+
+  if (dari && sampai) {
+    teks = `${dari} sampai dengan ${sampai}`;
+  } else if (dari) {
+    teks = `mulai ${dari} sampai sekarang`;
+  } else if (sampai) {
+    teks = `hingga ${sampai}`;
+  } else {
+    teks = "semua data";
+  }
+
+  document.getElementById("periodePrint").innerText = teks;
+}
+
+function printRiwayat() {
+  isiPeriodePrint(); // isi teks dulu
+  window.print();
 }
 
 function printLaporan() {
@@ -1130,7 +1146,26 @@ function renderDashboardDamage() {
         document.getElementById('dashboardDamageTable').innerHTML = html;
     });
 }
+  
+function isiPeriodePrint() {
+  const dari = document.getElementById("startDate").value;
+  const sampai = document.getElementById("endDate").value;
 
+  let teks = "";
+
+  if (dari && sampai) {
+    teks = `${dari} sampai dengan ${sampai}`;
+  } else if (dari) {
+    teks = `mulai ${dari} sampai sekarang`;
+  } else if (sampai) {
+    teks = `hingga ${sampai}`;
+  } else {
+    teks = "semua data";
+  }
+
+  document.getElementById("periodePrint").innerText = teks;
+}
+  
 async function hapusDamage(id){ if(isAdmin() && confirm("Hapus data kerusakan?")) await db.collection("barangRusak").doc(id).delete(); }
 
 // Print Logic
@@ -1260,8 +1295,9 @@ function printRiwayat(){
     <body>
 
       <h2>LAPORAN RIWAYAT PEMINJAMAN & PENGEMBALIAN</h2>
-      <p id="printOnlyText" class="text-sm text-gray-600">
-  Laporan ini memuat data peminjaman dan pengembalian barang dalam periode <span id="periodePrint"></span>.
+      <p id="printOnlyText" class="text-sm text-gray-600 mb-3">
+  Laporan ini memuat data peminjaman dan pengembalian barang dalam periode 
+  <span id="periodePrint"></span>.
 </p>
 
       ${clonedTable.outerHTML}
