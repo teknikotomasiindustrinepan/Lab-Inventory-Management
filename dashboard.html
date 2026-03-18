@@ -612,6 +612,7 @@ function initApp(){
     renderBarang(); 
     renderDashboard();
     renderDamageDropdown();
+    renderStokTable();
   });
 
   db.collection("loan").orderBy("time","desc").onSnapshot(snap=>{
