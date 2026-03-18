@@ -87,7 +87,7 @@
     font-size: 0.75rem;
     letter-spacing: 0.05em;
     padding: 12px 16px;
-    text-align: left;
+    text-align: center;
     border-bottom: 2px solid #e2e8f0;
   }
 
@@ -95,18 +95,11 @@
     padding: 12px 16px;
     border-bottom: 1px solid #f1f5f9;
     font-size: 0.875rem;
+    text-align: center;
   }
 
   table tr:last-child td { border-bottom: none; }
   table tr:hover td { background-color: #f8fafc; }
-
-  /* Badge styling */
-  .badge {
-    padding: 2px 8px;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 500;
-  }
 
   /* Modal */
   .custom-modal { 
@@ -131,25 +124,11 @@
     box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1) !important;
   }
 
-  /* Tech Accents */
-  .tech-border {
-    border-left: 4px solid var(--primary);
-  }
+  .tech-border { border-left: 4px solid var(--primary); }
 
-  .status-dot {
-    height: 8px;
-    width: 8px;
-    background-color: #10b981;
-    border-radius: 50%;
-    display: inline-block;
-    margin-right: 6px;
-  }
-
-  /* Scrollbar */
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: #f1f5f9; }
   ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-  ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 </style>
 </head>
 <body class="flex min-h-screen">
@@ -157,45 +136,46 @@
 <!-- SIDEBAR -->
 <div class="sidebar w-64 flex flex-col shrink-0">
   <div class="p-6">
-  <!-- Logo + Nama Lab -->
-  <div class="flex items-center gap-3 mb-8">
-    <img src="logo.png" alt="Logo Lab" class="w-12 h-12 rounded-lg">
-    <div>
-      <h1 class="font-bold text-lg leading-tight text-white">LAB-INV TOI</h1>
-      <p class="text-[10px] text-cyan-400 tracking-widest font-mono uppercase">SMK NEGERI 1 JAPARA</p>
+    <div class="flex items-center gap-3 text-white mb-8">
+      <div class="bg-cyan-500 p-2 rounded-lg">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" /></svg>
+      </div>
+      <div>
+        <h1 class="font-bold text-lg leading-tight">LAB-INV</h1>
+        <p class="text-[10px] text-cyan-400 tracking-widest font-mono uppercase">Electronics Dept</p>
+      </div>
     </div>
-  </div>
 
-  <nav class="space-y-1">
-    <div class="sidebar-link active" onclick="showPage('dashboard')">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
-      <span>Dashboard</span>
-    </div>
-    <div class="sidebar-link" onclick="showPage('inventory')">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
-      <span>Inventaris</span>
-    </div>
-    <div class="sidebar-link" onclick="showPage('peminjaman')">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m4-4l-4-4" /></svg>
-      <span>Peminjaman</span>
-    </div>
-    <div class="sidebar-link" onclick="showPage('riwayat')">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-      <span>Riwayat</span>
-    </div>
-    <div class="sidebar-link" onclick="showPage('kerusakan')">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-      <span>Barang Rusak</span>
-    </div>
-  </nav>
-</div>
+    <nav class="space-y-1">
+      <div class="sidebar-link active" onclick="showPage('dashboard')">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+        <span>Dashboard</span>
+      </div>
+      <div class="sidebar-link" onclick="showPage('inventory')">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+        <span>Inventaris</span>
+      </div>
+      <div class="sidebar-link" onclick="showPage('peminjaman')">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m4-4l-4-4" /></svg>
+        <span>Peminjaman</span>
+      </div>
+      <div class="sidebar-link" onclick="showPage('riwayat')">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        <span>Riwayat</span>
+      </div>
+      <div class="sidebar-link" onclick="showPage('kerusakan')">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+        <span>Barang Rusak</span>
+      </div>
+    </nav>
+  </div>
   
   <div class="mt-auto p-6 border-t border-slate-800">
     <div id="userInfo" class="flex items-center gap-3 text-slate-400 mb-4">
       <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-white">U</div>
       <div class="overflow-hidden">
-        <p class="text-xs font-semibold text-white truncate" id="userName">User</p>
-        <p class="text-[10px] uppercase tracking-tighter" id="userRole">Viewer</p>
+        <p class="text-xs font-semibold text-white truncate" id="userName">Memuat...</p>
+        <p class="text-[10px] uppercase tracking-tighter" id="userRole">...</p>
       </div>
     </div>
     <button onclick="handleLogout()" class="w-full bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white py-2 rounded-lg text-sm font-medium transition-colors">
@@ -207,7 +187,7 @@
 <!-- MAIN CONTENT -->
 <main class="flex-1 p-8 overflow-y-auto">
   
-  <!-- DASHBOARD PAGE -->
+  <!-- DASHBOARD -->
   <div id="dashboard" class="page active">
     <header class="mb-8">
       <h2 class="text-2xl font-bold text-slate-800">Sistem Monitoring Lab</h2>
@@ -218,60 +198,39 @@
       <div class="glass-card p-6 tech-border">
         <p class="text-sm font-medium text-slate-500 mb-1">Total Item</p>
         <h3 class="text-3xl font-bold text-slate-800" id="statTotal">0</h3>
-        <div class="mt-2 text-xs text-cyan-600 font-mono tracking-tighter uppercase">Verified Assets</div>
       </div>
       <div class="glass-card p-6 border-l-4 border-amber-400">
         <p class="text-sm font-medium text-slate-500 mb-1">Dipinjam</p>
         <h3 class="text-3xl font-bold text-slate-800" id="statPinjam">0</h3>
-        <div class="mt-2 text-xs text-amber-600 font-mono tracking-tighter uppercase">Active Sessions</div>
       </div>
       <div class="glass-card p-6 border-l-4 border-emerald-400">
         <p class="text-sm font-medium text-slate-500 mb-1">Tersedia</p>
         <h3 class="text-3xl font-bold text-slate-800" id="statTersedia">0</h3>
-        <div class="mt-2 text-xs text-emerald-600 font-mono tracking-tighter uppercase">Ready for Use</div>
       </div>
       <div class="glass-card p-6 border-l-4 border-red-400">
         <p class="text-sm font-medium text-slate-500 mb-1">Rusak</p>
         <h3 class="text-3xl font-bold text-slate-800" id="statRusak">0</h3>
-        <div class="mt-2 text-xs text-red-600 font-mono tracking-tighter uppercase">Maintenance Required</div>
-      </div>
-    </div>
-
-    <!-- Recent Activity Placeholder -->
-    <div class="glass-card p-6">
-      <h4 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
-        <span class="status-dot"></span> Aktifitas Terbaru
-      </h4>
-      <div id="recentActivity" class="space-y-4 text-sm text-slate-600">
-        <p class="italic opacity-50 text-center py-8">Memuat data terbaru...</p>
       </div>
     </div>
   </div>
 
-  <!-- INVENTORY PAGE -->
+  <!-- INVENTORY -->
   <div id="inventory" class="page">
     <div class="flex justify-between items-center mb-8">
       <div>
         <h2 class="text-2xl font-bold text-slate-800">Daftar Inventaris</h2>
-        <p class="text-slate-500">Kelola semua komponen dan peralatan lab.</p>
       </div>
-      <button onclick="openModal('addBarangModal')" id="btnAddBarang" class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg font-medium shadow-lg shadow-cyan-900/10 flex items-center gap-2">
+      <button onclick="openModal('addBarangModal')" id="btnAddBarang" class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg font-medium shadow-lg flex items-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
         Tambah Barang
       </button>
     </div>
-
     <div class="glass-card overflow-hidden">
-      <div class="p-4 bg-slate-50 border-b border-slate-200 flex flex-wrap gap-4">
-        <div class="relative flex-1 min-w-[200px]">
-          <span class="absolute inset-y-0 left-3 flex items-center text-slate-400">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-          </span>
-          <input type="text" id="searchBarang" placeholder="Cari nama atau kode barang..." class="w-full pl-10 pr-4 py-2 rounded-md text-sm">
-        </div>
+      <div class="p-4 bg-slate-50 border-b border-slate-200">
+        <input type="text" id="searchBarang" placeholder="Cari nama atau kode barang..." class="w-full max-w-sm px-4 py-2 rounded-md text-sm">
       </div>
       <div class="custom-table-container">
-        <table id="tableBarang">
+        <table>
           <thead>
             <tr>
               <th>Kode</th>
@@ -281,29 +240,21 @@
               <th>Aksi</th>
             </tr>
           </thead>
-          <tbody>
-            <!-- Dynamic data -->
-          </tbody>
+          <tbody id="tableBarang"></tbody>
         </table>
       </div>
     </div>
   </div>
 
-  <!-- PEMINJAMAN PAGE -->
+  <!-- PEMINJAMAN -->
   <div id="peminjaman" class="page">
     <div class="flex justify-between items-center mb-8">
-      <div>
-        <h2 class="text-2xl font-bold text-slate-800">Manajemen Peminjaman</h2>
-        <p class="text-slate-500">Alur keluar masuk peminjaman alat.</p>
-      </div>
-      <button onclick="openModal('pinjamModal')" class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg font-medium shadow-lg shadow-cyan-900/10">
-        Buat Pinjaman Baru
-      </button>
+      <h2 class="text-2xl font-bold text-slate-800">Manajemen Peminjaman</h2>
+      <button onclick="openModal('pinjamModal')" class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg font-medium shadow-lg">Buat Pinjaman Baru</button>
     </div>
-
     <div class="glass-card overflow-hidden">
       <div class="custom-table-container">
-        <table id="tablePinjam">
+        <table>
           <thead>
             <tr>
               <th>ID Pinjam</th>
@@ -314,23 +265,18 @@
               <th>Aksi</th>
             </tr>
           </thead>
-          <tbody>
-            <!-- Dynamic data -->
-          </tbody>
+          <tbody id="tablePinjam"></tbody>
         </table>
       </div>
     </div>
   </div>
 
-  <!-- RIWAYAT PAGE -->
+  <!-- RIWAYAT -->
   <div id="riwayat" class="page">
-    <div class="mb-8">
-      <h2 class="text-2xl font-bold text-slate-800">Log Riwayat</h2>
-      <p class="text-slate-500">Daftar transaksi pengembalian dan log sistem.</p>
-    </div>
+    <h2 class="text-2xl font-bold text-slate-800 mb-8">Log Riwayat</h2>
     <div class="glass-card overflow-hidden">
       <div class="custom-table-container">
-        <table id="tableRiwayat">
+        <table>
           <thead>
             <tr>
               <th>ID Pinjam</th>
@@ -341,29 +287,21 @@
               <th>Tgl Kembali</th>
             </tr>
           </thead>
-          <tbody>
-            <!-- Dynamic data -->
-          </tbody>
+          <tbody id="tableRiwayat"></tbody>
         </table>
       </div>
     </div>
   </div>
 
-  <!-- KERUSAKAN PAGE -->
+  <!-- KERUSAKAN -->
   <div id="kerusakan" class="page">
     <div class="flex justify-between items-center mb-8">
-      <div>
-        <h2 class="text-2xl font-bold text-slate-800">Laporan Kerusakan</h2>
-        <p class="text-slate-500">Pencatatan item yang membutuhkan perbaikan.</p>
-      </div>
-      <button onclick="openModal('damageModal')" id="btnAddDamage" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium shadow-lg">
-        Lapor Kerusakan
-      </button>
+      <h2 class="text-2xl font-bold text-slate-800">Laporan Kerusakan</h2>
+      <button onclick="openModal('damageModal')" id="btnAddDamage" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium shadow-lg">Lapor Kerusakan</button>
     </div>
-
     <div class="glass-card overflow-hidden border-t-4 border-red-500">
       <div class="custom-table-container">
-        <table id="tableDamage">
+        <table>
           <thead>
             <tr>
               <th>Kode</th>
@@ -373,9 +311,7 @@
               <th>Aksi</th>
             </tr>
           </thead>
-          <tbody>
-            <!-- Dynamic data -->
-          </tbody>
+          <tbody id="tableDamage"></tbody>
         </table>
       </div>
     </div>
@@ -383,184 +319,331 @@
 
 </main>
 
-<!-- =============================================
-     MODALS (DIBUAT LEBIH ELEGAN)
-     ============================================= -->
-
-<!-- Modal Add Barang -->
-<div id="addBarangModal" class="custom-modal flex">
+<!-- MODALS -->
+<div id="addBarangModal" class="custom-modal">
   <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
-    <div class="bg-slate-900 p-4 flex justify-between items-center">
+    <div class="bg-slate-900 p-4 flex justify-between">
       <h3 class="text-white font-bold">Input Inventaris Baru</h3>
       <button onclick="closeModal('addBarangModal')" class="text-slate-400 hover:text-white">&times;</button>
     </div>
-    <div class="p-6">
-      <form id="formBarang" class="space-y-4">
-        <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Kode Barang</label>
-          <input type="text" id="kodeBarang" class="w-full border p-2 rounded-lg text-sm" placeholder="Contoh: ELK-001" required>
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nama Barang</label>
-          <input type="text" id="namaBarang" class="w-full border p-2 rounded-lg text-sm" required>
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Kategori</label>
-          <select id="kategoriBarang" class="w-full border p-2 rounded-lg text-sm">
-            <option value="Komponen Elektronika">Komponen Elektronika</option>
-            <option value="Alat Ukur">Alat Ukur</option>
-            <option value="Alat Solder">Alat Solder</option>
-            <option value="Power Supply">Power Supply</option>
-            <option value="Lainnya">Lainnya</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Jumlah Stok</label>
-          <input type="number" id="stokBarang" class="w-full border p-2 rounded-lg text-sm" min="0" required>
-        </div>
-        <div class="pt-4">
-          <button type="submit" class="w-full bg-cyan-600 text-white py-2 rounded-lg font-bold hover:bg-cyan-700 transition-all">SIMPAN DATA</button>
-        </div>
-      </form>
-    </div>
+    <form id="formBarang" class="p-6 space-y-4">
+      <input type="text" id="kodeBarang" placeholder="Kode Barang" class="w-full border p-2 rounded-lg" required>
+      <input type="text" id="namaBarang" placeholder="Nama Barang" class="w-full border p-2 rounded-lg" required>
+      <select id="kategoriBarang" class="w-full border p-2 rounded-lg">
+        <option value="Komponen Elektronika">Komponen Elektronika</option>
+        <option value="Alat Ukur">Alat Ukur</option>
+        <option value="Alat Solder">Alat Solder</option>
+        <option value="Power Supply">Power Supply</option>
+      </select>
+      <input type="number" id="stokBarang" placeholder="Jumlah Stok" class="w-full border p-2 rounded-lg" required>
+      <button type="submit" class="w-full bg-cyan-600 text-white py-2 rounded-lg font-bold">SIMPAN DATA</button>
+    </form>
   </div>
 </div>
 
-<!-- Modal Pinjam -->
-<div id="pinjamModal" class="custom-modal flex">
+<div id="pinjamModal" class="custom-modal">
   <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
-    <div class="bg-slate-900 p-4 flex justify-between items-center">
-      <h3 class="text-white font-bold">Formulir Peminjaman</h3>
+    <div class="bg-slate-900 p-4 flex justify-between">
+      <h3 class="text-white font-bold">Peminjaman</h3>
       <button onclick="closeModal('pinjamModal')" class="text-slate-400 hover:text-white">&times;</button>
     </div>
-    <div class="p-6">
-      <form id="formPinjam" class="space-y-4">
-        <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nama Peminjam</label>
-          <input type="text" id="peminjamName" class="w-full border p-2 rounded-lg text-sm" required>
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Pilih Barang</label>
-          <select id="pinjamBarangId" class="w-full border p-2 rounded-lg text-sm" required></select>
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Jumlah (Qty)</label>
-          <input type="number" id="pinjamQty" class="w-full border p-2 rounded-lg text-sm" min="1" required>
-        </div>
-        <div class="pt-4 text-xs text-amber-600 italic">
-          *Pastikan peminjam membawa KTM/Kartu Identitas.
-        </div>
-        <div class="pt-2">
-          <button type="submit" class="w-full bg-cyan-600 text-white py-2 rounded-lg font-bold">KONFIRMASI PINJAMAN</button>
-        </div>
-      </form>
-    </div>
+    <form id="formPinjam" class="p-6 space-y-4">
+      <input type="text" id="peminjamName" placeholder="Nama Peminjam" class="w-full border p-2 rounded-lg" required>
+      <select id="pinjamBarangId" class="w-full border p-2 rounded-lg" required></select>
+      <input type="number" id="pinjamQty" placeholder="Jumlah" class="w-full border p-2 rounded-lg" required>
+      <button type="submit" class="w-full bg-cyan-600 text-white py-2 rounded-lg font-bold">KONFIRMASI</button>
+    </form>
   </div>
 </div>
 
-<!-- Modal Damage -->
-<div id="damageModal" class="custom-modal flex">
+<div id="damageModal" class="custom-modal">
   <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
-    <div class="bg-red-900 p-4 flex justify-between items-center">
-      <h3 class="text-white font-bold">Lapor Kerusakan Alat</h3>
+    <div class="bg-red-900 p-4 flex justify-between">
+      <h3 class="text-white font-bold">Lapor Kerusakan</h3>
       <button onclick="closeModal('damageModal')" class="text-slate-400 hover:text-white">&times;</button>
     </div>
-    <div class="p-6">
-      <form id="formDamage" class="space-y-4">
-        <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Barang Yang Rusak</label>
-          <select id="damageBarangId" class="w-full border p-2 rounded-lg text-sm" required></select>
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Jumlah Rusak</label>
-          <input type="number" id="damageQty" class="w-full border p-2 rounded-lg text-sm" min="1" required>
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Keterangan / Gejala</label>
-          <textarea id="damageNote" class="w-full border p-2 rounded-lg text-sm h-20" placeholder="Misal: Short circuit, pecah, dll"></textarea>
-        </div>
-        <div class="pt-4">
-          <button type="submit" class="w-full bg-red-600 text-white py-2 rounded-lg font-bold">KIRIM LAPORAN</button>
-        </div>
-      </form>
-    </div>
+    <form id="formDamage" class="p-6 space-y-4">
+      <select id="damageBarangId" class="w-full border p-2 rounded-lg" required></select>
+      <input type="number" id="damageQty" placeholder="Jumlah Rusak" class="w-full border p-2 rounded-lg" required>
+      <button type="submit" class="w-full bg-red-600 text-white py-2 rounded-lg font-bold">KIRIM</button>
+    </form>
   </div>
 </div>
 
-<!-- =============================================
-     LOGIC KRUSIAL (TIDAK BERUBAH)
-     DITULIS ULANG SESUAI ALUR FILE ASLI
-     ============================================= -->
-<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
+<!-- FIREBASE SDK -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
 <script>
-  // Script untuk transisi halaman UI
+  // SILAKAN ISI CONFIG ANDA DISINI
+  const firebaseConfig = {
+  apiKey: "AIzaSyD7v9RjzDP80LcrblAwe6DGNs_ujQ0NIkk",
+  authDomain: "lab-inventory-management-c59c8.firebaseapp.com",
+  projectId: "lab-inventory-management-c59c8",
+  storageBucket: "lab-inventory-management-c59c8.appspot.com",
+  messagingSenderId: "623343435584",
+  appId: "1:623343435584:web:54ee6bd7092995709404a5"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const auth = firebase.auth();
+
+  // --- UI HELPER ---
   function showPage(pageId) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
-    
     document.getElementById(pageId).classList.add('active');
-    
-    // Cari elemen sidebar link yang sesuai
-    const links = document.querySelectorAll('.sidebar-link');
-    links.forEach(link => {
-      if(link.getAttribute('onclick').includes(pageId)) {
-        link.classList.add('active');
-      }
-    });
+    event.currentTarget.classList.add('active');
   }
-
   function openModal(id) { document.getElementById(id).style.display = 'flex'; }
   function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-  // [KONTEN FIREBASE DAN LOGIKA CRUD ANDA DIMASUKKAN DI SINI]
-  // Catatan: Gunakan semua blok JavaScript dari file asli Anda ke sini tanpa perubahan fungsi.
-  // Pastikan variabel firebaseConfig, db, auth, dan semua fungsi (render, hapus, tambah) di-copy utuh.
-// Konfigurasi Firebase (cukup satu kali)
-const firebaseConfig = {
-  apiKey: "AIzaSyD7v9RjzDP80LcrblAwe6DGNs_ujQ0NIkk",
-  authDomain: "lab-inventory-management-c59c8.firebaseapp.com",
-  projectId: "lab-inventory-management-c59c8"
-};
+  // --- LOGIC PROGRAM ---
+  let barangList = [];
 
-// Inisialisasi Firebase
-const app = firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
-  /* Sesuai instruksi, saya tidak mengubah logika, 
-     silakan tempelkan (paste) script database anda di bawah ini agar tetap jalan: */
+  auth.onAuthStateChanged(user => {
+    if (!user) { window.location.href = "login.html"; } 
+    else {
+      document.getElementById("userName").innerText = user.displayName || user.email;
+      checkAdminStatus(user);
+      init();
+    }
+  });
 
-  // MOCK LOGIC FOR PREVIEW (Hapus bagian ini jika anda menempelkan kodingan asli anda)
-  window.onload = () => {
-    // Simulasi inisialisasi visual jika Firebase belum terhubung
-    console.log("UI Pro siap digunakan. Hubungkan Firebase anda.");
+  async function checkAdminStatus(user) {
+    const doc = await db.collection("users").doc(user.uid).get();
+    const role = doc.exists ? doc.data().role : "viewer";
+    document.getElementById("userRole").innerText = role.toUpperCase();
+    if(role !== 'admin') {
+      document.getElementById("btnAddBarang").style.display = 'none';
+      document.getElementById("btnAddDamage").style.display = 'none';
+    }
+  }
+
+  function isAdmin() { return document.getElementById("userRole").innerText === 'ADMIN'; }
+
+  function init() {
+    renderBarangTable();
+    renderPinjamTable();
+    renderRiwayatTable();
+    renderDamageTable();
+    renderDashboardStats();
+  }
+
+  // --- CRUD BARANG ---
+  async function renderBarangTable() {
+    const tbody = document.getElementById("tableBarang");
+    db.collection("barang").onSnapshot(snapshot => {
+      barangList = [];
+      let html = "";
+      snapshot.forEach(doc => {
+        const d = doc.data();
+        barangList.push({id: doc.id, ...d});
+        html += `<tr>
+          <td>${d.kode}</td>
+          <td class="font-medium text-slate-800">${d.nama}</td>
+          <td><span class="bg-slate-100 px-2 py-1 rounded text-xs">${d.kategori}</span></td>
+          <td class="font-mono">${d.stok}</td>
+          <td>
+            ${isAdmin() ? `<button onclick="hapusBarang('${doc.id}')" class="text-red-500 hover:text-red-700 font-medium">Hapus</button>` : '-'}
+          </td>
+        </tr>`;
+      });
+      tbody.innerHTML = html;
+      renderPinjamDropdown();
+      renderDamageDropdown();
+    });
+  }
+
+  document.getElementById("formBarang").onsubmit = async (e) => {
+    e.preventDefault();
+    const data = {
+      kode: document.getElementById("kodeBarang").value,
+      nama: document.getElementById("namaBarang").value,
+      kategori: document.getElementById("kategoriBarang").value,
+      stok: parseInt(document.getElementById("stokBarang").value),
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    await db.collection("barang").add(data);
+    e.target.reset();
+    closeModal('addBarangModal');
   };
 
-  function applyRoleUI(){
-  if(currentRole === "admin"){
-    // tampil semua
-    document.getElementById("menu-dashboard").style.display = "block";
-    document.getElementById("menu-barang").style.display = "block";
-    document.getElementById("menu-peminjaman").style.display = "block";
-    document.getElementById("menu-riwayat").style.display = "block";
-    document.getElementById("menu-barangRusak").style.display = "block";
-
-    // default ke input barang
-    navigate("barang");
-  } else {
-    // user biasa
-    document.getElementById("menu-dashboard").style.display = "none";
-    document.getElementById("menu-barang").style.display = "none";
-    document.getElementById("menu-peminjaman").style.display = "block";
-    document.getElementById("menu-riwayat").style.display = "block";
-    document.getElementById("menu-barangRusak").style.display = "none";
-
-    navigate("peminjaman");
+  async function hapusBarang(id) {
+    if(confirm("Hapus barang?")) await db.collection("barang").doc(id).delete();
   }
-}
-</script>
 
+  // --- PEMINJAMAN ---
+  function renderPinjamDropdown() {
+    const select = document.getElementById("pinjamBarangId");
+    let html = '<option value="">Pilih Barang...</option>';
+    barangList.forEach(b => {
+      if(b.stok > 0) html += `<option value="${b.id}">${b.nama} (Stok: ${b.stok})</option>`;
+    });
+    select.innerHTML = html;
+  }
+
+  document.getElementById("formPinjam").onsubmit = async (e) => {
+    e.preventDefault();
+    const bid = document.getElementById("pinjamBarangId").value;
+    const qty = parseInt(document.getElementById("pinjamQty").value);
+    const b = barangList.find(x => x.id === bid);
+
+    if(qty > b.stok) return alert("Stok tidak cukup");
+
+    await db.collection("peminjaman").add({
+      nama: document.getElementById("peminjamName").value,
+      barangId: bid,
+      namaBarang: b.nama,
+      qty: qty,
+      status: "dipinjam",
+      tglPinjam: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    await db.collection("barang").doc(bid).update({ stok: b.stok - qty });
+    e.target.reset();
+    closeModal('pinjamModal');
+  };
+
+  async function renderPinjamTable() {
+    db.collection("peminjaman").where("status", "==", "dipinjam").onSnapshot(snapshot => {
+      let html = "";
+      snapshot.forEach(doc => {
+        const d = doc.data();
+        html += `<tr>
+          <td class="text-xs font-mono">${doc.id.substring(0,6)}</td>
+          <td>${d.nama}</td>
+          <td>${d.namaBarang}</td>
+          <td>${d.qty}</td>
+          <td>${d.tglPinjam?.toDate().toLocaleDateString('id-ID')}</td>
+          <td><button onclick="kembalikan('${doc.id}')" class="bg-emerald-500 text-white px-3 py-1 rounded-md text-sm">Kembali</button></td>
+        </tr>`;
+      });
+      document.getElementById("tablePinjam").innerHTML = html;
+    });
+  }
+
+  async function kembalikan(id) {
+    const doc = await db.collection("peminjaman").doc(id).get();
+    const d = doc.data();
+    const bDoc = await db.collection("barang").doc(d.barangId).get();
+    
+    await db.collection("peminjaman").doc(id).update({
+      status: "kembali",
+      tglKembali: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    
+    if(bDoc.exists) {
+      await db.collection("barang").doc(d.barangId).update({ stok: bDoc.data().stok + d.qty });
+    }
+  }
+
+  // --- RIWAYAT ---
+  function renderRiwayatTable() {
+    db.collection("peminjaman").where("status", "==", "kembali").onSnapshot(snapshot => {
+      let html = "";
+      snapshot.forEach(doc => {
+        const d = doc.data();
+        html += `<tr>
+          <td class="text-xs font-mono">${doc.id.substring(0,6)}</td>
+          <td>${d.nama}</td>
+          <td>${d.namaBarang}</td>
+          <td>${d.qty}</td>
+          <td>${d.tglPinjam?.toDate().toLocaleDateString('id-ID')}</td>
+          <td>${d.tglKembali?.toDate().toLocaleDateString('id-ID')}</td>
+        </tr>`;
+      });
+      document.getElementById("tableRiwayat").innerHTML = html;
+    });
+  }
+
+  // --- KERUSAKAN ---
+  function renderDamageDropdown() {
+    const select = document.getElementById("damageBarangId");
+    let html = '<option value="">Pilih Barang...</option>';
+    barangList.forEach(b => {
+      html += `<option value="${b.id}">${b.nama} (Tersedia: ${b.stok})</option>`;
+    });
+    select.innerHTML = html;
+  }
+
+  document.getElementById("formDamage").onsubmit = async (e) => {
+    e.preventDefault();
+    const bid = document.getElementById("damageBarangId").value;
+    const qty = parseInt(document.getElementById("damageQty").value);
+    const b = barangList.find(x => x.id === bid);
+
+    if(qty > b.stok) return alert("Jumlah rusak melebihi stok");
+
+    await db.collection("barangRusak").add({
+      barangId: bid,
+      nama: b.nama,
+      qty: qty,
+      tglLapor: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    await db.collection("barang").doc(bid).update({ stok: b.stok - qty });
+    e.target.reset();
+    closeModal('damageModal');
+  };
+
+  function renderDamageTable() {
+    db.collection("barangRusak").onSnapshot(snapshot => {
+      let html = "";
+      snapshot.forEach(doc => {
+        const d = doc.data();
+        html += `<tr>
+          <td>-</td>
+          <td>${d.nama}</td>
+          <td class="text-red-600 font-bold">${d.qty}</td>
+          <td>${d.tglLapor?.toDate().toLocaleDateString('id-ID')}</td>
+          <td>${isAdmin() ? `<button onclick="hapusDamage('${doc.id}')" class="text-red-500">Hapus</button>` : '-'}</td>
+        </tr>`;
+      });
+      document.getElementById("tableDamage").innerHTML = html;
+    });
+  }
+
+  async function hapusDamage(id) {
+    if(confirm("Hapus data kerusakan?")) await db.collection("barangRusak").doc(id).delete();
+  }
+
+  // --- DASHBOARD STATS ---
+  function renderDashboardStats() {
+    db.collection("barang").onSnapshot(snap => {
+      let total = 0;
+      snap.forEach(d => total += d.data().stok);
+      document.getElementById("statTotal").innerText = total;
+      document.getElementById("statTersedia").innerText = total;
+    });
+    db.collection("peminjaman").where("status", "==", "dipinjam").onSnapshot(snap => {
+      document.getElementById("statPinjam").innerText = snap.size;
+    });
+    db.collection("barangRusak").onSnapshot(snap => {
+      let rusak = 0;
+      snap.forEach(d => rusak += d.data().qty);
+      document.getElementById("statRusak").innerText = rusak;
+    });
+  }
+
+  async function handleLogout() {
+    await auth.signOut();
+    window.location.href = "login.html";
+  }
+
+  // --- SEARCH BARANG ---
+  document.getElementById("searchBarang").onkeyup = function() {
+    let filter = this.value.toUpperCase();
+    let rows = document.querySelector("#tableBarang").rows;
+    for (let i = 0; i < rows.length; i++) {
+      let txt = rows[i].cells[1].textContent || rows[i].cells[1].innerText;
+      let code = rows[i].cells[0].textContent || rows[i].cells[0].innerText;
+      rows[i].style.display = (txt.toUpperCase().indexOf(filter) > -1 || code.toUpperCase().indexOf(filter) > -1) ? "" : "none";
+    }
+  };
+
+</script>
 </body>
 </html>
