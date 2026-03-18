@@ -403,9 +403,9 @@ db.collection("loan")
   try{
 
     let snapshot = await db.collection("loan")
-      .where("tanggalPinjam", ">=", startDate)
-      .where("tanggalPinjam", "<=", endDate)
-      .orderBy("tanggalPinjam","desc")
+      .where("time", ">=", startDate)
+      .where("time", "<=", endDate)
+      .orderBy("time","desc")
       .get();
 
     let data = [];
@@ -662,18 +662,6 @@ if(l.status === "kembali"){
   }
 </td>
 
-  ${
-    (l.status=="dipinjam" && currentUser && (isAdmin() || l.userId === currentUser.uid))
-    ? `<br>
-       <button 
-         onclick="kembaliDenganNama('${l.id}','${l.barangId}',${l.qty})"
-         class="bg-green-500 text-white px-2 py-1 mt-1 rounded text-sm">
-         Kembali
-       </button>`
-    : ''
-  }
-</td>
-
 </tr>`;
   });
 
@@ -683,7 +671,7 @@ if(l.status === "kembali"){
     // ================= printriwayat =================
 function printRiwayat(){
 
-  let isi = document.getElementById("areaRiwayat").innerHTML;
+  let isi = document.getElementById("riwayatTable").innerHTML;
 
   let win = window.open('', '', 'width=900,height=700');
 
