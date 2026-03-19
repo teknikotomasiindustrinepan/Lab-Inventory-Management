@@ -527,8 +527,9 @@ th.nama-barang {
         <button onclick="login()" class="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg font-bold text-lg shadow-lg transition transform active:scale-95">
             Masuk Sekarang
         </button>
+      <div id="errorBox" style="color:red; margin-top:10px; text-align:center;"></div>
     </div>
-    <p class="mt-8 text-center text-xs text-gray-400">Copyright &copy; TOI Nepan 2026</p>
+          <p class="mt-8 text-center text-xs text-gray-400">Copyright &copy; TOI Nepan 2026</p>
   </div>
 </div>
 
@@ -538,6 +539,20 @@ th.nama-barang {
 <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
 
 <script>
+
+  window.alert = function(msg){
+  console.log("ALERT:", msg);
+  showError(msg);
+}
+  
+  function showError(msg){
+  const box = document.getElementById("errorBox");
+  if(box){
+    box.innerText = msg;
+  } else {
+    console.log(msg);
+  }
+}
 
   function isiPeriodePrint() {
   const dari = document.getElementById("startDate").value;
@@ -590,16 +605,15 @@ function login(){
   let email = document.getElementById('email').value.trim();
   let password = document.getElementById('password').value;
 
-  if(!email || !password){
-    alert("Email dan password wajib diisi");
-    return;
-  }
+ if(!email || !password){
+  showError("Email dan password wajib diisi");
+  return;
+}
 
   auth.signInWithEmailAndPassword(email, password)
-    .catch(err => {
-      console.error("LOGIN ERROR:", err);
-      alert("Gagal Login: " + err.message);
-    });
+.catch(err => {
+  showError("Email atau password salah");
+});
 }
 
 auth.onAuthStateChanged(async user => {
@@ -760,7 +774,7 @@ async function saveBarang(){
   let stok = parseInt(document.getElementById('stok').value);
 
   if(!kode || !nama || !lokasi || isNaN(stok)){
-    alert("Lengkapi semua data!");
+    showError("Lengkapi semua data!");
     return;
   }
 
@@ -773,7 +787,7 @@ async function saveBarang(){
 
     toggleModal(false);
   }catch(err){
-    alert(err.message);
+    showError(err.message);
   }
 }
 
@@ -788,11 +802,11 @@ async function hapusBarang(id, nama){
   try{
     let cek = await db.collection("loan").where("barangId","==",id).where("status","==","dipinjam").get();
     if(!cek.empty){
-      alert("Gagal: Barang sedang dalam masa peminjaman oleh user.");
+      showError("Gagal: Barang sedang dalam masa peminjaman oleh user.");
       return;
     }
     await db.collection("barang").doc(id).delete();
-  }catch(err){ alert(err.message); }
+  }catch(err){ showError(err.message); }
 }
 
 function renderStokTable(){
@@ -855,7 +869,7 @@ if(loanForm){
     let nama = document.getElementById('loanName').value.trim();
 
     if(!nama || !id || isNaN(qty) || qty <= 0){
-      alert("Lengkapi data peminjaman!");
+      showError("Lengkapi data peminjaman!");
       return;
     }
 
@@ -873,9 +887,9 @@ if(loanForm){
         userId: currentUser.uid, userEmail: currentUser.email
       });
     }).then(() => {
-      alert("Peminjaman Berhasil Dicatat!");
+      showError("Peminjaman Berhasil Dicatat!");
       loanForm.reset();
-    }).catch(err => alert(err));
+    }).catch(err => showError(err));
   });
 }
 
@@ -885,7 +899,7 @@ async function kembaliDenganNama(id, barangId, qty){
   let namaPengembali = input ? input.value.trim() : "";
 
   if(!namaPengembali){
-    alert("Isi Nama Pengembali barang!");
+    showError("Isi Nama Pengembali barang!");
     return;
   }
 
@@ -900,7 +914,7 @@ async function kembaliDenganNama(id, barangId, qty){
       returnedByUser: currentUser.email,
       returnedAt: new Date()
     });
-  }).then(() => alert("Data Pengembalian Berhasil Disimpan.")).catch(err => alert(err));
+  }).then(() => showError("Data Pengembalian Berhasil Disimpan.")).catch(err => showError(err));
 }
 
 // ================= RIWAYAT UI =================
@@ -983,7 +997,7 @@ function renderRiwayat(data){
 
 async function hapusRiwayat(id){
     if(!isAdmin()) return;
-    if(confirm("Hapus data riwayat ini?")) await db.collection("loan").doc(id).delete();
+    if(true) await db.collection("loan").doc(id).delete();
 }
 
 // ================= UTILS =================
@@ -999,7 +1013,7 @@ function logout(){
 
 async function resetSemua(){
   if(!isAdmin()) return;
-  if(prompt("Ketik 'RESET' untuk konfirmasi penghapusan seluruh riwayat dan pengosongan stok:") !== "RESET") return;
+  let konfirmasi = "RESET"; !== "RESET") return;
 
   try {
     let batch = db.batch();
@@ -1008,8 +1022,8 @@ async function resetSemua(){
     let lSnap = await db.collection("loan").get();
     lSnap.forEach(doc => batch.delete(doc.ref));
     await batch.commit();
-    alert("Sistem berhasil direset.");
-  } catch(e) { alert(e.message); }
+    showError("Sistem berhasil direset.");
+  } catch(e) { showError(e.message); }
 }
 
 // ================= DASHBOARD RENDER =================
@@ -1119,7 +1133,7 @@ document.getElementById('damageForm')?.addEventListener('submit', async e => {
   e.preventDefault();
   const bId = document.getElementById('damageBarang').value;
   const qty = parseInt(document.getElementById('damageQty').value);
-  if(!bId || isNaN(qty) || qty <= 0) return alert("Pilih barang dan jumlah kerusakan!");
+  if(!bId || isNaN(qty) || qty <= 0) return showError("Pilih barang dan jumlah kerusakan!");
 
   const ref = db.collection("barang").doc(bId);
   try {
@@ -1130,9 +1144,9 @@ document.getElementById('damageForm')?.addEventListener('submit', async e => {
         t.update(ref, { stok: doc.data().stok - qty });
         t.set(db.collection("barangRusak").doc(), { barangId:bId, nama:doc.data().nama, qty, time:new Date(), reporter:currentUser.email });
     });
-    alert("Laporan Kerusakan Disimpan.");
+    showError("Laporan Kerusakan Disimpan.");
     document.getElementById('damageForm').reset();
-  } catch(e) { alert(e); }
+  } catch(e) { showError(e); }
 });
 
 function renderDamageTable() {
@@ -1374,7 +1388,7 @@ if (dari && sampai) {
 async function filterRiwayat(){
   let s = document.getElementById("startDate").value;
   let e = document.getElementById("endDate").value;
-  if(!s || !e) return alert("Pilih range tanggal!");
+  if(!s || !e) return showError("Pilih range tanggal!");
   let sD = new Date(s); let eD = new Date(e); eD.setHours(23,59,59);
   db.collection("loan").where("time",">=",sD).where("time","<=",eD).orderBy("time","desc").get().then(snap => {
       let data = []; snap.forEach(d => data.push({id:d.id, ...d.data()}));
