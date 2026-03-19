@@ -1013,17 +1013,26 @@ function logout(){
 
 async function resetSemua(){
   if(!isAdmin()) return;
-  let konfirmasi = "RESET"; !== "RESET") return;
+
+  let konfirmasi = prompt("Ketik 'RESET' untuk konfirmasi:");
+
+  if(konfirmasi !== "RESET") return;
 
   try {
     let batch = db.batch();
+
     let bSnap = await db.collection("barang").get();
     bSnap.forEach(doc => batch.update(doc.ref, { stok: 0 }));
+
     let lSnap = await db.collection("loan").get();
     lSnap.forEach(doc => batch.delete(doc.ref));
+
     await batch.commit();
+
     showError("Sistem berhasil direset.");
-  } catch(e) { showError(e.message); }
+  } catch(e) { 
+    showError(e.message); 
+  }
 }
 
 // ================= DASHBOARD RENDER =================
